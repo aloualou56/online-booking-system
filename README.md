@@ -1,6 +1,8 @@
 # Reserva — Django Booking Engine
 
 A SaaS-ready appointment booking platform (Reserva) built with Django. Full multi-tenant B2B SaaS for service businesses (health, beauty, fitness, education, legal, auto services, IT, etc.). Supports role-based teams, flexible pricing, automated notifications, verified reviews, and a powerful admin dashboard.
+This was build together with https://github.com/Giormall
+It is a cleaned reupload from the private project we had together. The reupload happened because of sensitive data such as API keys and such was up in the repo.
 
 ## ⭐ Core Features
 
