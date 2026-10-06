@@ -1,0 +1,1316 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Κράτηση — {{ business.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a227;
+            --gold-light: #f0c04a;
+            --gold-dark: #8a6500;
+            --gold-glow: rgba(201, 162, 39, .35);
+            --gold-bg: rgba(201, 162, 39, .1);
+            --dark: #0e0d08;
+            --dark2: #1a180e;
+            --surface: #ffffff;
+            --bg: #f7f4ed;
+            --text: #1a1400;
+            --text-muted: #6b5f3a;
+            --border: #e8e2d0;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 1px 4px rgba(0, 0, 0, .05), 0 4px 20px rgba(0, 0, 0, .06);
+            --shadow-lg: 0 8px 40px rgba(0, 0, 0, .12);
+            --accent: var(--gold);
+            --accent-light: var(--gold-light);
+            --accent-bg: var(--gold-bg);
+            --success: #0a6e3a;
+            --success-bg: #e8f7ef;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Top Bar ─── */
+        .top-bar {
+            background: rgba(255, 255, 255, .9);
+            border-bottom: 1px solid var(--border);
+            padding: 0;
+            height: 56px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+        }
+        .top-bar .brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: -.3px;
+        }
+        .top-bar .brand img {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            object-fit: contain;
+            clip-path: inset(18% round 7px);
+        }
+        .top-bar .brand-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold-light));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0e0d08;
+            font-size: .8rem;
+        }
+
+        /* ── Hero ─── */
+        .hero-section {
+            background: linear-gradient(160deg, var(--dark) 0%, var(--dark2) 100%);
+            padding: 36px 0 64px;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(201, 162, 39, .22) 0%, transparent 65%);
+            pointer-events: none;
+        }
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0; right: 0;
+            height: 32px;
+            background: var(--bg);
+            border-radius: 32px 32px 0 0;
+        }
+        .hero-section h1 {
+            font-size: clamp(1.3rem, 4vw, 1.75rem);
+            font-weight: 900;
+            margin-bottom: 6px;
+            letter-spacing: -.5px;
+        }
+        .hero-meta {
+            font-size: .88rem;
+            color: rgba(245, 230, 192, .68);
+        }
+        .hero-rating {
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(201, 162, 39, .18);
+            border: 1px solid rgba(201, 162, 39, .3);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: .82rem;
+            color: var(--gold-light);
+            font-weight: 600;
+        }
+        .hero-rating:hover,
+        .hero-rating:focus {
+            color: #fff;
+        }
+        .hero-rating i { color: var(--gold-light); }
+
+        /* ── Stepper ─── */
+        .stepper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin: -28px auto 36px;
+            position: relative;
+            z-index: 10;
+            max-width: 620px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            border-radius: 60px;
+            padding: 18px 20px;
+        }
+        .stepper-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            position: relative;
+            padding: 8px 12px;
+            border-radius: 50px;
+            transition: all .35s cubic-bezier(.34, 1.56, .64, 1);
+        }
+        .stepper-item:not(:last-child)::after { display: none; }
+        .step-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.05rem;
+            background: #e8e3d3;
+            border: none;
+            color: #a89e8f;
+            transition: all .35s cubic-bezier(.34, 1.56, .64, 1);
+            position: relative;
+            z-index: 2;
+        }
+        .stepper-item.active {
+            background: linear-gradient(135deg, #8a6500 0%, #c9a227 50%, #f0c04a 100%);
+            padding: 12px 28px;
+            box-shadow: 0 6px 20px rgba(201, 162, 39, .35);
+        }
+        .stepper-item.active .step-circle {
+            background: rgba(255, 255, 255, .25);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, .4);
+            width: 40px;
+            height: 40px;
+            font-size: .95rem;
+        }
+        .stepper-item.done .step-circle {
+            background: #ddd9cc;
+            color: #8a6500;
+        }
+        .stepper-item.done,
+        .stepper-item.clickable { cursor: pointer; }
+        .stepper-item.done:hover .step-circle,
+        .stepper-item.clickable:hover .step-circle {
+            background: #d4cfc0;
+            transform: scale(1.08);
+        }
+        .step-label {
+            font-size: .75rem;
+            font-weight: 900;
+            color: #9d928a;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+        .stepper-item.active .step-label { 
+            color: #fff;
+            font-size: .76rem;
+            letter-spacing: .8px;
+        }
+        .stepper-item.done .step-label { color: #8a6500; }
+
+        /* ── Cards ─── */
+        .booking-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 0;
+            overflow: hidden;
+            margin-bottom: 14px;
+            animation: fadeUp .4s ease-out;
+        }
+        .booking-card-body { padding: 14px 20px 18px; }
+        .booking-card-title {
+            font-size: .72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Service Cards ─── */
+        .service-card {
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all .2s;
+            margin-bottom: 10px;
+        }
+        .service-card:hover {
+            border-color: var(--accent);
+            background: var(--accent-bg);
+        }
+        .service-card.selected {
+            border-color: var(--accent);
+            background: var(--accent-bg);
+            box-shadow: 0 0 0 3px rgba(201, 162, 39, .15);
+        }
+        .service-card .svc-name {
+            font-weight: 700;
+            font-size: .92rem;
+            color: var(--text);
+        }
+        .service-card .svc-meta {
+            display: flex;
+            gap: 14px;
+            margin-top: 6px;
+            font-size: .8rem;
+            color: var(--text-muted);
+        }
+        .service-card .svc-price {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--gold-dark);
+        }
+
+        /* ── Employee Select ─── */
+        .emp-option {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all .2s;
+            margin: 0 6px 8px 0;
+            font-size: .9rem;
+            font-weight: 500;
+        }
+        .emp-option:hover { border-color: var(--accent); background: var(--accent-bg); }
+        .emp-option.selected { border-color: var(--accent); background: var(--accent-bg); color: var(--gold-dark); }
+        .emp-avatar {
+            width: 30px; height: 30px;
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0e0d08;
+            font-size: .7rem;
+            font-weight: 700;
+        }
+
+        /* ── Date Chips ─── */
+        .date-chip {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all .2s;
+            margin: 0 6px 8px 0;
+            min-width: 72px;
+            text-align: center;
+        }
+        .date-chip:hover { border-color: var(--accent-light); background: var(--accent-bg); }
+        .date-chip.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        .date-chip .dc-day {
+            font-size: .65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            opacity: .7;
+        }
+        .date-chip.active .dc-day { opacity: .9; }
+        .date-chip .dc-date {
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-top: 2px;
+        }
+
+        /* ── Time Slots ─── */
+        .time-slot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s;
+            margin: 0 6px 8px 0;
+            font-weight: 500;
+            font-size: .85rem;
+            min-width: 80px;
+        }
+        .time-slot:hover { border-color: var(--accent-light); background: var(--accent-bg); }
+        .time-slot.active {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold-light));
+            color: #0e0d08;
+            box-shadow: 0 4px 16px var(--gold-glow);
+        }
+        .slot-period-header {
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--text-muted);
+            padding: 10px 0 8px;
+            width: 100%;
+        }
+
+        /* ── Calendar ─── */
+        .cal-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .cal-nav-btn {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            width: 34px; height: 34px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            transition: all .2s;
+            font-size: .85rem;
+        }
+        .cal-nav-btn:hover:not(:disabled) { background: var(--accent-bg); color: var(--accent); border-color: var(--accent); }
+        .cal-nav-btn:disabled { opacity: .3; cursor: not-allowed; }
+        .cal-month-label { font-weight: 600; font-size: .95rem; color: var(--text); }
+        .cal-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: .62rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            margin-bottom: 6px;
+        }
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+        }
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            font-size: .85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: default;
+            user-select: none;
+            transition: all .15s;
+        }
+        .cal-day.today { font-weight: 700; color: var(--text); border: 1.5px solid var(--border); }
+        .cal-day.available {
+            cursor: pointer;
+            color: var(--gold-dark);
+            background: var(--accent-bg);
+            font-weight: 600;
+        }
+        .cal-day.available:hover { background: rgba(201, 162, 39, .2); }
+        .cal-day.selected {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold-light)) !important;
+            color: #0e0d08 !important;
+            font-weight: 800;
+            box-shadow: 0 2px 10px var(--gold-glow);
+        }
+
+        /* ── Continue Btn ─── */
+        .btn-continue {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+            color: #0e0d08;
+            border: none;
+            border-radius: 50px;
+            padding: 14px 32px;
+            font-weight: 800;
+            font-size: 1rem;
+            width: 100%;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-continue:hover:not(:disabled) { color: #0e0d08; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(201, 162, 39, .5); }
+        .btn-continue:disabled { opacity: .4; cursor: not-allowed; color: #0e0d08; }
+
+        .btn-book {
+            background: var(--success);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 16px 32px;
+            font-weight: 600;
+            font-size: 1rem;
+            width: 100%;
+            transition: all .2s;
+        }
+        .btn-book:hover { background: #0b7f44; color: #fff; transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+        /* ── Summary ─── */
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: .9rem;
+        }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-row .label { color: var(--text-muted); }
+        .summary-row .value { font-weight: 600; }
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 0 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        /* ── Guest Fields ─── */
+        .guest-field {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: .9rem;
+            transition: border-color .2s;
+            width: 100%;
+        }
+        .guest-field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+        .guest-label { font-size: .8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+
+        .notes-field {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: .9rem;
+            width: 100%;
+            resize: vertical;
+            transition: border-color .2s;
+        }
+        .notes-field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+
+        /* ── Step visibility ─── */
+        .step-panel { display: none; }
+        .step-panel.active { display: block; }
+
+        /* ── Footer ─── */
+        .page-footer {
+            text-align: center;
+            padding: 32px 0;
+            font-size: .8rem;
+            color: var(--text-muted);
+        }
+        .page-footer a { color: var(--gold-dark); text-decoration: none; }
+
+        /* ── Skeleton ─── */
+        .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 400% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+            height: 44px;
+            margin: 0 6px 8px 0;
+            display: inline-block;
+            width: 72px;
+        }
+        .skeleton-time { width: 80px; height: 38px; }
+        @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+        .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+        /* ── Responsive ─── */
+        @media (max-width: 576px) {
+            .hero-section { padding: 28px 0 52px; }
+            .hero-section h1 { font-size: 1.4rem; }
+            .booking-card-body { padding: 12px 14px 16px; }
+            .stepper { 
+                margin-top: -26px;
+                gap: 6px;
+                padding: 14px 12px;
+            }
+            .stepper-item {
+                padding: 6px 8px;
+            }
+            .stepper-item.active {
+                padding: 10px 18px;
+            }
+            .step-circle {
+                width: 38px;
+                height: 38px;
+                font-size: .95rem;
+            }
+            .stepper-item.active .step-circle {
+                width: 36px;
+                height: 36px;
+            }
+            .step-label { font-size: .7rem; }
+            .stepper-item.active .step-label { font-size: .71rem; }
+            #employeeList { flex-direction: column; }
+            .emp-option { width: 100%; margin-right: 0; }
+            .emp-option span { flex: 1; min-width: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="container" style="max-width:660px">
+        <div class="d-flex justify-content-between align-items-center" style="height:56px;">
+            <a href="/" class="brand">
+                <img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                <span class="brand-icon" style="display:none"><i class="fas fa-calendar-check"></i></span>
+                Reserva
+            </a>
+            {% if user.is_authenticated %}
+            <span style="font-size:.85rem; color:var(--text-muted);">
+                <i class="fas fa-user-circle me-1"></i>{{ user.get_full_name|default:user.username }}
+            </span>
+            {% else %}
+            <a href="{% url 'accounts:login' %}?next=/b/{{ business.slug }}/" style="font-size:.85rem; color:var(--accent); text-decoration:none; font-weight:500;">
+                <i class="fas fa-sign-in-alt me-1"></i>Σύνδεση
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Hero -->
+<div class="hero-section">
+    <div class="container">
+        {% if business.logo %}
+        <img src="{{ business.logo.url }}" alt="{{ business.name }}" style="width:72px; height:72px; border-radius:20px; object-fit:cover; margin-bottom:14px; border:2px solid rgba(201,162,39,.35); box-shadow:0 6px 22px rgba(201,162,39,.3);">
+        {% endif %}
+        <h1>{{ business.name }}</h1>
+        <div class="hero-meta">
+            <i class="fas fa-tag me-1"></i>{{ business.get_category_display }}
+            {% if business.address %}<span class="mx-2">·</span><i class="fas fa-map-marker-alt me-1"></i>{{ business.address }}{% endif %}
+        </div>
+        {% if business.average_rating %}
+        <a href="{% url 'reviews:business_reviews' business.slug %}" class="hero-rating text-decoration-none" title="Δείτε κριτικές">
+            <i class="fas fa-star"></i>
+            <strong>{{ business.average_rating }}</strong>
+            <span style="opacity:.7">({{ business.review_count }})</span>
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Stepper -->
+<div class="container" style="max-width:660px">
+    <div class="stepper">
+        <div class="stepper-item active" id="si-1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Υπηρεσία</div>
+        </div>
+        <div class="stepper-item" id="si-2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Ημ/νία</div>
+        </div>
+        <div class="stepper-item" id="si-3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Επιβεβαίωση</div>
+        </div>
+    </div>
+</div>
+
+<!-- Content -->
+<div class="container" style="max-width:660px; padding-bottom: 40px;">
+
+    <!-- STEP 1: Service & Employee -->
+    <div class="step-panel active" id="step-1">
+        <div class="booking-card">
+            <div class="booking-card-body">
+                <div class="booking-card-title"><i class="fas fa-concierge-bell me-2"></i>Επιλέξτε υπηρεσία</div>
+                <div id="serviceList">
+                    {% for svc in services %}
+                    <div class="service-card" data-id="{{ svc.id }}" data-duration="{{ svc.duration_minutes }}" data-price="{{ svc.price }}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="svc-name">{{ svc.name }}</div>
+                                <div class="svc-meta">
+                                    <span><i class="far fa-clock me-1"></i>{{ svc.duration_minutes }} λεπτά</span>
+                                    {% if svc.description %}<span>{{ svc.description|truncatewords:8 }}</span>{% endif %}
+                                </div>
+                            </div>
+                            <div class="svc-price">{% if svc.price > 0 %}{{ svc.price }}€{% else %}Δωρεάν{% endif %}</div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-4">Δεν υπάρχουν διαθέσιμες υπηρεσίες.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {% if business.allow_employee_selection and employees %}
+        <div class="booking-card" id="empCard" style="display:none;">
+            <div class="booking-card-body">
+                <div class="booking-card-title"><i class="fas fa-user me-2"></i>Επιλέξτε επαγγελματία</div>
+                <div id="employeeList" class="d-flex flex-wrap">
+                    <div class="emp-option" data-id="auto">
+                        <div class="emp-avatar">A</div>
+                        <span>Automatic selection <small style="opacity:.6">· Το σύστημα επιλέγει διαθέσιμο επαγγελματία</small></span>
+                    </div>
+                    {% for emp in employees %}
+                    <div class="emp-option" data-id="{{ emp.id }}">
+                        <div class="emp-avatar">{{ emp.name|make_list|first }}</div>
+                        <span>{{ emp.name }}{% if emp.title %} <small style="opacity:.6">· {{ emp.title }}</small>{% endif %}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <button class="btn-continue" id="toStep2" disabled>
+            Συνέχεια <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <!-- STEP 2: Date & Time -->
+    <div class="step-panel" id="step-2">
+        <div class="booking-card">
+            <div class="booking-card-body">
+                <div class="booking-card-title"><i class="far fa-calendar me-2"></i>Επιλέξτε ημερομηνία</div>
+
+                <!-- Calendar widget -->
+                <div id="calendarWidget">
+                    <div class="cal-nav">
+                        <button class="cal-nav-btn" id="calPrev" onclick="calNav(-1)" disabled type="button">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="cal-month-label" id="calMonth"></span>
+                        <button class="cal-nav-btn" id="calNext" onclick="calNav(1)" type="button">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="cal-weekdays">
+                        <div>Δε</div><div>Τρ</div><div>Τε</div><div>Πε</div><div>Πα</div><div>Σα</div><div>Κυ</div>
+                    </div>
+                    <div class="cal-grid" id="calGrid"></div>
+                </div>
+
+                <div id="datesLoading" class="text-center py-3" style="display:none">
+                    <div class="spinner-border spinner-border-sm" style="color:var(--accent)" role="status"></div>
+                </div>
+                <div id="datesEmpty" class="text-center py-3 d-none" style="color:var(--text-muted); font-size:.9rem;">
+                    <i class="far fa-calendar-times me-2"></i>Δεν βρέθηκαν διαθέσιμες ημέρες
+                </div>
+            </div>
+        </div>
+
+        <div class="booking-card" id="timesCard" style="display:none;">
+            <div class="booking-card-body">
+                <div class="booking-card-title"><i class="far fa-clock me-2"></i>Επιλέξτε ώρα</div>
+                <div id="slotsContainer" class="d-flex flex-wrap"></div>
+                <div id="slotsLoading" class="d-none"><span class="skeleton skeleton-time"></span><span class="skeleton skeleton-time"></span><span class="skeleton skeleton-time"></span><span class="skeleton skeleton-time"></span></div>
+                <div id="noSlots" class="text-center py-3 d-none" style="color:var(--text-muted); font-size:.9rem;">
+                    <i class="far fa-calendar-times me-2"></i>Δεν υπάρχουν διαθέσιμες ώρες
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-continue" id="toStep3" disabled>
+            Συνέχεια <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <!-- STEP 3: Confirm -->
+    <div class="step-panel" id="step-3">
+        <div class="booking-card">
+            <div class="booking-card-body">
+                <div class="booking-card-title"><i class="fas fa-receipt me-2"></i>Σύνοψη κράτησης</div>
+                <div class="summary-row">
+                    <span class="label">Υπηρεσία</span>
+                    <span class="value" id="sumService"></span>
+                </div>
+                {% if business.allow_employee_selection %}
+                <div class="summary-row">
+                    <span class="label">Επαγγελματίας</span>
+                    <span class="value" id="sumEmployee"></span>
+                </div>
+                {% endif %}
+                <div class="summary-row">
+                    <span class="label">Ημερομηνία</span>
+                    <span class="value" id="sumDate"></span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Ώρα</span>
+                    <span class="value" id="sumTime"></span>
+                </div>
+                <div class="summary-total">
+                    <span>Σύνολο</span>
+                    <span id="sumPrice" style="color:var(--accent);"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="booking-card">
+            <div class="booking-card-body">
+                <form id="bookingForm" method="post" action="{% url 'public_booking:booking_create' business.slug %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="service_id" id="fService">
+                    <input type="hidden" name="employee_id" id="fEmployee">
+                    <input type="hidden" name="date" id="fDate">
+                    <input type="hidden" name="start_time" id="fTime">
+                    <input type="hidden" name="confirm_duplicate" id="confirmDuplicateFlag" value="">
+                    {% if not user.is_authenticated %}
+                    <div class="booking-card-title"><i class="fas fa-user-edit me-2"></i>Τα στοιχεία σας</div>
+                    <div class="mb-3">
+                        <label class="guest-label">Ονοματεπώνυμο *</label>
+                        <input type="text" name="guest_name" class="guest-field" required placeholder="π.χ. Γιάννης Παπαδόπουλος">
+                    </div>
+                    <div class="mb-3">
+                        <label class="guest-label">Email <span id="emailRequiredMark">*</span></label>
+                        <input type="email" name="guest_email" id="guestEmailInput" class="guest-field" required placeholder="π.χ. email@example.com">
+                    </div>
+                    {% if sms_enabled %}
+                    <div class="mb-3">
+                        <label class="guest-label">Τηλέφωνο <span id="phoneRequiredMark">*</span></label>
+                        <input type="tel" name="guest_phone" id="guestPhoneInput" class="guest-field" required placeholder="π.χ. 6912345678" pattern="[0-9]{10}" title="Το τηλέφωνο πρέπει να είναι 10 ψηφία">
+                    </div>
+                    <div class="mb-3">
+                        <label class="guest-label">Προτίμηση Επικοινωνίας *</label>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="guest_contact_preference" value="email" style="margin-right: 6px;" required>
+                                <span>Email</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="guest_contact_preference" value="phone" style="margin-right: 6px;" required>
+                                <span>Τηλέφωνο</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="guest_contact_preference" value="both" checked style="margin-right: 6px;" required>
+                                <span>Και τα δύο</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="alert" style="background: var(--accent-bg); border: 1px solid var(--accent); color: var(--text); font-size: .85rem; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="guestOtpInfoText">Θα λάβετε κωδικούς OTP στο email και στο κινητό σας για να ολοκληρώσετε την κράτηση.</span>
+                    </div>
+                    {% else %}
+                    <input type="hidden" name="guest_phone" value="">
+                    <input type="hidden" name="guest_contact_preference" value="email">
+                    <div class="alert" style="background: var(--accent-bg); border: 1px solid var(--accent); color: var(--text); font-size: .85rem; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Οι ειδοποιήσεις SMS είναι προσωρινά απενεργοποιημένες. Η επιβεβαίωση θα σταλεί μέσω email.
+                    </div>
+                    {% endif %}
+                    <div class="divider"></div>
+                    {% else %}
+                    <div class="booking-card-title"><i class="fas fa-bell me-2"></i>Προτίμηση Ειδοποίησης</div>
+                    {% if sms_enabled %}
+                    <div class="mb-3">
+                        <label class="guest-label">Πώς θέλετε να ενημερώνεστε;</label>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="customer_contact_preference" value="email" style="margin-right: 6px;" required>
+                                <span>Email</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="customer_contact_preference" value="phone" style="margin-right: 6px;" required>
+                                <span>SMS</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="customer_contact_preference" value="both" checked style="margin-right: 6px;" required>
+                                <span>Και τα δύο</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="customerPhoneField" style="display: none;">
+                        <label class="guest-label">Τηλέφωνο για SMS</label>
+                        <input type="tel" name="customer_phone" id="customerPhoneInput" class="guest-field" placeholder="π.χ. 6912345678" value="{{ user.phone }}" pattern="[0-9]{10}" title="Το τηλέφωνο πρέπει να είναι 10 ψηφία">
+                        {% if not user.phone %}<span style="color: var(--text-muted); font-size: 0.85rem;">* Υποχρεωτικό εάν δεν έχετε τηλέφωνο στο προφίλ σας</span>{% endif %}
+                    </div>
+                    <script>
+                    const phoneRadios = document.querySelectorAll('input[name="customer_contact_preference"]');
+                    const phoneField = document.getElementById('customerPhoneField');
+                    const phoneInput = document.getElementById('customerPhoneInput');
+                    function togglePhoneField() {
+                        const preference = document.querySelector('input[name="customer_contact_preference"]:checked')?.value;
+                        const hasProfilePhone = '{{ user.phone }}' ? true : false;
+                        if (preference === 'phone' || preference === 'both') {
+                            phoneField.style.display = 'block';
+                            phoneInput.required = !hasProfilePhone;
+                        } else {
+                            phoneField.style.display = 'none';
+                            phoneInput.required = false;
+                        }
+                    }
+                    phoneRadios.forEach(radio => radio.addEventListener('change', togglePhoneField));
+                    togglePhoneField();
+                    </script>
+                    {% else %}
+                    <input type="hidden" name="customer_contact_preference" value="email">
+                    <div class="alert" style="background: var(--accent-bg); border: 1px solid var(--accent); color: var(--text); font-size: .85rem; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Οι ειδοποιήσεις SMS είναι προσωρινά απενεργοποιημένες. Η επιβεβαίωση θα σταλεί μέσω email.
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="guest-label">Σημειώσεις (προαιρετικά)</label>
+                        <textarea name="notes" class="notes-field" rows="2" placeholder="Κάτι που θα θέλατε να γνωρίζουμε;"></textarea>
+                    </div>
+                    <button type="submit" class="btn-book">
+                        <i class="fas fa-check-circle me-2"></i>Ολοκλήρωση Κράτησης
+                    </button>
+                </form>
+                {% if not user.is_authenticated %}
+                <div class="text-center mt-3">
+                    <span style="font-size:.8rem; color:var(--text-muted);">
+                        Έχετε λογαριασμό; <a href="{% url 'accounts:login' %}?next=/b/{{ business.slug }}/" style="color:var(--accent); text-decoration:none; font-weight:500;">Συνδεθείτε</a>
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Duplicate Booking Warning Modal -->
+<div class="modal fade" id="duplicateModal" tabindex="-1" aria-labelledby="duplicateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: var(--radius); border: none; box-shadow: var(--shadow-lg);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--border); padding: 20px 24px;">
+                <h5 class="modal-title" id="duplicateModalLabel" style="font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
+                    Υπάρχον Ραντεβού
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Κλείσιμο"></button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <p style="margin: 0; color: var(--text); font-size: .95rem;">
+                    Φαίνεται ότι <strong>έχετε ήδη ένα ραντεβού</strong> αυτή την ημέρα και ώρα με το ίδιο email ή τηλέφωνο.
+                </p>
+                <p style="margin: 12px 0 0; color: var(--text-muted); font-size: .875rem;">
+                    Είστε σίγουροι ότι θέλετε να κάνετε νέα κράτηση;
+                </p>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid var(--border); padding: 16px 24px; gap: 10px;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 50px; font-size: .9rem; padding: 8px 20px;">
+                    Ακύρωση
+                </button>
+                <button type="button" id="confirmDuplicateBtn" class="btn" style="background: var(--accent); color: #fff; border-radius: 50px; font-size: .9rem; padding: 8px 20px; border: none;">
+                    <i class="fas fa-check me-1"></i>Ναι, συνέχεια
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-footer">
+    Powered by <a href="/">Reserva</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const slug = '{{ business.slug }}';
+const allowEmployeeSelection = {{ business.allow_employee_selection|lower }};
+let selectedService = null, selectedEmployee = '', selectedDate = null, selectedTime = null;
+let selectedServiceName = '', selectedServicePrice = '', selectedEmployeeName = '', selectedDateDisplay = '';
+
+/* ── Stepper ─── */
+let currentStep = 1;
+
+function setStep(n) {
+    currentStep = n;
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('step-' + n).classList.add('active');
+    for (let i = 1; i <= 3; i++) {
+        const si = document.getElementById('si-' + i);
+        si.classList.remove('active', 'done', 'clickable');
+        if (i < n) {
+            si.classList.add('done');
+        } else if (i === n) {
+            si.classList.add('active');
+        } else {
+            // Future step — clickable only if its prerequisites are met
+            if (i === 2 && canGoToStep2()) si.classList.add('clickable');
+            if (i === 3 && canGoToStep3()) si.classList.add('clickable');
+        }
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function canGoToStep2() {
+    let ok = !!selectedService;
+    {% if business.allow_employee_selection and employees %}
+    ok = ok && !!selectedEmployee;
+    {% endif %}
+    return ok;
+}
+function canGoToStep3() { return canGoToStep2() && !!selectedDate && !!selectedTime; }
+
+function navigateToStep(n) {
+    if (n === currentStep) return;
+    if (n < currentStep) { setStep(n); return; }  // going back always ok
+    if (n === 2 && canGoToStep2()) {
+        if (currentStep === 1) {
+            setStep(2);
+            loadDates();
+        } else {
+            setStep(2);
+        }
+        return;
+    }
+    if (n === 3 && canGoToStep3()) {
+        setStep(3);
+        document.getElementById('sumService').textContent = selectedServiceName;
+        {% if business.allow_employee_selection %}
+        document.getElementById('sumEmployee').textContent = selectedEmployeeName;
+        {% endif %}
+        document.getElementById('sumDate').textContent = selectedDateDisplay;
+        document.getElementById('sumTime').textContent = selectedTime;
+        document.getElementById('sumPrice').textContent = selectedServicePrice;
+        document.getElementById('fService').value = selectedService;
+        document.getElementById('fEmployee').value = selectedEmployee !== 'auto' ? selectedEmployee : '';
+        document.getElementById('fDate').value = selectedDate;
+        document.getElementById('fTime').value = selectedTime;
+        return;
+    }
+}
+
+document.querySelectorAll('.stepper-item').forEach(function(si) {
+    si.addEventListener('click', function() {
+        const n = parseInt(this.id.replace('si-', ''));
+        navigateToStep(n);
+    });
+});
+
+/* ── Step 1: Service selection ─── */
+document.querySelectorAll('.service-card').forEach(card => {
+    card.addEventListener('click', function() {
+        document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+        selectedService = this.dataset.id;
+        selectedServiceName = this.querySelector('.svc-name').textContent;
+        selectedServicePrice = parseFloat(this.dataset.price) > 0 ? this.dataset.price + '€' : 'Δωρεάν';
+        {% if business.allow_employee_selection and employees %}
+        document.getElementById('empCard').style.display = 'block';
+        {% endif %}
+        checkStep1();
+    });
+});
+
+{% if business.allow_employee_selection and employees %}
+document.querySelectorAll('.emp-option').forEach(opt => {
+    opt.addEventListener('click', function() {
+        document.querySelectorAll('.emp-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+        selectedEmployee = this.dataset.id;
+        selectedEmployeeName = this.querySelector('span').textContent.trim();
+        checkStep1();
+    });
+});
+{% endif %}
+
+function checkStep1() {
+    let ready = !!selectedService;
+    {% if business.allow_employee_selection and employees %}
+    ready = ready && !!selectedEmployee;
+    {% endif %}
+    document.getElementById('toStep2').disabled = !ready;
+    // Refresh step-2 circle clickability
+    const si2 = document.getElementById('si-2');
+    if (currentStep === 1) {
+        si2.classList.toggle('clickable', ready);
+    }
+}
+
+document.getElementById('toStep2').addEventListener('click', function() {
+    setStep(2);
+    loadDates();
+});
+
+/* ── Step 2: Calendar ─── */
+const MONTH_NAMES = ['Ιανουάριος','Φεβρουάριος','Μάρτιος','Απρίλιος','Μάιος','Ιούνιος',
+                     'Ιούλιος','Αύγουστος','Σεπτέμβριος','Οκτώβριος','Νοέμβριος','Δεκέμβριος'];
+let availableDates = {};   // { 'YYYY-MM': Set of 'YYYY-MM-DD' }
+let calYear = null, calMonth = null;
+
+function loadDates() {
+    document.getElementById('datesLoading').style.display = '';
+    document.getElementById('calGrid').innerHTML = '';
+    document.getElementById('calMonth').textContent = '';
+    document.getElementById('datesEmpty').classList.add('d-none');
+    document.getElementById('calPrev').disabled = true;
+    document.getElementById('calNext').disabled = true;
+    const empParam = (selectedEmployee && selectedEmployee !== 'auto') ? `&employee_id=${selectedEmployee}` : '';
+    fetch(`/b/${slug}/api/dates/?service_id=${selectedService}${empParam}`)
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('datesLoading').style.display = 'none';
+            if (!data.dates.length) {
+                document.getElementById('datesEmpty').classList.remove('d-none');
+                return;
+            }
+            availableDates = {};
+            data.dates.forEach(d => {
+                const parts = d.date_str.split('-');
+                const key = parts[0] + '-' + parts[1];
+                if (!availableDates[key]) availableDates[key] = new Set();
+                availableDates[key].add(d.date_str);
+            });
+            const firstParts = data.dates[0].date_str.split('-');
+            calYear = parseInt(firstParts[0]);
+            calMonth = parseInt(firstParts[1]) - 1;
+            renderCalendar();
+        });
+}
+
+function renderCalendar() {
+    const grid = document.getElementById('calGrid');
+    const monthLabel = document.getElementById('calMonth');
+    monthLabel.textContent = MONTH_NAMES[calMonth] + ' ' + calYear;
+
+    const key = calYear + '-' + String(calMonth + 1).padStart(2, '0');
+    const avail = availableDates[key] || new Set();
+
+    const firstDayOfWeek = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const startOffset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1; // Mon-first
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let html = '';
+    for (let i = 0; i < startOffset; i++) html += '<div class="cal-day"></div>';
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = calYear + '-' + String(calMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        const thisDate = new Date(calYear, calMonth, d);
+        const isAvail = avail.has(dateStr);
+        const isSelected = dateStr === selectedDate;
+        const isToday = thisDate.toDateString() === today.toDateString();
+
+        let cls = 'cal-day';
+        if (isToday && !isAvail) cls += ' today';
+        if (isAvail) cls += ' available';
+        if (isSelected) cls += ' selected';
+
+        const click = isAvail ? ' onclick="selectDateCal(\'' + dateStr + '\')"' : '';
+        html += '<div class="' + cls + '"' + click + '>' + d + '</div>';
+    }
+    grid.innerHTML = html;
+
+    const months = Object.keys(availableDates).sort();
+    const curKey = calYear + '-' + String(calMonth + 1).padStart(2, '0');
+    document.getElementById('calPrev').disabled = curKey <= months[0];
+    document.getElementById('calNext').disabled = curKey >= months[months.length - 1];
+}
+
+function calNav(dir) {
+    calMonth += dir;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    if (calMonth < 0)  { calMonth = 11; calYear--; }
+    renderCalendar();
+}
+
+function selectDateCal(dateStr) {
+    selectedDate = dateStr;
+    const p = dateStr.split('-');
+    selectedDateDisplay = p[2] + '/' + p[1] + '/' + p[0];
+    selectedTime = null;
+    document.getElementById('toStep3').disabled = true;
+    renderCalendar();
+    document.getElementById('timesCard').style.display = 'block';
+    loadSlots(dateStr);
+    setTimeout(function() {
+        document.getElementById('timesCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+}
+
+function loadSlots(date) {
+    const sc = document.getElementById('slotsContainer');
+    const ld = document.getElementById('slotsLoading');
+    const ns = document.getElementById('noSlots');
+    sc.innerHTML = ''; ns.classList.add('d-none'); ld.classList.remove('d-none');
+    document.getElementById('toStep3').disabled = true;
+
+    const empParam = (selectedEmployee && selectedEmployee !== 'auto') ? `&employee_id=${selectedEmployee}` : '';
+    fetch(`/b/${slug}/api/slots/?service_id=${selectedService}${empParam}&date=${date}`)
+        .then(r => r.json())
+        .then(data => {
+            ld.classList.add('d-none');
+            if (!data.slots.length) { ns.classList.remove('d-none'); return; }
+
+            const MESIMERI_START = 12;
+            const APOGEYMA_START = 17;
+            function slotHour(t) { return parseInt(t.start_str.split(':')[0]); }
+
+            const periods = [
+                { label: 'Πρωί',      icon: 'fa-sun',       slots: data.slots.filter(t => slotHour(t) < MESIMERI_START) },
+                { label: 'Μεσημέρι', icon: 'fa-cloud-sun',  slots: data.slots.filter(t => slotHour(t) >= MESIMERI_START && slotHour(t) < APOGEYMA_START) },
+                { label: 'Απόγευμα', icon: 'fa-moon',       slots: data.slots.filter(t => slotHour(t) >= APOGEYMA_START) },
+            ];
+
+            periods.forEach(function(period) {
+                if (!period.slots.length) return;
+                const header = document.createElement('div');
+                header.className = 'slot-period-header';
+                header.innerHTML = '<i class="fas ' + period.icon + ' me-2"></i>' + period.label;
+                sc.appendChild(header);
+                const row = document.createElement('div');
+                row.className = 'd-flex flex-wrap';
+                period.slots.forEach(function(t) {
+                    const slot = document.createElement('div');
+                    slot.className = 'time-slot';
+                    slot.textContent = t.start_str;
+                    slot.onclick = function() { selectSlot(t.start_str, slot); };
+                    row.appendChild(slot);
+                });
+                sc.appendChild(row);
+            });
+        });
+}
+
+function selectSlot(time, slot) {
+    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('active'));
+    slot.classList.add('active');
+    selectedTime = time;
+    document.getElementById('toStep3').disabled = false;
+}
+
+document.getElementById('toStep3').addEventListener('click', function() {
+    setStep(3);
+    document.getElementById('sumService').textContent = selectedServiceName;
+    {% if business.allow_employee_selection %}
+    document.getElementById('sumEmployee').textContent = selectedEmployeeName;
+    {% endif %}
+    document.getElementById('sumDate').textContent = selectedDateDisplay;
+    document.getElementById('sumTime').textContent = selectedTime;
+    document.getElementById('sumPrice').textContent = selectedServicePrice;
+    document.getElementById('fService').value = selectedService;
+    document.getElementById('fEmployee').value = selectedEmployee !== 'auto' ? selectedEmployee : '';
+    document.getElementById('fDate').value = selectedDate;
+    document.getElementById('fTime').value = selectedTime;
+});
+
+/* ── Duplicate Booking Check ─── */
+const duplicateCheckUrl = "{% url 'public_booking:check_duplicate' business.slug %}";
+const duplicateModal = new bootstrap.Modal(document.getElementById('duplicateModal'));
+let duplicateCheckPending = false;
+
+document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    // If already confirmed or this is a re-submit after confirmation, let it go through
+    if (document.getElementById('confirmDuplicateFlag').value === '1') {
+        return;
+    }
+
+    e.preventDefault();
+
+    // Only check if we haven't already checked in this submission
+    if (duplicateCheckPending) return;
+    duplicateCheckPending = true;
+
+    const form = this;
+    const formData = new FormData(form);
+    const csrfToken = formData.get('csrfmiddlewaretoken');
+
+    const payload = new URLSearchParams();
+    payload.append('csrfmiddlewaretoken', csrfToken);
+    payload.append('guest_email', formData.get('guest_email') || '');
+    payload.append('guest_phone', formData.get('guest_phone') || '');
+    payload.append('date', document.getElementById('fDate').value || '');
+    payload.append('start_time', document.getElementById('fTime').value || '');
+
+    fetch(duplicateCheckUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': csrfToken },
+        body: payload.toString(),
+    })
+    .then(r => r.json())
+    .then(data => {
+        duplicateCheckPending = false;
+        if (data.duplicate) {
+            duplicateModal.show();
+        } else {
+            form.submit();
+        }
+    })
+    .catch(() => {
+        duplicateCheckPending = false;
+        form.submit(); // on error, proceed normally
+    });
+});
+
+document.getElementById('confirmDuplicateBtn').addEventListener('click', function() {
+    duplicateModal.hide();
+    document.getElementById('confirmDuplicateFlag').value = '1';
+    document.getElementById('bookingForm').submit();
+});
+
+/* ── Guest Contact Preference Required Fields ─── */
+const guestContactRadios = document.querySelectorAll('input[name="guest_contact_preference"]');
+const guestPhoneInput = document.getElementById('guestPhoneInput');
+const guestEmailInput = document.getElementById('guestEmailInput');
+const emailRequiredMark = document.getElementById('emailRequiredMark');
+const phoneRequiredMark = document.getElementById('phoneRequiredMark');
+const guestOtpInfoText = document.getElementById('guestOtpInfoText');
+
+function applyGuestContactPreference() {
+    if (!guestPhoneInput || !guestEmailInput || !guestContactRadios.length) return;
+    const selected = document.querySelector('input[name="guest_contact_preference"]:checked');
+    const preference = selected ? selected.value : 'both';
+
+    if (preference === 'phone') {
+        guestPhoneInput.required = true;
+        guestEmailInput.required = false;
+        guestPhoneInput.placeholder = 'π.χ. 6912345678';
+        guestEmailInput.placeholder = 'Email (προαιρετικό)';
+        if (phoneRequiredMark) phoneRequiredMark.textContent = '*';
+        if (emailRequiredMark) emailRequiredMark.textContent = '';
+        if (guestOtpInfoText) guestOtpInfoText.textContent = 'Θα λάβετε κωδικό OTP μόνο στο κινητό σας για να ολοκληρώσετε την κράτηση.';
+    } else if (preference === 'email') {
+        guestPhoneInput.required = false;
+        guestEmailInput.required = true;
+        guestPhoneInput.placeholder = 'Τηλέφωνο (προαιρετικό)';
+        guestEmailInput.placeholder = 'π.χ. email@example.com';
+        if (phoneRequiredMark) phoneRequiredMark.textContent = '';
+        if (emailRequiredMark) emailRequiredMark.textContent = '*';
+        if (guestOtpInfoText) guestOtpInfoText.textContent = 'Θα λάβετε κωδικό OTP μόνο στο email σας για να ολοκληρώσετε την κράτηση.';
+    } else {
+        guestPhoneInput.required = true;
+        guestEmailInput.required = true;
+        guestPhoneInput.placeholder = 'π.χ. 6912345678';
+        guestEmailInput.placeholder = 'π.χ. email@example.com';
+        if (phoneRequiredMark) phoneRequiredMark.textContent = '*';
+        if (emailRequiredMark) emailRequiredMark.textContent = '*';
+        if (guestOtpInfoText) guestOtpInfoText.textContent = 'Θα λάβετε κωδικούς OTP στο email και στο κινητό σας για να ολοκληρώσετε την κράτηση.';
+    }
+}
+
+guestContactRadios.forEach(function(radio) {
+    radio.addEventListener('change', applyGuestContactPreference);
+});
+applyGuestContactPreference();
+</script>
+</body>
+</html>

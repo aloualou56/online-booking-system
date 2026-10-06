@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Ωράριο — {{ employee.name }}{% endblock %}
+
+{% block content %}
+<h3 class="mb-1"><i class="fas fa-clock me-2"></i><span>Ωράριο:</span> {{ employee.name }}</h3>
+<p class="text-muted mb-4">Ορίστε τις ώρες εργασίας για κάθε ημέρα. Οι ημέρες με Ρεπό δεν θα εμφανίζονται για κράτηση.</p>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr><th>Ημέρα</th><th class="text-center">Ρεπό / Κλειστό</th><th>Ώρα Έναρξης</th><th>Ώρα Λήξης</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for wh in hours %}
+                        <tr id="wh-row-{{ wh.day_of_week }}"{% if wh.is_day_off %} style="opacity:.5"{% endif %}>
+                            <td><strong>{{ wh.get_day_of_week_display }}</strong></td>
+                            <td class="text-center">
+                                <div class="form-check form-switch d-flex justify-content-center">
+                                    <input class="form-check-input day-off-toggle"
+                                           type="checkbox"
+                                           name="day_off_{{ wh.day_of_week }}"
+                                           id="dayoff_{{ wh.day_of_week }}"
+                                           data-day="{{ wh.day_of_week }}"
+                                           {% if wh.is_day_off %}checked{% endif %}>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="time-picker-wrap d-flex align-items-center gap-1" id="tp_start_{{ wh.day_of_week }}">
+                                    <select class="form-select form-select-sm tp-h" style="width:72px" aria-label="Ώρα" data-i18n-aria-hour {% if wh.is_day_off %}disabled{% endif %}></select>
+                                    <span class="text-muted fw-bold">:</span>
+                                    <select class="form-select form-select-sm tp-m" style="width:72px" aria-label="Λεπτά" data-i18n-aria-minutes {% if wh.is_day_off %}disabled{% endif %}></select>
+                                    <input type="hidden" name="start_{{ wh.day_of_week }}" value="{{ wh.start_time|time:'H:i' }}">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="time-picker-wrap d-flex align-items-center gap-1" id="tp_end_{{ wh.day_of_week }}">
+                                    <select class="form-select form-select-sm tp-h" style="width:72px" aria-label="Ώρα" data-i18n-aria-hour {% if wh.is_day_off %}disabled{% endif %}></select>
+                                    <span class="text-muted fw-bold">:</span>
+                                    <select class="form-select form-select-sm tp-m" style="width:72px" aria-label="Λεπτά" data-i18n-aria-minutes {% if wh.is_day_off %}disabled{% endif %}></select>
+                                    <input type="hidden" name="end_{{ wh.day_of_week }}" value="{{ wh.end_time|time:'H:i' }}">
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Αποθήκευση Ωραρίου</button>
+        </form>
+    </div>
+</div>
+
+<!-- Special Days Off -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between">
+        <h5 class="mb-0"><i class="fas fa-calendar-times me-2"></i>Ειδικές Αργίες / Απουσίες</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted small">Προσθέστε συγκεκριμένες ημέρες που ο υπάλληλος δεν θα είναι διαθέσιμος.</p>
+        <form method="post" action="{% url 'businesses:add_day_off' employee.id %}" class="row g-2 mb-3">
+            {% csrf_token %}
+            <div class="col-md-4">
+                <input type="date" name="date" class="form-control" required>
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="reason" class="form-control" placeholder="Λόγος (π.χ. Άδεια, Αρρώστια)" id="dayoffReasonInput">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-outline-primary w-100"><i class="fas fa-plus me-1"></i>Προσθήκη</button>
+            </div>
+        </form>
+        {% if days_off %}
+        <ul class="list-group">
+            {% for d in days_off %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="fas fa-calendar-day me-2 text-danger"></i>
+                    <strong>{{ d.date|date:"d/m/Y" }}</strong>
+                    {% if d.reason %}<span class="text-muted ms-2">— {{ d.reason }}</span>{% endif %}
+                </span>
+                <form method="post" action="{% url 'businesses:delete_day_off' d.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-times"></i></button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">Δεν υπάρχουν ειδικές αργίες.</p>
+        {% endif %}
+    </div>
+</div>
+
+<a href="{% url 'businesses:employee_list' %}" class="btn btn-outline-secondary mt-3"><i class="fas fa-arrow-left me-2"></i>Πίσω</a>
+
+<script>
+/* ── Custom time picker ─── */
+function initTimePicker(wrap) {
+    const hidden = wrap.querySelector('input[type="hidden"]');
+    const parts = (hidden.value || '00:00').split(':');
+    const hVal = parts[0].padStart(2, '0');
+    const mRaw = parseInt(parts[1] || '0');
+    const mRounded = Math.min(Math.round(mRaw / 15) * 15, 45);
+    const mVal = String(mRounded).padStart(2, '0');
+
+    const hSel = wrap.querySelector('.tp-h');
+    const mSel = wrap.querySelector('.tp-m');
+
+    for (let h = 0; h < 24; h++) {
+        const opt = document.createElement('option');
+        opt.value = String(h).padStart(2, '0');
+        opt.textContent = String(h).padStart(2, '0');
+        if (opt.value === hVal) opt.selected = true;
+        hSel.appendChild(opt);
+    }
+    ['00', '15', '30', '45'].forEach(function(m) {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        if (m === mVal) opt.selected = true;
+        mSel.appendChild(opt);
+    });
+
+    function sync() { hidden.value = hSel.value + ':' + mSel.value; }
+    hSel.addEventListener('change', sync);
+    mSel.addEventListener('change', sync);
+}
+
+document.querySelectorAll('.time-picker-wrap').forEach(initTimePicker);
+
+/* ── Day-off toggle ─── */
+document.querySelectorAll('.day-off-toggle').forEach(function(toggle) {
+    toggle.addEventListener('change', function() {
+        const day = this.dataset.day;
+        const row = document.getElementById('wh-row-' + day);
+        const closed = this.checked;
+        row.querySelectorAll('.time-picker-wrap').forEach(function(wrap) {
+            wrap.querySelectorAll('select').forEach(function(sel) { sel.disabled = closed; });
+        });
+        row.style.opacity = closed ? '0.5' : '';
+    });
+});
+
+function applyScheduleLocale() {
+    const lang = localStorage.getItem('dashLang') || 'gr';
+    const reasonInput = document.getElementById('dayoffReasonInput');
+    if (reasonInput) {
+        reasonInput.placeholder = lang === 'en'
+            ? 'Reason (e.g. Leave, Sick)'
+            : 'Λόγος (π.χ. Άδεια, Αρρώστια)';
+    }
+
+    document.querySelectorAll('[data-i18n-aria-hour]').forEach(function(el) {
+        el.setAttribute('aria-label', lang === 'en' ? 'Hour' : 'Ώρα');
+    });
+    document.querySelectorAll('[data-i18n-aria-minutes]').forEach(function(el) {
+        el.setAttribute('aria-label', lang === 'en' ? 'Minutes' : 'Λεπτά');
+    });
+}
+
+applyScheduleLocale();
+const langBtn = document.getElementById('dashLangBtn');
+if (langBtn) {
+    langBtn.addEventListener('click', function() {
+        setTimeout(applyScheduleLocale, 0);
+    });
+}
+</script>
+{% endblock %}

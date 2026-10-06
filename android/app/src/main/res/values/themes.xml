@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Full-screen theme: hides action bar so the WebView fills the whole screen -->
+    <style name="Theme.Reserva" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:statusBarColor">#c9a227</item>
+        <item name="android:navigationBarColor">@android:color/white</item>
+    </style>
+</resources>

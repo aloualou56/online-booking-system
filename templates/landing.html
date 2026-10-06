@@ -1,0 +1,264 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva — Κλείστε Ραντεβού Online</title>
+    <meta name="description" content="Κλείστε ραντεβού online σε 30 δευτερόλεπτα. Βρείτε επαγγελματίες και κάντε κράτηση χωρίς τηλεφωνήματα, χωρίς αναμονή.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Reserva — Κλείστε Ραντεβού Online">
+    <meta property="og:description" content="Κλείστε ραντεβού online σε 30 δευτερόλεπτα.">
+    <meta property="og:image" content="{% static 'img/logo.png' %}?v=2026">
+    <link rel="icon" href="/favicon.ico?v=20260404" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}?v=20260404">
+    <link rel="apple-touch-icon" href="{% static 'img/logo.png' %}?v=2026">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <style>
+        .feature-teaser-card,.feature-mini-card,.site-footer,.cat-filters-wrap,.biz-search-wrap{font-family:'Inter',sans-serif}
+        .cat-filters-wrap{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+        .cat-filters-wrap::-webkit-scrollbar{display:none}
+        .cat-filters-inner{display:flex;gap:8px;flex-wrap:nowrap;width:max-content}
+        @media(min-width:768px){.cat-filters-inner{flex-wrap:wrap;width:auto}}
+        .category-btn{border-radius:50px!important;padding:6px 16px!important;font-size:.85rem!important;font-weight:600!important;white-space:nowrap}
+        .biz-search-wrap{position:relative;max-width:420px}
+        .biz-search-wrap .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#888;pointer-events:none}
+        .biz-search-wrap input{padding-left:38px!important;border-radius:50px!important;height:44px}
+        .feature-teaser-card{background:#0e0d08;border-radius:20px;color:#fff;border:1px solid rgba(201,162,39,.15)}
+        .feature-mini-card{background:#faf8f5;border-radius:16px;border:1px solid rgba(201,162,39,.12);transition:transform .2s,box-shadow .2s}
+        .feature-mini-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(201,162,39,.12);border-color:rgba(201,162,39,.3)}
+        .feature-mini-card h5 { overflow-wrap: break-word; }
+        @media(max-width:576px) {
+            .feature-mini-card { padding: 0.8rem !important; }
+            .feature-mini-card h5 { font-size: 0.92rem; line-height: 1.35; }
+        }
+        .feature-mini-icon{width:44px;height:44px;background:rgba(201,162,39,.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;color:var(--gold);margin-bottom:1rem}
+        .site-footer{background:#0e0d08;color:rgba(255,255,255,.6);padding:2rem 0;font-size:.88rem}
+        .site-footer .footer-brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:600;font-size:1.1rem;text-decoration:none;margin-bottom:.25rem}
+        .site-footer .footer-brand img{width:30px;height:30px;object-fit:contain;border-radius:6px;clip-path:inset(18% round 6px)}
+        .site-footer .footer-links{display:flex;flex-wrap:wrap;gap:8px 16px;list-style:none;padding:0;margin:0}
+        .site-footer .footer-links a{color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s}
+        .site-footer .footer-links a:hover{color:var(--gold-light)}
+        .site-footer .social-btns{display:flex;gap:8px;flex-wrap:wrap}
+        .site-footer .social-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);border-radius:50px;padding:6px 14px;font-size:.82rem;text-decoration:none;transition:border-color .2s,color .2s}
+        .site-footer .social-btn:hover{border-color:var(--gold-light);color:var(--gold-light)}
+        .biz-card .biz-services-list li{font-size:.85rem}
+    </style>
+</head>
+<body class="landing-body">
+<nav class="navbar navbar-expand-lg navbar-dark landing-navbar fixed-top">
+    <div class="container">
+        <a class="navbar-brand landing-logo-brand" href="{% url 'landing' %}">
+            <img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block'">
+            <i class="fas fa-calendar-check" style="display:none"></i>
+            Reserva
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav" aria-controls="landingNav" aria-expanded="false" aria-label="Toggle menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="landingNav">
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'landing' %}" data-i18n="nav_home">Αρχική</a></li>
+                <li class="nav-item"><a class="nav-link text-white-50" href="#businesses" data-i18n="nav_partners">Partners</a></li>
+                <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'business_browser' %}" data-i18n="nav_businesses">Businesses</a></li>
+                <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'features' %}" data-i18n="nav_features">Features</a></li>
+                {% if request.user.is_authenticated %}
+                <li class="nav-item ms-2"><button id="langToggle" class="btn btn-sm lang-toggle-btn" onclick="toggleLanguage()" title="Switch language"><i class="fas fa-globe me-1"></i><span id="langLabel">EN</span></button></li>
+                <li class="nav-item"><a class="btn btn-outline-light btn-sm px-3" href="{% url 'accounts:redirect_after_login' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></li>
+                {% else %}
+                <li class="nav-item"><a class="btn btn-gold-outline btn-sm px-3" href="{% url 'accounts:register_professional' %}"><i class="fas fa-briefcase me-1"></i><span data-i18n="nav_pro_cta">Είστε επαγγελματίας;</span></a></li>
+                <li class="nav-item ms-2"><button id="langToggle" class="btn btn-sm lang-toggle-btn" onclick="toggleLanguage()" title="Switch language"><i class="fas fa-globe me-1"></i><span id="langLabel">EN</span></button></li>
+                <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'accounts:login' %}" data-i18n="nav_login">Σύνδεση</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section class="landing-hero text-white">
+    <div class="container">
+        <div class="row align-items-center gy-4 gy-lg-5">
+            <div class="col-lg-5 text-center order-1">
+                <div class="landing-logo-wrap">
+                    <img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva" class="landing-logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <div style="display:none;width:100px;height:100px;border-radius:24px;background:rgba(201,162,39,.15);border:2px solid rgba(201,162,39,.4);align-items:center;justify-content:center;font-size:2.8rem;color:var(--gold-light)"><i class="fas fa-calendar-check"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-7 text-center text-lg-start order-2">
+                <h1 class="landing-logo-text mb-3 mb-lg-4">Reserva</h1>
+                <p class="landing-tagline mb-4 mx-auto ms-lg-0" data-i18n="hero_tagline">Βρες επαγγελματία &amp; κλείσε ραντεβού σε <strong>30 δευτερόλεπτα</strong><br class="d-none d-md-block"> χωρίς τηλεφωνήματα, χωρίς αναμονή.</p>
+                <div class="d-flex flex-column flex-sm-row flex-wrap gap-3 justify-content-center justify-content-lg-start mb-2">
+                    <a href="#businesses" class="btn landing-cta-btn btn-lg px-5 py-3 fw-bold shadow-lg"><i class="fas fa-bolt me-2"></i><span data-i18n="hero_cta">Κλείστε τώρα ραντεβού</span></a>
+                    <a href="{% url 'features' %}" class="btn btn-outline-light btn-lg px-4 py-3 fw-semibold landing-ghost-btn"><i class="fas fa-stars me-2"></i><span data-i18n="hero_features_cta">Μάθετε περισσότερα</span></a>
+                    <a href="{% url 'business_browser' %}" class="btn btn-outline-light btn-lg px-4 py-3 fw-semibold landing-ghost-btn"><i class="fas fa-table-cells-large me-2"></i><span data-i18n="hero_businesses_cta">Δες όλες τις επιχειρήσεις</span></a>
+                </div>
+                <div class="mt-4 d-flex justify-content-center justify-content-lg-start gap-4 landing-trust-badges flex-wrap">
+                    <span><i class="fas fa-shield-alt me-1 text-success"></i><span data-i18n="trust_payments">Ασφαλείς πληρωμές</span></span>
+                    <span><i class="fas fa-star me-1 text-warning"></i>Επαληθευμένες κριτικές</span>
+                    <span><i class="fas fa-sms me-1 text-info"></i><span data-i18n="trust_sms">SMS υπενθυμίσεις</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hero-wave"><svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#f8f9fa"/></svg></div>
+</section>
+
+<section class="py-5" style="background:#f8f9fa">
+    <div class="container">
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-4">
+                <div class="feature-teaser-card h-100 p-4 p-lg-5">
+                    <div class="feature-teaser-icon" style="padding:0;overflow:hidden;background:none;border:none;border-radius:14px;">
+                        <img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva" style="width:100%;height:100%;object-fit:cover;border-radius:14px;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;background:rgba(201,162,39,.15);border-radius:14px;"><i class="fas fa-sparkles"></i></div>
+                    </div>
+                    <p class="text-uppercase small fw-bold mb-2" style="color:var(--gold-light);opacity:.7;letter-spacing:.5px">Reserva Platform</p>
+                    <h2 class="fw-bold mb-3" style="color:#fff;font-size:clamp(1.2rem,2.5vw,1.5rem)">Όλα όσα χρειάζεται μια σύγχρονη επιχείρηση</h2>
+                    <p class="mb-4" style="color:rgba(255,255,255,.6);font-size:.92rem">Κρατήσεις, branded websites, widget embed, approval flow, calendar mode και mobile-first εμπειρία σε ένα σύστημα.</p>
+                    <a href="{% url 'features' %}" class="btn btn-light fw-semibold px-4" style="border-radius:10px"><i class="fas fa-arrow-right me-2"></i><span data-i18n="hero_features_cta">Μάθετε περισσότερα</span></a>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="row g-3 h-100">
+                    <div class="col-6"><div class="feature-mini-card h-100 p-3 p-md-4"><div class="feature-mini-icon"><i class="fas fa-globe"></i></div><h5 class="fw-bold mb-1">Προσωποιημένες ιστοσελίδες</h5><p class="text-muted mb-0" style="font-size:.85rem">Δημόσιες σελίδες με λογότυπο, κείμενα, φωτογραφίες και widget κρατήσεων.</p></div></div>
+                    <div class="col-6"><div class="feature-mini-card h-100 p-3 p-md-4"><div class="feature-mini-icon"><i class="fas fa-calendar-days"></i></div><h5 class="fw-bold mb-1">Ημερολόγιο & πίνακας</h5><p class="text-muted mb-0" style="font-size:.85rem">Λίστα ή calendar view, actions πάνω στα ραντεβού και overdue reminders.</p></div></div>
+                    <div class="col-6"><div class="feature-mini-card h-100 p-3 p-md-4"><div class="feature-mini-icon"><i class="fas fa-palette"></i></div><h5 class="fw-bold mb-1">Θέματα widget</h5><p class="text-muted mb-0" style="font-size:.85rem">Classic gold και site-match για custom branding.</p></div></div>
+                    <div class="col-6"><div class="feature-mini-card h-100 p-3 p-md-4"><div class="feature-mini-icon"><i class="fas fa-mobile-screen-button"></i></div><h5 class="fw-bold mb-1">Mobile-first εμπειρία</h5><p class="text-muted mb-0" style="font-size:.85rem">Σχεδιασμένο ώστε κουμπιά, actions και photos να δουλεύουν σωστά σε κινητά.</p></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-white">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5" data-i18n="hiw_title">Πώς λειτουργεί</h2>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4 text-center"><div class="hiw-step-circle mx-auto mb-3">1</div><h5 class="fw-semibold" data-i18n="hiw1_title">Βρες επαγγελματία</h5><p class="text-muted" data-i18n="hiw1_desc">Περιήγησε στους συνεργάτες μας και διάλεξε αυτόν που σε ταιριάζει.</p></div>
+            <div class="col-md-4 text-center"><div class="hiw-step-circle mx-auto mb-3">2</div><h5 class="fw-semibold" data-i18n="hiw2_title">Επίλεξε υπηρεσία &amp; ώρα</h5><p class="text-muted" data-i18n="hiw2_desc">Δες τις διαθέσιμες ώρες σε πραγματικό χρόνο και επίλεξε αυτή που σου βολεύει.</p></div>
+            <div class="col-md-4 text-center"><div class="hiw-step-circle mx-auto mb-3">3</div><h5 class="fw-semibold" data-i18n="hiw3_title">Επιβεβαίωση αμέσως</h5><p class="text-muted" data-i18n="hiw3_desc">Λαμβάνεις SMS επιβεβαίωση και υπενθύμιση 24 ώρες πριν.</p></div>
+        </div>
+    </div>
+</section>
+
+<section id="businesses" class="py-5" style="background:#faf8f5">
+    <div class="container">
+        <div class="d-flex align-items-start align-items-sm-center justify-content-between mb-4 flex-wrap gap-2">
+            <div>
+                <h2 class="fw-bold mb-1" data-i18n="dir_title">Partners &amp; Businesses</h2>
+                <p class="text-muted mb-0 small" data-i18n="dir_subtitle">Κλείστε ραντεβού απευθείας με τους καλύτερους επαγγελματίες</p>
+            </div>
+        </div>
+        <div class="biz-search-wrap mb-3">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="bizSearch" class="form-control" placeholder="Αναζήτηση επιχείρησης…" data-i18n-placeholder="search_placeholder" autocomplete="off">
+        </div>
+        <div class="cat-filters-wrap mb-4">
+            <div class="cat-filters-inner" id="categoryFilters">
+                <button class="btn btn-sm btn-primary category-btn active" data-cat="all" data-i18n="cat_all">Όλα</button>
+                {% for biz in businesses %}
+                <button class="btn btn-sm btn-outline-secondary category-btn d-none" data-cat="{{ biz.category }}" data-label="{{ biz.get_category_display }}">{{ biz.get_category_display }}</button>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if businesses %}
+        <div class="row g-4" id="bizGrid">
+            {% for biz in businesses %}
+            <div class="col-sm-6 col-lg-4 biz-item" data-category="{{ biz.category }}" data-name="{{ biz.name|lower }}" data-desc="{{ biz.description|default:''|lower }}">
+                <div class="card biz-card h-100 shadow-sm border-0">
+                    <div class="biz-card-header d-flex align-items-center gap-3 px-4 py-3">
+                        <div class="biz-avatar">
+                            {% if biz.logo %}<img src="{{ biz.logo.url }}" alt="{{ biz.name }}" class="biz-avatar-img">{% else %}<i class="fas {% if biz.category == 'health' %}fa-stethoscope{% elif biz.category == 'beauty' %}fa-cut{% elif biz.category == 'fitness' %}fa-dumbbell{% elif biz.category == 'education' %}fa-graduation-cap{% elif biz.category == 'legal' %}fa-gavel{% elif biz.category == 'accounting' %}fa-calculator{% elif biz.category == 'auto' %}fa-car{% elif biz.category == 'tech' %}fa-laptop-code{% else %}fa-store{% endif %}"></i>{% endif %}
+                        </div>
+                        <div class="overflow-hidden flex-grow-1">
+                            <h6 class="fw-bold mb-0 text-truncate">{{ biz.name }}</h6>
+                            {% if biz.category == 'other' and biz.category_label %}
+                                <small class="text-muted" data-custom-category-gr="{{ biz.custom_category_gr|default:biz.custom_category }}" data-custom-category-en="{{ biz.custom_category_en|default:biz.custom_category }}">{{ biz.category_label }}</small>
+                            {% else %}
+                                <small class="text-muted" data-i18n-category="{{ biz.category }}">{{ biz.get_category_display }}</small>
+                            {% endif %}
+                        </div>
+                        {% if biz.average_rating > 0 %}
+                        <a href="{% url 'reviews:business_reviews' biz.slug %}" class="ms-auto d-flex align-items-center gap-1 text-warning fw-semibold small text-nowrap text-decoration-none" title="Δείτε κριτικές"><i class="fas fa-star"></i> {{ biz.average_rating }}</a>
+                        {% endif %}
+                    </div>
+                    <div class="card-body px-4 pb-3 pt-2 d-flex flex-column">
+                        {% if biz.description %}<p class="text-muted small mb-3 biz-description">{{ biz.description|truncatechars:90 }}</p>{% endif %}
+                        {% with services=biz.services.all %}
+                        {% if services %}
+                        <ul class="list-unstyled mb-3 biz-services-list">
+                            {% for svc in services|slice:":4" %}
+                            <li class="d-flex align-items-center justify-content-between py-1 border-bottom border-light small"><span class="text-truncate me-2"><i class="fas fa-check-circle text-success me-1"></i>{{ svc.name }}</span><span class="text-nowrap text-muted">{{ svc.duration_minutes }}<span data-i18n="min_suffix">λ</span>{% if svc.price > 0 %} • {{ svc.price }}€{% else %} • Δωρεάν{% endif %}</span></li>
+                            {% endfor %}
+                            {% if services.count > 4 %}<li class="text-muted small pt-1"><i class="fas fa-ellipsis-h me-1"></i>+{{ services.count|add:"-4" }} <span data-i18n="more_services">ακόμη υπηρεσίες</span></li>{% endif %}
+                        </ul>
+                        {% endif %}
+                        {% endwith %}
+                        {% if biz.address %}<p class="text-muted small mb-3"><i class="fas fa-map-marker-alt me-1 text-danger"></i>{{ biz.address }}</p>{% endif %}
+                        {% if biz.public_site_mode != 'booking_page' or biz.custom_site_enabled or biz.custom_landing_html %}
+                        <div class="d-flex gap-2 mt-auto"><a href="{% url 'business_custom_page' biz.slug %}" class="btn btn-outline-primary w-50 fw-semibold"><i class="fas fa-globe me-2"></i><span data-i18n="biz_site_btn">Επισκεφθείτε site</span></a><a href="{{ biz.get_booking_url }}" class="btn btn-primary w-50 fw-semibold"><i class="fas fa-calendar-plus me-2"></i><span data-i18n="biz_book_btn">Κλείστε ραντεβού</span></a></div>
+                        {% else %}
+                        <a href="{{ biz.get_booking_url }}" class="btn btn-primary mt-auto w-100 fw-semibold"><i class="fas fa-calendar-plus me-2"></i><span data-i18n="biz_book_btn">Κλείστε ραντεβού</span></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div id="noResults" class="text-center py-5 d-none"><i class="fas fa-search fa-2x text-muted mb-3 d-block"></i><p class="text-muted" data-i18n="no_results">Δεν βρέθηκαν επιχειρήσεις για την αναζήτησή σας.</p></div>
+        {% else %}
+        <div class="text-center py-5"><i class="fas fa-store-slash fa-3x text-muted mb-3 d-block"></i><h5 class="text-muted" data-i18n="biz_empty_title">Δεν υπάρχουν ακόμη επαγγελματίες στην πλατφόρμα.</h5><p class="text-muted" data-i18n="biz_empty_desc">Ελάτε σύντομα — προσθέτουμε νέους συνεργάτες καθημερινά!</p></div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="py-5 landing-biz-banner text-white text-center">
+    <div class="container">
+        <h3 class="fw-bold mb-2" data-i18n="banner_title">Είστε επαγγελματίας;</h3>
+        <p class="mb-4 opacity-75" data-i18n="banner_desc">Αποκτήστε τη δική σας σελίδα κρατήσεων δωρεάν για 30 μέρες.</p>
+        {% if not request.user.is_authenticated %}<a href="{% url 'accounts:register_professional' %}" class="btn btn-light btn-lg fw-semibold px-5" style="border-radius:50px"><i class="fas fa-rocket me-2"></i><span data-i18n="banner_cta">Ξεκινήστε Δωρεάν</span></a>{% endif %}
+    </div>
+</section>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <a href="{% url 'landing' %}" class="footer-brand">
+                    <img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+                    <i class="fas fa-calendar-check" style="display:none;color:var(--gold-light)"></i>Reserva
+                </a>
+                <p class="footer-copy mb-0 mt-1" style="color:rgba(255,255,255,.4);font-size:.8rem">&copy; 2026 Reserva. All rights reserved.</p>
+            </div>
+            <ul class="footer-links">
+                <li><a href="{% url 'about' %}" data-i18n="footer_about">Σχετικά</a></li>
+                <li><a href="{% url 'contact' %}" data-i18n="footer_contact">Επικοινωνία</a></li>
+                <li><a href="{% url 'privacy' %}" data-i18n="footer_privacy">Απόρρητο</a></li>
+                <li><a href="{% url 'terms' %}" data-i18n="footer_terms">Όροι</a></li>
+            </ul>
+            <div class="social-btns">
+                <a href="https://www.instagram.com/reserva_hellas" target="_blank" rel="noopener" class="social-btn"><i class="fab fa-instagram"></i> Instagram</a>
+                <a href="https://www.tiktok.com/@reserva.gr" target="_blank" rel="noopener" class="social-btn"><i class="fab fa-tiktok"></i> TikTok</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const translations={gr:{nav_home:'Αρχική',nav_partners:'Partners',nav_businesses:'Businesses',nav_features:'Features',nav_login:'Σύνδεση',nav_pro_cta:'Είστε επαγγελματίας;',hero_tagline:'Βρες επαγγελματία &amp; κλείσε ραντεβού σε <strong>30 δευτερόλεπτα</strong><br class="d-none d-md-block"> χωρίς τηλεφωνήματα, χωρίς αναμονή.',hero_cta:'Κλείστε τώρα ραντεβού',hero_businesses_cta:'Δες όλες τις επιχειρήσεις',hero_features_cta:'Μάθετε περισσότερα',trust_payments:'Ασφαλείς πληρωμές',trust_sms:'SMS υπενθυμίσεις',hiw_title:'Πώς λειτουργεί',hiw1_title:'Βρες επαγγελματία',hiw1_desc:'Περιήγησε στους συνεργάτες μας και διάλεξε αυτόν που σε ταιριάζει.',hiw2_title:'Επίλεξε υπηρεσία &amp; ώρα',hiw2_desc:'Δες τις διαθέσιμες ώρες σε πραγματικό χρόνο και επίλεξε αυτή που σου βολεύει.',hiw3_title:'Επιβεβαίωση αμέσως',hiw3_desc:'Λαμβάνεις SMS επιβεβαίωση και υπενθύμιση 24 ώρες πριν.',dir_title:'Partners &amp; Businesses',dir_subtitle:'Κλείστε ραντεβού απευθείας με τους καλύτερους επαγγελματίες',biz_site_btn:'Επισκεφθείτε site',biz_book_btn:'Κλείστε ραντεβού',min_suffix:'λ',more_services:'ακόμη υπηρεσίες',biz_empty_title:'Δεν υπάρχουν ακόμη επαγγελματίες στην πλατφόρμα.',biz_empty_desc:'Ελάτε σύντομα — προσθέτουμε νέους συνεργάτες καθημερινά!',banner_title:'Είστε επαγγελματίας;',banner_desc:'Αποκτήστε τη δική σας σελίδα κρατήσεων δωρεάν για 30 μέρες.',banner_cta:'Ξεκινήστε Δωρεάν',search_placeholder:'Αναζήτηση επιχείρησης…',cat_all:'Όλα',no_results:'Δεν βρέθηκαν επιχειρήσεις για την αναζήτησή σας.',footer_about:'Σχετικά',footer_contact:'Επικοινωνία',footer_privacy:'Απόρρητο',footer_terms:'Όροι'},en:{nav_home:'Home',nav_partners:'Partners',nav_businesses:'Businesses',nav_features:'Features',nav_login:'Login',nav_pro_cta:'Are you a professional?',hero_tagline:'Find a professional &amp; book in <strong>30 seconds</strong><br class="d-none d-md-block"> no phone calls, no waiting.',hero_cta:'Book now',hero_businesses_cta:'See all businesses',hero_features_cta:'Learn more',trust_payments:'Secure payments',trust_sms:'SMS reminders',hiw_title:'How it works',hiw1_title:'Find a professional',hiw1_desc:'Browse our partners and choose the one that suits you.',hiw2_title:'Choose service &amp; time',hiw2_desc:'See available slots in real time and pick the one that works.',hiw3_title:'Instant confirmation',hiw3_desc:'You receive an SMS confirmation and a reminder 24 hours before.',dir_title:'Partners &amp; Businesses',dir_subtitle:'Book directly with the best professionals',biz_site_btn:'Visit site',biz_book_btn:'Book now',min_suffix:'min',more_services:'more services',biz_empty_title:'No professionals on the platform yet.',biz_empty_desc:'Coming soon — we add new partners every day!',banner_title:'Are you a professional?',banner_desc:'Get your own booking page free for 30 days.',banner_cta:'Start Free',search_placeholder:'Search business…',cat_all:'All',no_results:'No businesses found for your search.',footer_about:'About',footer_contact:'Contact',footer_privacy:'Privacy',footer_terms:'Terms'}};
+const categories={gr:{health:'Υγεία',beauty:'Ομορφιά',fitness:'Fitness',education:'Εκπαίδευση',legal:'Νομικά',accounting:'Λογιστική',auto:'Αυτοκίνητο',tech:'Τεχνολογία',other:'Άλλο'},en:{health:'Health',beauty:'Beauty',fitness:'Fitness',education:'Education',legal:'Legal',accounting:'Accounting',auto:'Auto',tech:'Tech',other:'Other'}};
+let currentLang=localStorage.getItem('lang')||'gr';
+function applyLanguage(lang){const t=translations[lang];document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.getAttribute('data-i18n');if(t[key]!==undefined)el.innerHTML=t[key];});document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const key=el.getAttribute('data-i18n-placeholder');if(t[key]!==undefined)el.placeholder=t[key];});document.querySelectorAll('[data-i18n-category]').forEach(el=>{const cat=el.getAttribute('data-i18n-category');if(categories[lang][cat])el.textContent=categories[lang][cat];});document.querySelectorAll('[data-custom-category-gr]').forEach(el=>{const gr=el.getAttribute('data-custom-category-gr')||'';const en=el.getAttribute('data-custom-category-en')||'';el.textContent=lang==='en'?(en||gr):(gr||en);});document.querySelectorAll('.category-btn[data-cat]').forEach(btn=>{const cat=btn.dataset.cat;if(cat!=='all'&&categories[lang][cat])btn.textContent=categories[lang][cat];});document.documentElement.lang=lang==='gr'?'el':'en';document.getElementById('langLabel').textContent=lang==='gr'?'EN':'ΕΛ';currentLang=lang;localStorage.setItem('lang',lang)}
+function toggleLanguage(){applyLanguage(currentLang==='gr'?'en':'gr')}
+document.addEventListener('DOMContentLoaded',()=>applyLanguage(currentLang));
+document.querySelectorAll('#landingNav a').forEach(el=>{el.addEventListener('click',()=>{const collapse=bootstrap.Collapse.getInstance(document.getElementById('landingNav'));if(collapse&&window.innerWidth<992)collapse.hide();});});
+(function(){const items=document.querySelectorAll('.biz-item');const catBtns=document.querySelectorAll('.category-btn[data-cat]');const seen=new Set();catBtns.forEach(btn=>{if(btn.dataset.cat!=='all'){if(seen.has(btn.dataset.cat)){btn.remove()}else{seen.add(btn.dataset.cat);btn.classList.remove('d-none')}}});let activeCat='all';let searchVal='';function applyFilters(){let visible=0;items.forEach(item=>{const catMatch=activeCat==='all'||item.dataset.category===activeCat;const q=searchVal.trim().toLowerCase();const textMatch=!q||item.dataset.name.includes(q)||item.dataset.desc.includes(q);const show=catMatch&&textMatch;item.classList.toggle('d-none',!show);if(show)visible++;});const noRes=document.getElementById('noResults');if(noRes)noRes.classList.toggle('d-none',visible>0);}document.querySelectorAll('.category-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.category-btn').forEach(b=>{b.classList.remove('active','btn-primary');b.classList.add('btn-outline-secondary')});btn.classList.add('active','btn-primary');btn.classList.remove('btn-outline-secondary');activeCat=btn.dataset.cat;applyFilters()})});const searchInput=document.getElementById('bizSearch');if(searchInput)searchInput.addEventListener('input',()=>{searchVal=searchInput.value;applyFilters()});})();
+</script>
+</body>
+</html>

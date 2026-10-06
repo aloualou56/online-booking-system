@@ -1,0 +1,1254 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Τα Ραντεβού μου — Reserva{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Customer Dashboard Styles */
+.customer-dash-hero {
+    background: linear-gradient(135deg, #1a180e 0%, #2d2810 50%, #1a180e 100%);
+    border-bottom: 1px solid rgba(201,162,39,.25);
+    padding: 2rem 0 1.5rem;
+    margin-bottom: 2rem;
+}
+.customer-dash-hero .greeting {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #f0c04a;
+}
+.customer-dash-hero .sub {
+    color: rgba(245,230,192,.65);
+    font-size: .95rem;
+}
+.hero-controls {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+}
+.switch-mode-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    background: rgba(248, 250, 252, .95);
+    color: #18181b;
+    border: 1px solid rgba(201,162,39,.45);
+    border-radius: 12px;
+    padding: .46rem .82rem;
+    font-size: .86rem;
+    font-weight: 700;
+    text-decoration: none;
+    position: relative;
+    top: -8px;
+    transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+.switch-mode-btn:hover {
+    background: #fff;
+    color: #101010;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.18);
+}
+.switch-mode-btn i {
+    color: #7a5f10;
+    font-size: .85rem;
+}
+.hero-side-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    object-fit: cover;
+    border: 1px solid rgba(201,162,39,.4);
+    background: rgba(255,255,255,.08);
+    box-shadow: 0 6px 18px rgba(0,0,0,.2);
+}
+.stat-card {
+    background: linear-gradient(160deg, #ffffff 0%, #fbfdff 100%);
+    border: 1px solid rgba(201,162,39,.28);
+    border-radius: 16px;
+    padding: 1.15rem .95rem;
+    text-align: center;
+    transition: transform .22s, box-shadow .22s, border-color .22s;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 22px rgba(15,23,42,.08);
+}
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg,#c9a227 0%, #f0c04a 55%, #ffe28a 100%);
+}
+.stat-card::after {
+    content: '';
+    position: absolute;
+    right: -38px;
+    top: -36px;
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,162,39,.16) 0%, rgba(201,162,39,0) 70%);
+}
+.stat-card:hover {
+    transform: translateY(-5px) scale(1.015);
+    box-shadow: 0 16px 34px rgba(2,8,23,.14);
+    border-color: rgba(201,162,39,.44);
+}
+.stat-card .stat-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    margin: 0 auto .62rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    background: rgba(201,162,39,.14);
+    color: #7a5f10;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+}
+.stat-card .stat-value {
+    font-size: 2.2rem;
+    font-weight: 900;
+    line-height: 1;
+    color: #111827;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+}
+.stat-card .stat-label {
+    font-size: .78rem;
+    opacity: .9;
+    margin-top: .4rem;
+    color: #334155;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .35px;
+}
+.stat-card,
+.stat-card .stat-icon,
+.stat-card .stat-value,
+.stat-card .stat-label {
+    color: inherit;
+}
+.stat-card.stat-primary .stat-icon { background: linear-gradient(145deg, rgba(201,162,39,.28), rgba(240,192,74,.22)); color: #7a5f10; }
+.stat-card.stat-info .stat-icon { background: linear-gradient(145deg, rgba(59,130,246,.26), rgba(96,165,250,.2)); color: #1d4ed8; }
+.stat-card.stat-success .stat-icon { background: linear-gradient(145deg, rgba(22,163,74,.26), rgba(74,222,128,.2)); color: #15803d; }
+.stat-card.stat-danger .stat-icon { background: linear-gradient(145deg, rgba(220,38,38,.22), rgba(248,113,113,.2)); color: #b91c1c; }
+
+.stat-card.stat-primary .stat-value { color: #7a5f10; }
+.stat-card.stat-info .stat-value { color: #1d4ed8; }
+.stat-card.stat-success .stat-value { color: #15803d; }
+.stat-card.stat-danger .stat-value { color: #b91c1c; }
+
+.stat-card.stat-info::before { background: linear-gradient(90deg,#60a5fa 0%, #3b82f6 100%); }
+.stat-card.stat-success::before { background: linear-gradient(90deg,#4ade80 0%, #22c55e 100%); }
+.stat-card.stat-danger::before { background: linear-gradient(90deg,#f87171 0%, #ef4444 100%); }
+
+.stat-card.stat-primary .stat-label,
+.stat-card.stat-info .stat-label,
+.stat-card.stat-success .stat-label,
+.stat-card.stat-danger .stat-label {
+    color: #475569;
+}
+
+.booking-card-customer {
+    background: linear-gradient(180deg,#ffffff 0%, #fcfdff 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(201,162,39,.25);
+    transition: box-shadow .22s, transform .18s, border-color .18s;
+    overflow: hidden;
+    box-shadow: 0 8px 22px rgba(15,23,42,.07);
+    position: relative;
+}
+.booking-card-customer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg,#f0c04a 0%, #c9a227 100%);
+}
+.booking-card-customer:hover {
+    box-shadow: 0 16px 34px rgba(15,23,42,.13);
+    transform: translateY(-4px);
+    border-color: rgba(201,162,39,.42);
+}
+.booking-card-customer .biz-header {
+    padding: .95rem 1.05rem .7rem;
+    border-bottom: 1px solid rgba(201,162,39,.18);
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    background: linear-gradient(180deg, rgba(248,250,252,.9), #fff);
+}
+.booking-card-customer .biz-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg,#c9a227,#f0c04a);
+    display: flex; align-items: center; justify-content: center;
+    color: #1a1400; font-size: 1.1rem; flex-shrink: 0;
+}
+.booking-card-customer .biz-name { font-weight: 700; font-size: .97rem; color: #1a1a1a; }
+.booking-card-customer .biz-service { font-size: .82rem; color: #6c757d; }
+.booking-card-customer .card-body-inner { padding: .9rem 1.1rem 1rem; }
+
+.status-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px; font-size: .78rem; font-weight: 600;
+}
+.status-pill.confirmed  { background: #d1fae5; color: #065f46; }
+.status-pill.pending    { background: #fef9c3; color: #854d0e; }
+.status-pill.completed  { background: #dbeafe; color: #1e40af; }
+.status-pill.cancelled  { background: #fee2e2; color: #991b1b; }
+.status-pill.no-show    { background: #f3f4f6; color: #374151; }
+
+.section-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    border-left: 4px solid #c9a227;
+    padding-left: .75rem;
+    margin-bottom: 1.2rem;
+}
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #adb5bd;
+}
+.empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+/* Tab styling */
+.customer-tabs .nav-link {
+    color: #6c757d;
+    font-weight: 600;
+    border-radius: 10px 10px 0 0;
+    padding: .65rem 1.4rem;
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: color .2s, border-color .2s;
+}
+.customer-tabs .nav-link.active,
+.customer-tabs .nav-link:hover {
+    color: #c9a227;
+    border-bottom-color: #c9a227;
+    background: transparent;
+}
+.customer-tabs {
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 1.5rem;
+    flex-wrap: nowrap;
+    gap: .35rem;
+}
+.customer-tabs .nav-item {
+    flex: 1 1 0;
+    min-width: 0;
+}
+.customer-tabs .nav-link {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+}
+.customer-tabs .nav-link span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+    .customer-tabs .nav-link {
+        padding: .58rem .45rem;
+        font-size: .82rem;
+        border-radius: 9px 9px 0 0;
+        gap: .25rem;
+    }
+    .customer-tabs .nav-link i {
+        font-size: .82rem;
+        margin-right: 0 !important;
+    }
+}
+
+@keyframes tabPaneFadeSlide {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tab-pane-animating {
+    animation: tabPaneFadeSlide 0.22s ease;
+}
+
+/* Business search card */
+.business-search-card {
+    background: linear-gradient(165deg,#ffffff 0%, #fffdf7 55%, #fcfdff 100%);
+    border-radius: 18px;
+    border: 1px solid rgba(201,162,39,.28);
+    transition: box-shadow .24s, transform .18s, border-color .18s;
+    overflow: hidden;
+    box-shadow: 0 10px 24px rgba(15,23,42,.08);
+    position: relative;
+}
+.business-search-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg,#f0c04a 0%, #c9a227 100%);
+}
+.business-search-card:hover {
+    box-shadow: 0 20px 42px rgba(15,23,42,.14);
+    transform: translateY(-4px);
+    border-color: rgba(201,162,39,.42);
+}
+.business-search-card .biz-header {
+    padding: 1rem 1rem .85rem;
+    border-bottom: 1px solid rgba(201,162,39,.16);
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    background: linear-gradient(180deg, rgba(248,250,252,.82), #fff);
+}
+.business-search-card .biz-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #c9a227;
+    background: rgba(201,162,39,.1);
+    border: 1px solid rgba(201,162,39,.2);
+    font-size: 1.1rem;
+}
+.business-search-card .biz-name {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #161616;
+    line-height: 1.24;
+    margin-bottom: .35rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.business-search-card .biz-cat-badge {
+    font-size: .74rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(201,162,39,.12);
+    color: #9a770d;
+    border: 1px solid rgba(201,162,39,.24);
+    display: inline-block;
+}
+.business-search-card .card-body-inner {
+    padding: .9rem 1rem;
+}
+.business-search-card .biz-main {
+    display: grid;
+    gap: .45rem;
+}
+.business-search-card .biz-meta-row {
+    display: flex;
+    align-items: flex-start;
+    gap: .45rem;
+    color: #48556a;
+    font-size: .86rem;
+    line-height: 1.35;
+}
+.business-search-card .biz-meta-row i {
+    color: #b28700;
+    width: 14px;
+    margin-top: 2px;
+}
+.business-search-card .biz-description {
+    margin: .2rem 0 .1rem;
+    color: #5c6778;
+    font-size: .84rem;
+    line-height: 1.45;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+.business-search-card .biz-services {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin-top: .3rem;
+}
+.business-search-card .biz-service-pill {
+    font-size: .72rem;
+    color: #2f3b4c;
+    background: #f6f8fb;
+    border: 1px solid #dde4ef;
+    border-radius: 999px;
+    padding: 4px 9px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.business-search-card .biz-footer {
+    padding: .78rem 1rem 1rem;
+    border-top: 1px solid rgba(15,23,42,.07);
+}
+.business-search-card .biz-cta {
+    width: 100%;
+    border: 0;
+    border-radius: 11px;
+    padding: .56rem .72rem;
+    background: linear-gradient(135deg,#c9a227,#e0b742);
+    color: #201700;
+    font-size: .94rem;
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+.business-search-card .biz-cta:hover {
+    filter: brightness(1.03);
+    color: #1a1400;
+}
+.search-bar-wrapper {
+    background: #f8f9fa;
+    border-radius: 14px;
+    padding: 1.25rem 1.25rem 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e9ecef;
+}
+
+/* Customer lang toggle */
+#customerLangBtn {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    z-index: 9999;
+    background: rgba(30,28,16,.92);
+    border: 1px solid rgba(201,162,39,.4);
+    color: #f0c04a;
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0,0,0,.3);
+    letter-spacing: .5px;
+}
+
+.past-booking-mobile-card {
+    border-radius: 14px;
+    border: 1px solid #e9ecef;
+}
+
+.past-booking-mobile-meta {
+    color: #64748b;
+}
+
+.past-booking-mobile-meta strong {
+    color: #1a1a1a;
+}
+
+.news-pane-body {
+    min-height: 42vh;
+}
+
+@media (max-width: 576px) {
+    .business-search-card .biz-name {
+        font-size: 1.02rem;
+    }
+    .business-search-card .biz-meta-row {
+        font-size: .82rem;
+    }
+    .business-search-card .biz-footer {
+        padding: .72rem .9rem .9rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-2" style="max-width:1100px;">
+
+    <!-- Hero / greeting -->
+    <div class="customer-dash-hero rounded-3 mb-4 px-4">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="greeting">
+                    <span class="lang-gr">Καλώς ήρθατε</span>
+                    <span class="lang-en" style="display:none">Welcome</span>
+                    , {{ request.user.first_name|default:request.user.username }}!
+                </div>
+                <div class="sub mt-1">
+                    <span class="lang-gr">Διαχειριστείτε τα ραντεβού σας</span>
+                    <span class="lang-en" style="display:none">Manage your appointments</span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="hero-controls">
+                {% if hide_sidebar and request.user.role != 'customer' %}
+                <a href="{% url 'accounts:exit_customer_mode' %}" class="switch-mode-btn me-2">
+                    <i class="fas fa-briefcase"></i>
+                    <span class="lang-gr">Λειτουργία Εργασίας</span>
+                    <span class="lang-en" style="display:none">Work Mode</span>
+                </a>
+                {% endif %}
+                <img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva" class="hero-side-logo d-none d-md-inline-block">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-primary">
+                <span class="stat-icon"><i class="fas fa-calendar-alt"></i></span>
+                <div class="stat-value">{{ total_count }}</div>
+                <div class="stat-label lang-gr">Σύνολο Ραντεβού</div>
+                <div class="stat-label lang-en" style="display:none">Total Bookings</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-info">
+                <span class="stat-icon"><i class="fas fa-clock"></i></span>
+                <div class="stat-value">{{ upcoming_count }}</div>
+                <div class="stat-label lang-gr">Επερχόμενα</div>
+                <div class="stat-label lang-en" style="display:none">Upcoming</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-success">
+                <span class="stat-icon"><i class="fas fa-check-circle"></i></span>
+                <div class="stat-value">{{ completed_count }}</div>
+                <div class="stat-label lang-gr">Ολοκληρωμένα</div>
+                <div class="stat-label lang-en" style="display:none">Completed</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-danger">
+                <span class="stat-icon"><i class="fas fa-times-circle"></i></span>
+                <div class="stat-value">{{ cancelled_count }}</div>
+                <div class="stat-label lang-gr">Ακυρωμένα</div>
+                <div class="stat-label lang-en" style="display:none">Cancelled</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Tab Navigation ── -->
+    <ul class="nav customer-tabs mb-0" id="customerDashTabs">
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab != 'book_new' and active_tab != 'news' %}active{% endif %}"
+               href="?tab=my_bookings" id="tab-my-bookings">
+                <i class="fas fa-calendar-alt me-1"></i>
+                <span class="lang-gr">Τα Ραντεβού μου</span>
+                <span class="lang-en" style="display:none">My Bookings</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'book_new' %}active{% endif %}"
+               href="?tab=book_new" id="tab-book-new">
+                <i class="fas fa-calendar-plus me-1"></i>
+                <span class="lang-gr">Κλείστε Ραντεβού</span>
+                <span class="lang-en" style="display:none">Book Appointment</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'news' %}active{% endif %}"
+               href="?tab=news" id="tab-news">
+                <i class="fas fa-newspaper me-1"></i>
+                <span class="lang-gr">Ειδήσεις</span>
+                <span class="lang-en" style="display:none">News</span>
+            </a>
+        </li>
+    </ul>
+
+    <!-- ════════════════════════════════════════════════════
+         TAB 1 — MY BOOKINGS
+    ════════════════════════════════════════════════════ -->
+    <div id="pane-my-bookings" {% if active_tab == 'book_new' %}style="display:none"{% endif %}>
+
+        <!-- Search / Filter bar -->
+        <div class="search-bar-wrapper mt-3">
+            <form method="get" action="">
+                <input type="hidden" name="tab" value="my_bookings">
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label small fw-semibold mb-1">
+                            <span class="lang-gr">Αναζήτηση</span>
+                            <span class="lang-en" style="display:none">Search</span>
+                        </label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" name="q" class="form-control"
+                                   placeholder="Επιχείρηση / Υπηρεσία — Business / Service"
+                                   value="{{ q }}">
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label small fw-semibold mb-1">
+                            <span class="lang-gr">Κατάσταση</span>
+                            <span class="lang-en" style="display:none">Status</span>
+                        </label>
+                        <select name="status" class="form-select form-select-sm">
+                            <option value="">— Όλα —</option>
+                            <option value="pending"   {% if status_filter == 'pending'   %}selected{% endif %}>Σε αναμονή</option>
+                            <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Επιβεβαιωμένο</option>
+                            <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Ολοκληρωμένο</option>
+                            <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Ακυρωμένο</option>
+                            <option value="no_show"   {% if status_filter == 'no_show'   %}selected{% endif %}>Δεν εμφανίστηκε</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label small fw-semibold mb-1">
+                            <span class="lang-gr">Από</span>
+                            <span class="lang-en" style="display:none">From</span>
+                        </label>
+                        <input type="date" name="date_from" class="form-control form-control-sm" value="{{ date_from }}">
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label small fw-semibold mb-1">
+                            <span class="lang-gr">Έως</span>
+                            <span class="lang-en" style="display:none">To</span>
+                        </label>
+                        <input type="date" name="date_to" class="form-control form-control-sm" value="{{ date_to }}">
+                    </div>
+                    <div class="col-6 col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-sm w-100" style="background:#c9a227;color:#1a1400;font-weight:600;">
+                            <i class="fas fa-filter me-1"></i>
+                            <span class="lang-gr">Φίλτρο</span>
+                            <span class="lang-en" style="display:none">Filter</span>
+                        </button>
+                        {% if q or status_filter or date_from or date_to %}
+                        <a href="?tab=my_bookings" class="btn btn-sm btn-outline-secondary" title="Clear filters">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Upcoming Bookings -->
+        <div class="section-title lang-gr mt-2">
+            <i class="fas fa-calendar-day me-2" style="color:#c9a227;"></i>Επερχόμενα Ραντεβού
+        </div>
+        <div class="section-title lang-en mt-2" style="display:none">
+            <i class="fas fa-calendar-day me-2" style="color:#c9a227;"></i>Upcoming Bookings
+        </div>
+
+        {% if upcoming %}
+        <div class="row g-3 mb-5">
+            {% for booking in upcoming %}
+            <div class="col-md-6 col-lg-4">
+                <div class="booking-card-customer shadow-sm">
+                    <div class="biz-header">
+                        <div class="biz-icon"><i class="fas fa-store"></i></div>
+                        <div>
+                            <div class="biz-name">{{ booking.business.name }}</div>
+                            <div class="biz-service">{{ booking.service.name }}</div>
+                        </div>
+                    </div>
+                    <div class="card-body-inner">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <div class="fw-semibold" style="font-size:.9rem;">
+                                    <i class="fas fa-calendar-day me-1 text-muted"></i>{{ booking.date|date:"d/m/Y" }}
+                                </div>
+                                <div class="text-muted" style="font-size:.85rem;">
+                                    <i class="fas fa-clock me-1"></i>{{ booking.start_time|time:"H:i" }} — {{ booking.end_time|time:"H:i" }}
+                                </div>
+                                <div class="text-muted" style="font-size:.82rem;">
+                                    <i class="fas fa-user me-1"></i>{{ booking.employee_display_name }}
+                                </div>
+                            </div>
+                            <span class="status-pill {% if booking.status == 'confirmed' %}confirmed{% elif booking.status == 'pending' %}pending{% else %}cancelled{% endif %}">
+                                <i class="fas fa-circle" style="font-size:.4rem;"></i>
+                                {{ booking.get_status_display }}
+                            </span>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-light text-dark border">
+                                <i class="fas fa-euro-sign me-1" style="color:#c9a227;"></i>{% if booking.price_at_booking > 0 %}{{ booking.price_at_booking }}€{% else %}Δωρεάν{% endif %}
+                            </span>
+                        </div>
+
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% if booking.is_cancellable %}
+                            <form method="post" action="{% url 'bookings:cancel_booking' booking.id %}"
+                                  onsubmit="event.preventDefault(); confirmCancel(this); return false;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-times me-1"></i>
+                                    <span class="lang-gr">Ακύρωση</span>
+                                    <span class="lang-en" style="display:none">Cancel</span>
+                                </button>
+                            </form>
+                            <a href="{% url 'bookings:reschedule_booking' booking.id %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-calendar-day me-1"></i>
+                                <span class="lang-gr">Αλλαγή Ώρας</span>
+                                <span class="lang-en" style="display:none">Reschedule</span>
+                            </a>
+                            {% else %}
+                            <small class="text-muted">
+                                <span class="lang-gr">Έχει λήξει η προθεσμία αλλαγής (σε {{ booking.service.cancellation_deadline_hours|default:"24" }} ώρες πριν το ραντεβού)</span>
+                                <span class="lang-en" style="display:none">Reschedule deadline passed</span>
+                            </small>
+                            {% endif %}
+                            <a href="{% url 'reports:submit_report' booking.business.slug %}?booking_id={{ booking.id }}"
+                               class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-flag me-1"></i>
+                                <span class="lang-gr">Αναφορά</span>
+                                <span class="lang-en" style="display:none">Report</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-modern">
+            <div class="empty-icon">
+                <i class="fas fa-calendar-plus"></i>
+            </div>
+            <h3 class="lang-gr">Κανένα επερχόμενο ραντεβού</h3>
+            <h3 class="lang-en" style="display:none">No Upcoming Bookings</h3>
+            <p class="lang-gr">Δεν έχετε προγραμματισμένα ραντεβού αυτή τη στιγμή. Εξερευνήστε τις διαθέσιμες επιχειρήσεις και κλείστε το επόμενό σας ραντεβού!</p>
+            <p class="lang-en" style="display:none">You don't have any scheduled appointments at the moment. Explore available businesses and book your next appointment!</p>
+            <a href="?tab=book_new" class="empty-action">
+                <i class="fas fa-calendar-plus"></i>
+                <span class="lang-gr">Κλείστε το πρώτο σας ραντεβού</span>
+                <span class="lang-en" style="display:none">Book Your First Appointment</span>
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Past Bookings -->
+        <div class="section-title lang-gr">
+            <i class="fas fa-history me-2" style="color:#c9a227;"></i>Ιστορικό Ραντεβού
+        </div>
+        <div class="section-title lang-en" style="display:none">
+            <i class="fas fa-history me-2" style="color:#c9a227;"></i>Booking History
+        </div>
+
+        {% if past %}
+        <div class="card shadow-sm border-0 rounded-3 mb-4 d-none d-md-block">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" style="font-size:.92rem;">
+                    <thead style="background:#f8f9fa;">
+                        <tr>
+                            <th class="px-3 py-3 lang-en" style="display:none">Business</th>
+                            <th class="px-3 py-3 lang-gr">Επιχείρηση</th>
+                            <th class="lang-en" style="display:none">Service</th>
+                            <th class="lang-gr">Υπηρεσία</th>
+                            <th class="lang-en" style="display:none">Date</th>
+                            <th class="lang-gr">Ημ/νία</th>
+                            <th class="lang-en" style="display:none">Status</th>
+                            <th class="lang-gr">Κατάσταση</th>
+                            <th class="lang-en" style="display:none">Review</th>
+                            <th class="lang-gr">Αξιολόγηση</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in past %}
+                        <tr>
+                            <td class="px-3 py-3 fw-semibold">{{ booking.business.name }}</td>
+                            <td>{{ booking.service.name }}</td>
+                            <td class="text-nowrap">{{ booking.date|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="status-pill {% if booking.status == 'completed' %}completed{% elif booking.status == 'cancelled' %}cancelled{% else %}no-show{% endif %}">
+                                    <i class="fas fa-circle" style="font-size:.4rem;"></i>
+                                    {{ booking.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if booking.status == 'completed' %}
+                                    {% if booking.id in reviewed_booking_ids %}
+                                        <span class="text-warning small">
+                                            <i class="fas fa-star me-1"></i>
+                                            <span class="lang-gr">Αξιολογήθηκε</span>
+                                            <span class="lang-en" style="display:none">Reviewed</span>
+                                        </span>
+                                    {% else %}
+                                        <a href="{% url 'reviews:submit_review' booking.id %}" class="btn btn-outline-warning btn-sm">
+                                            <i class="fas fa-star me-1"></i>
+                                            <span class="lang-gr">Αξιολόγηση</span>
+                                            <span class="lang-en" style="display:none">Review</span>
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'reports:submit_report' booking.business.slug %}?booking_id={{ booking.id }}"
+                                   class="btn btn-outline-secondary btn-sm" title="Αναφορά">
+                                    <i class="fas fa-flag"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="d-md-none mb-4">
+            {% for booking in past %}
+            <article class="card shadow-sm border-0 mb-3 past-booking-mobile-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                        <div>
+                            <h6 class="mb-1 fw-semibold">{{ booking.business.name }}</h6>
+                            <div class="small text-muted">{{ booking.service.name }}</div>
+                        </div>
+                        <span class="status-pill {% if booking.status == 'completed' %}completed{% elif booking.status == 'cancelled' %}cancelled{% else %}no-show{% endif %}">
+                            <i class="fas fa-circle" style="font-size:.4rem;"></i>
+                            {{ booking.get_status_display }}
+                        </span>
+                    </div>
+
+                    <div class="past-booking-mobile-meta small mb-3">
+                        <div>
+                            <span class="lang-gr">Ημερομηνία:</span>
+                            <span class="lang-en" style="display:none">Date:</span>
+                            <strong>{{ booking.date|date:"d/m/Y" }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {% if booking.status == 'completed' %}
+                            {% if booking.id in reviewed_booking_ids %}
+                                <span class="btn btn-light border text-warning disabled">
+                                    <i class="fas fa-star me-1"></i>
+                                    <span class="lang-gr">Αξιολογήθηκε</span>
+                                    <span class="lang-en" style="display:none">Reviewed</span>
+                                </span>
+                            {% else %}
+                                <a href="{% url 'reviews:submit_review' booking.id %}" class="btn btn-outline-warning">
+                                    <i class="fas fa-star me-1"></i>
+                                    <span class="lang-gr">Αξιολόγηση</span>
+                                    <span class="lang-en" style="display:none">Review</span>
+                                </a>
+                            {% endif %}
+                        {% endif %}
+
+                        <a href="{% url 'reports:submit_report' booking.business.slug %}?booking_id={{ booking.id }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-flag me-1"></i>
+                            <span class="lang-gr">Αναφορά</span>
+                            <span class="lang-en" style="display:none">Report</span>
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-modern">
+            <div class="empty-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <h3 class="lang-gr">Κανένα ιστορικό ραντεβού</h3>
+            <h3 class="lang-en" style="display:none">No Booking History</h3>
+            <p class="lang-gr">Δεν έχετε ακόμα ιστορικό ραντεβού. Κλείστε το πρώτο σας ραντεβού για να ξεκινήσετε!</p>
+            <p class="lang-en" style="display:none">You don't have any booking history yet. Book your first appointment to get started!</p>
+        </div>
+        {% endif %}
+
+    </div>{# /pane-my-bookings #}
+
+    <!-- ════════════════════════════════════════════════════
+         TAB 2 — BOOK A RANTEVOU
+    ════════════════════════════════════════════════════ -->
+    <div id="pane-book-new" {% if active_tab != 'book_new' %}style="display:none"{% endif %}>
+
+        <!-- Business search form -->
+        <div class="search-bar-wrapper mt-3">
+            <form method="get" action="">
+                <input type="hidden" name="tab" value="book_new">
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-md-5">
+                        <label class="form-label small fw-semibold mb-1">
+                            <span class="lang-gr">Αναζήτηση επιχείρησης</span>
+                            <span class="lang-en" style="display:none">Search business</span>
+                        </label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" name="business_q" class="form-control"
+                                   placeholder="Όνομα επιχείρησης… — Business name…"
+                                   value="{{ business_search }}">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label small fw-semibold mb-1">
+                            <span class="lang-gr">Κατηγορία</span>
+                            <span class="lang-en" style="display:none">Category</span>
+                        </label>
+                        <select name="business_category" class="form-select form-select-sm">
+                            <option value="">
+                                <span class="lang-gr">— Όλες —</span>
+                            </option>
+                            {% for val, label in category_choices %}
+                            <option value="{{ val }}" {% if business_category == val %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-sm w-100" style="background:#c9a227;color:#1a1400;font-weight:600;">
+                            <i class="fas fa-search me-1"></i>
+                            <span class="lang-gr">Αναζήτηση</span>
+                            <span class="lang-en" style="display:none">Search</span>
+                        </button>
+                        {% if business_search or business_category %}
+                        <a href="?tab=book_new" class="btn btn-sm btn-outline-secondary" title="Clear">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results heading -->
+        <div class="section-title lang-gr">
+            <i class="fas fa-store me-2" style="color:#c9a227;"></i>
+            {% if business_search or business_category %}Αποτελέσματα αναζήτησης{% else %}Διαθέσιμες Επιχειρήσεις{% endif %}
+        </div>
+        <div class="section-title lang-en" style="display:none">
+            <i class="fas fa-store me-2" style="color:#c9a227;"></i>
+            {% if business_search or business_category %}Search Results{% else %}Available Businesses{% endif %}
+        </div>
+
+        {% if businesses %}
+        <div class="row g-3 mb-5">
+            {% for biz in businesses %}
+            <div class="col-md-6 col-lg-4">
+                <div class="business-search-card shadow-sm h-100 d-flex flex-column">
+                    <div class="biz-header">
+                        <div class="biz-icon">
+                            {% if biz.logo %}
+                            <img src="{{ biz.logo.url }}" alt="{{ biz.name }}"
+                                 style="width:40px;height:40px;border-radius:10px;object-fit:cover;">
+                            {% else %}
+                            <i class="fas fa-store"></i>
+                            {% endif %}
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="biz-name">{{ biz.name }}</div>
+                            <span class="biz-cat-badge">{{ biz.get_category_display }}</span>
+                        </div>
+                    </div>
+                    <div class="card-body-inner flex-grow-1">
+                        <div class="biz-main">
+                            {% if biz.address %}
+                            <div class="biz-meta-row">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{ biz.address }}</span>
+                            </div>
+                            {% endif %}
+                            {% if biz.phone %}
+                            <div class="biz-meta-row">
+                                <i class="fas fa-phone"></i>
+                                <span>{{ biz.phone }}</span>
+                            </div>
+                            {% endif %}
+                            {% if biz.description %}
+                            <p class="biz-description">{{ biz.description }}</p>
+                            {% endif %}
+
+                            {% with biz.services.all as svcs %}
+                            {% if svcs %}
+                            <div class="biz-services">
+                                {% for svc in svcs|slice:":3" %}
+                                <span class="biz-service-pill">{{ svc.name }}</span>
+                                {% endfor %}
+                                {% if svcs|length > 3 %}
+                                <span class="biz-service-pill">+{{ svcs|length|add:"-3" }} <span class="lang-gr">ακόμα</span><span class="lang-en" style="display:none">more</span></span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="biz-footer">
+                        {% if biz.slug %}
+                        <a href="{% url 'public_booking:booking_page' biz.slug %}"
+                           class="btn biz-cta">
+                            <i class="fas fa-calendar-plus me-1"></i>
+                            <span class="lang-gr">Κλείστε Ραντεβού</span>
+                            <span class="lang-en" style="display:none">Book Appointment</span>
+                        </a>
+                        {% else %}
+                        <button class="btn btn-sm w-100 fw-semibold"
+                                style="background:#6c757d;color:white;"
+                                disabled>
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <span class="lang-gr">Μη Διαθέσιμο</span>
+                            <span class="lang-en" style="display:none">Unavailable</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-modern">
+            <div class="empty-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3 class="lang-gr">Δεν βρέθηκαν επιχειρήσεις</h3>
+            <h3 class="lang-en" style="display:none">No Businesses Found</h3>
+            <p class="lang-gr">Δεν βρέθηκαν επιχειρήσεις που να ταιριάζουν με τα κριτήρια αναζήτησής σας. Δοκιμάστε διαφορετικά φίλτρα ή εξερευνήστε όλες τις διαθέσιμες επιχειρήσεις.</p>
+            <p class="lang-en" style="display:none">No businesses found matching your search criteria. Try different filters or explore all available businesses.</p>
+            {% if business_search or business_category %}
+            <a href="?tab=book_new" class="empty-action">
+                <i class="fas fa-times"></i>
+                <span class="lang-gr">Καθαρισμός φίλτρων</span>
+                <span class="lang-en" style="display:none">Clear Filters</span>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>{# /pane-book-new #}
+
+    <!-- ════════════════════════════════════════════════════
+         TAB 3 — NEWS
+    ════════════════════════════════════════════════════ -->
+    <div id="pane-news" {% if active_tab != 'news' %}style="display:none"{% endif %}>
+        <div class="mt-4 news-pane-body">
+            {% if latest_news %}
+                <div class="row g-4">
+                    {% for news in latest_news %}
+                    <div class="col-lg-6">
+                        <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                            <div class="position-relative" style="background: linear-gradient(135deg,#c9a227,#f0c04a); height: 220px; overflow: hidden;">
+                                {% if news.image and news.image.url %}
+                                <img src="{{ news.image.url }}" alt="{{ news.title_gr }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.style.display='none';">
+                                {% endif %}
+                                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center text-white" style="background: rgba(0,0,0,0.15); opacity: 0.8;">
+                                    <i class="fas fa-newspaper fa-4x" style="opacity: 0.4;"></i>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold" style="color: #1a1a1a; line-height: 1.3;">{{ news.get_title }}</h5>
+                                <p class="card-text text-muted" style="font-size: 0.95rem; line-height: 1.5; flex: 1;">{{ news.get_description }}</p>
+                                {% if news.get_content %}
+                                    <div class="news-content small text-muted my-3 pb-3 border-bottom" style="max-height: 100px; overflow: hidden;">
+                                        {{ news.get_content|truncatewords:25 }}
+                                    </div>
+                                {% endif %}
+                                <small class="text-muted d-flex align-items-center">
+                                    <i class="fas fa-calendar me-2" style="color: #c9a227;"></i>{{ news.published_at|date:"d/m/Y" }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+            <div class="alert alert-info text-center py-5 rounded-3">
+                <i class="fas fa-newspaper fa-3x mb-3" style="color: rgba(13,110,253,.3);"></i>
+                <div class="mt-3">
+                    <span class="lang-gr d-block mb-2 fw-semibold" style="font-size: 1.1rem;">Δεν υπάρχουν διαθέσιμες ειδήσεις αυτή τη στιγμή.</span>
+                    <span class="lang-en d-block" style="display:none; font-size: 1.1rem;" style="font-weight: 600;">No news available at the moment.</span>
+                    <p class="text-muted mt-2 mb-0">Επιστρέψτε σύντομα για τις τελευταίες ανακοινώσεις.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>{# /pane-news #}
+
+</div>
+
+<!-- Language Toggle Button -->
+<button id="customerLangBtn" onclick="toggleCustomerLang()" title="Change Language">
+    <i class="fas fa-globe me-1"></i><span id="customerLangLabel">EN</span>
+</button>
+
+<script>
+(function () {
+    // Translation map — Greek → English.
+    // IMPORTANT: "Reserva" is a brand name and must NEVER appear here or be translated.
+    var CUSTOMER_GR_EN = {
+        'Καλώς ήρθατε': 'Welcome',
+        'Διαχειριστείτε τα ραντεβού σας': 'Manage your appointments',
+        'Σύνολο Ραντεβού': 'Total Bookings',
+        'Επερχόμενα': 'Upcoming',
+        'Ολοκληρωμένα': 'Completed',
+        'Ακυρωμένα': 'Cancelled',
+        'Επερχόμενα Ραντεβού': 'Upcoming Bookings',
+        'Ιστορικό Ραντεβού': 'Booking History',
+        'Ακύρωση': 'Cancel',
+        'Αναφορά': 'Report',
+        'Δεν έχετε επερχόμενα ραντεβού.': 'No upcoming bookings.',
+        'Βρείτε επιχειρήσεις': 'Find businesses',
+        'Επιχείρηση': 'Business',
+        'Υπηρεσία': 'Service',
+        'Ημ/νία': 'Date',
+        'Κατάσταση': 'Status',
+        'Αξιολόγηση': 'Review',
+        'Αξιολογήθηκε': 'Reviewed',
+        'Δεν υπάρχει ιστορικό ραντεβού.': 'No booking history.',
+        'Τα Ραντεβού μου': 'My Bookings',
+        'Κλείστε Ραντεβού': 'Book Appointment',
+        'Αναζήτηση': 'Search',
+        'Φίλτρο': 'Filter',
+        'Από': 'From',
+        'Έως': 'To',
+        'Αναζήτηση επιχείρησης': 'Search business',
+        'Κατηγορία': 'Category',
+        'Διαθέσιμες Επιχειρήσεις': 'Available Businesses',
+        'Αποτελέσματα αναζήτησης': 'Search Results',
+        'Δεν βρέθηκαν επιχειρήσεις.': 'No businesses found.',
+        'Καθαρισμός φίλτρων': 'Clear filters',
+        // Navigation items
+        'Αρχική': 'Home',
+        'Βοήθεια': 'Help',
+        'Προφίλ': 'Profile',
+        'Αποσύνδεση': 'Logout',
+        // Status labels (from model)
+        'Σε αναμονή': 'Pending',
+        'Επιβεβαιωμένο': 'Confirmed',
+        'Ακυρωμένο': 'Cancelled',
+        'Ολοκληρωμένο': 'Completed',
+        'Δεν εμφανίστηκε': 'No-Show',
+        '— Όλα —': '— All —',
+    };
+
+    var CUSTOMER_EN_GR = {};
+    Object.entries(CUSTOMER_GR_EN).forEach(function(kv) {
+        if (kv[0] !== kv[1]) CUSTOMER_EN_GR[kv[1]] = kv[0];
+    });
+
+    var lang = localStorage.getItem('customerLang') || 'gr';
+
+    window.confirmCancel = async function(form) {
+        var msg = lang === 'en'
+            ? 'Are you sure you want to cancel this booking?'
+            : 'Είστε σίγουροι ότι θέλετε να ακυρώσετε αυτό το ραντεβού;';
+        var title = lang === 'en' ? 'Cancel Booking' : 'Ακύρωση Ραντεβού';
+
+        const confirmed = await window.customConfirm(msg, title);
+        if (confirmed && form) {
+            form.submit();
+        }
+        return confirmed;
+    };
+
+    function applyLang(l) {
+        var map = l === 'en' ? CUSTOMER_GR_EN : CUSTOMER_EN_GR;
+        var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+        var nodes = [];
+        var n;
+        while ((n = walker.nextNode())) nodes.push(n);
+        nodes.forEach(function(node) {
+            var t = node.textContent.trim();
+            // Never translate nodes that contain the brand name "Reserva"
+            if (t && map[t] !== undefined && t.indexOf('Reserva') === -1) {
+                node.textContent = node.textContent.replace(t, map[t]);
+            }
+        });
+        document.querySelectorAll('.lang-gr').forEach(function(el) {
+            el.style.display = l === 'en' ? 'none' : '';
+        });
+        document.querySelectorAll('.lang-en').forEach(function(el) {
+            el.style.display = l === 'en' ? '' : 'none';
+        });
+        var lbl = document.getElementById('customerLangLabel');
+        if (lbl) lbl.textContent = l === 'en' ? 'ΕΛ' : 'EN';
+    }
+
+    window.toggleCustomerLang = function() {
+        lang = lang === 'gr' ? 'en' : 'gr';
+        localStorage.setItem('customerLang', lang);
+        applyLang(lang);
+    };
+
+    function initTabsWithoutReload() {
+        var myTab = document.getElementById('tab-my-bookings');
+        var newTab = document.getElementById('tab-book-new');
+        var newsTab = document.getElementById('tab-news');
+        var myPane = document.getElementById('pane-my-bookings');
+        var newPane = document.getElementById('pane-book-new');
+        var newsPane = document.getElementById('pane-news');
+
+        if (!myTab || !newTab || !myPane || !newPane) {
+            return;
+        }
+
+        function activateTab(tab) {
+            // Hide all panes
+            myPane.style.display = 'none';
+            newPane.style.display = 'none';
+            if (newsPane) newsPane.style.display = 'none';
+            
+            // Deactivate all tabs
+            myTab.classList.remove('active');
+            newTab.classList.remove('active');
+            if (newsTab) newsTab.classList.remove('active');
+            
+            // Show selected pane and activate tab
+            if (tab === 'my_bookings') {
+                myPane.style.display = '';
+                myTab.classList.add('active');
+                var visiblePane = myPane;
+            } else if (tab === 'book_new') {
+                newPane.style.display = '';
+                newTab.classList.add('active');
+                var visiblePane = newPane;
+            } else if (tab === 'news' && newsPane) {
+                newsPane.style.display = '';
+                if (newsTab) newsTab.classList.add('active');
+                var visiblePane = newsPane;
+            }
+            
+            if (visiblePane) {
+                visiblePane.classList.remove('tab-pane-animating');
+                void visiblePane.offsetWidth;
+                visiblePane.classList.add('tab-pane-animating');
+            }
+
+            var nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.set('tab', tab);
+            window.history.replaceState({}, '', nextUrl.toString());
+        }
+
+        myTab.addEventListener('click', function (event) {
+            event.preventDefault();
+            activateTab('my_bookings');
+        });
+
+        newTab.addEventListener('click', function (event) {
+            event.preventDefault();
+            activateTab('book_new');
+        });
+
+        if (newsTab) {
+            newsTab.addEventListener('click', function (event) {
+                event.preventDefault();
+                activateTab('news');
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        applyLang(lang);
+        initTabsWithoutReload();
+    });
+})();
+</script>
+{% endblock %}
+

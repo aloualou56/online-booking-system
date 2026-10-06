@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% block title %}Ραντεβού Υπαλλήλου — {{ employee.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h3 class="mb-1"><i class="fas fa-calendar-alt me-2"></i>Ραντεβού</h3>
+        <div class="text-muted small">{{ business.name }} • {{ employee.name }}</div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <div class="btn-group bookings-view-toggle" role="group" aria-label="Εναλλαγή προβολής ραντεβού">
+            <button type="button" class="btn btn-outline-primary active" data-bookings-view="list">
+                <i class="fas fa-list me-1"></i>Λίστα
+            </button>
+            <button type="button" class="btn btn-outline-primary" data-bookings-view="calendar">
+                <i class="fas fa-calendar-week me-1"></i>Ημερολόγιο
+            </button>
+        </div>
+        <a href="{% url 'accounts:employee_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center">
+        <form method="get" class="employee-bookings-filter-form w-100">
+            <div class="row g-2 align-items-end">
+                <div class="col-12 col-sm-auto">
+                    <label for="statusFilter" class="form-label mb-0 small text-muted">Φίλτρο κατάστασης</label>
+                </div>
+                <div class="col-12 col-sm">
+                    <select id="statusFilter" name="status" class="form-select form-select-sm">
+                        <option value="" {% if not status_filter %}selected{% endif %}>Όλες</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Αναμονή</option>
+                        <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Επιβεβαιωμένο</option>
+                        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Ολοκληρωμένο</option>
+                        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Ακυρωμένο</option>
+                        <option value="no_show" {% if status_filter == 'no_show' %}selected{% endif %}>No-Show</option>
+                    </select>
+                </div>
+                <div class="col-12 col-sm-auto d-grid">
+                    <button type="submit" class="btn btn-sm btn-primary">Εφαρμογή</button>
+                </div>
+            </div>
+        </form>
+
+        {% if business.allow_employee_booking_actions %}
+        <span class="badge bg-success"><i class="fas fa-user-check me-1"></i>Ενέργειες ενεργές</span>
+        {% else %}
+        <span class="badge bg-secondary"><i class="fas fa-eye me-1"></i>Μόνο προβολή</span>
+        {% endif %}
+    </div>
+</div>
+
+<div id="employeeBookingsListView">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if bookings %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Ημερομηνία</th>
+                            <th>Ώρα</th>
+                            <th>Πελάτης</th>
+                            <th>Υπηρεσία</th>
+                            <th>Σημειώσεις</th>
+                            <th>Κατάσταση</th>
+                            <th class="text-nowrap">Ενέργειες</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.id }}</td>
+                            <td>{{ booking.date|date:"d/m/Y" }}</td>
+                            <td>{{ booking.start_time|time:"H:i" }}-{{ booking.end_time|time:"H:i" }}</td>
+                            <td>
+                                {% if booking.customer %}
+                                    {{ booking.customer.get_full_name|default:booking.customer.username }}
+                                {% else %}
+                                    {{ booking.guest_name|default:"Επισκέπτης" }}
+                                {% endif %}
+                            </td>
+                            <td>{{ booking.service.name }}</td>
+                            <td style="min-width:220px; max-width:320px;" class="text-wrap">
+                                {% if booking.notes %}
+                                    {{ booking.notes|linebreaksbr }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if booking.status == 'confirmed' %}success{% elif booking.status == 'pending' %}warning text-dark{% elif booking.status == 'completed' %}info{% elif booking.status == 'cancelled' %}danger{% else %}dark{% endif %}">
+                                    {{ booking.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="text-nowrap">
+                                {% if business.allow_employee_booking_actions and booking.status == 'pending' %}
+                                <form method="post" action="{% url 'accounts:employee_confirm_booking' booking.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-success" type="submit">
+                                        <i class="fas fa-check me-1"></i>Επιβεβαίωση
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                {% if business.allow_employee_booking_actions and booking.status == 'confirmed' %}
+                                <form method="post" action="{% url 'accounts:employee_mark_completed' booking.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-outline-success" type="submit">
+                                        <i class="fas fa-check-double me-1"></i>Ολοκληρώθηκε
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'accounts:employee_mark_no_show' booking.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-outline-dark" type="submit">
+                                        <i class="fas fa-user-slash me-1"></i>No-Show
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                {% if business.allow_employee_booking_actions %}
+                                {% if booking.status == 'pending' or booking.status == 'confirmed' %}
+                                <form method="post" action="{% url 'accounts:employee_reject_booking' booking.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="rejection_reason" value="Απόρριψη από υπάλληλο">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">
+                                        <i class="fas fa-times me-1"></i>Απόρριψη
+                                    </button>
+                                </form>
+                                {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if page_obj %}
+            <nav class="mt-3" aria-label="Σελιδοποίηση ραντεβού">
+                <ul class="pagination pagination-sm mb-0 justify-content-end">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?status={{ status_filter }}&page={{ page_obj.previous_page_number }}">Προηγ.</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Προηγ.</span></li>
+                    {% endif %}
+                    <li class="page-item disabled"><span class="page-link">Σελίδα {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?status={{ status_filter }}&page={{ page_obj.next_page_number }}">Επόμ.</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Επόμ.</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle me-2"></i>Δεν υπάρχουν ραντεβού για εμφάνιση.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div id="employeeBookingsCalendarView" class="d-none">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div id="employeeBookingsCalendar"></div>
+        </div>
+    </div>
+</div>
+
+{{ bookings_calendar_data|json_script:"employeeBookingsCalendarData" }}
+
+<div class="modal fade" id="employeeCalendarBookingModal" tabindex="-1" aria-labelledby="employeeCalendarBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="employeeCalendarBookingModalLabel">Λεπτομέρειες ραντεβού</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="employeeCalendarBookingModalBody"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.css">
+<style>
+.bookings-view-toggle .btn { border-radius: 0.6rem !important; font-weight: 600; }
+.bookings-view-toggle { display: inline-flex; gap: 0.45rem; }
+.bookings-view-toggle .btn.active {
+    background: linear-gradient(135deg, #c9a227, #f0c04a);
+    border-color: #c9a227;
+    color: #1a1400;
+}
+.employee-bookings-filter-form .form-select {
+    min-width: 0;
+}
+#employeeBookingsCalendar .fc-event { border: 0; border-radius: 0.6rem; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const listView = document.getElementById('employeeBookingsListView');
+    const calendarView = document.getElementById('employeeBookingsCalendarView');
+    const calendarRoot = document.getElementById('employeeBookingsCalendar');
+    const toggleButtons = document.querySelectorAll('[data-bookings-view]');
+    const preferenceKey = 'employeeBookingsView_{{ employee.id }}';
+    const dataElement = document.getElementById('employeeBookingsCalendarData');
+    const modalElement = document.getElementById('employeeCalendarBookingModal');
+    const modalBody = document.getElementById('employeeCalendarBookingModalBody');
+    const modal = (modalElement && typeof bootstrap !== 'undefined') ? new bootstrap.Modal(modalElement) : null;
+    let calendarInstance = null;
+
+    function statusColor(status) {
+        if (status === 'pending') return '#f59e0b';
+        if (status === 'confirmed') return '#16a34a';
+        if (status === 'completed') return '#2563eb';
+        if (status === 'cancelled') return '#dc2626';
+        if (status === 'no_show') return '#374151';
+        return '#6b7280';
+    }
+
+    function escapeHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function buildEvents() {
+        if (!dataElement) return [];
+        let rows = [];
+        try { rows = JSON.parse(dataElement.textContent || '[]'); } catch (error) { rows = []; }
+
+        return rows.map(function (booking) {
+            return {
+                id: String(booking.id),
+                title: (booking.customer_name || 'Πελάτης') + ' • ' + (booking.service_name || 'Υπηρεσία'),
+                start: booking.date + 'T' + booking.start_time,
+                end: booking.date + 'T' + booking.end_time,
+                backgroundColor: statusColor(booking.status),
+                extendedProps: booking,
+            };
+        });
+    }
+
+    function openBookingModal(event) {
+        if (!modal || !modalBody) return;
+        const p = event.extendedProps || {};
+        const details = [];
+        details.push('<div><strong>Ραντεβού #' + escapeHtml(event.id) + '</strong></div>');
+        details.push('<div>Πελάτης: ' + escapeHtml(p.customer_name) + '</div>');
+        details.push('<div>Υπηρεσία: ' + escapeHtml(p.service_name) + '</div>');
+        details.push('<div>Κατάσταση: ' + escapeHtml(p.status_display || p.status) + '</div>');
+        if (p.phone) details.push('<div>Τηλέφωνο: ' + escapeHtml(p.phone) + '</div>');
+        if (p.notes) details.push('<div class="mt-2"><strong>Σημειώσεις:</strong><br>' + escapeHtml(p.notes).replace(/\n/g, '<br>') + '</div>');
+        modalBody.innerHTML = details.join('');
+        modal.show();
+    }
+
+    function ensureCalendar() {
+        if (!calendarRoot || typeof FullCalendar === 'undefined' || calendarInstance) return;
+        calendarInstance = new FullCalendar.Calendar(calendarRoot, {
+            initialView: 'timeGridWeek',
+            height: 'auto',
+            locale: 'el',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay',
+            },
+            events: buildEvents(),
+            eventClick: function (info) {
+                info.jsEvent.preventDefault();
+                openBookingModal(info.event);
+            },
+        });
+        calendarInstance.render();
+    }
+
+    function setView(mode) {
+        const selected = mode === 'calendar' ? 'calendar' : 'list';
+        listView.classList.toggle('d-none', selected !== 'list');
+        calendarView.classList.toggle('d-none', selected !== 'calendar');
+
+        toggleButtons.forEach(function (btn) {
+            const active = btn.getAttribute('data-bookings-view') === selected;
+            btn.classList.toggle('active', active);
+            btn.classList.toggle('btn-primary', active);
+            btn.classList.toggle('btn-outline-primary', !active);
+        });
+
+        if (selected === 'calendar') {
+            ensureCalendar();
+            if (calendarInstance) {
+                window.setTimeout(function () { calendarInstance.updateSize(); }, 20);
+            }
+        }
+
+        localStorage.setItem(preferenceKey, selected);
+    }
+
+    toggleButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            setView(btn.getAttribute('data-bookings-view'));
+        });
+    });
+
+    const stored = localStorage.getItem(preferenceKey);
+    setView(stored || 'list');
+});
+</script>
+{% endblock %}

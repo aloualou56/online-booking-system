@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Υπαλλήλου — {{ employee.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="fas fa-user-tie me-2"></i>Καλώς ήρθες, {{ employee.name }}</h3>
+    <span class="badge bg-primary fs-6">{{ business.name }}</span>
+</div>
+
+<!-- Today's Status Card -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-1">Κατάσταση για Σήμερα ({{ today|date:"d/m/Y" }})</h5>
+                {% if is_off_today %}
+                <span class="badge bg-danger fs-6"><i class="fas fa-ban me-1"></i>Μη Διαθέσιμος/η</span>
+                {% else %}
+                <span class="badge bg-success fs-6"><i class="fas fa-check me-1"></i>Διαθέσιμος/η</span>
+                {% endif %}
+            </div>
+            <div class="text-muted small">
+                <i class="fas fa-info-circle me-1"></i>Για αλλαγή διαθεσιμότητας, υποβάλετε αίτημα άδειας
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Bookings -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <div class="d-flex justify-content-between align-items-center gap-2">
+            <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Επερχόμενα Ραντεβού</h5>
+            <a href="{% url 'accounts:employee_bookings' %}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-list me-1"></i>Όλα τα ραντεβού
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if upcoming_bookings %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Ημερομηνία</th>
+                        <th>Ώρα</th>
+                        <th>Υπηρεσία</th>
+                        <th>Πελάτης</th>
+                        <th>Κατάσταση</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in upcoming_bookings %}
+                    <tr>
+                        <td>{{ booking.date|date:"d/m/Y" }}</td>
+                        <td>{{ booking.start_time|time:"H:i" }}</td>
+                        <td>{{ booking.service.name }}</td>
+                        <td>
+                            {% if booking.customer %}
+                                {{ booking.customer.get_full_name|default:"Επισκέπτης" }}
+                            {% else %}
+                                {{ booking.guest_name|default:"Επισκέπτης" }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Αναμονή</span>
+                            {% elif booking.status == 'confirmed' %}
+                            <span class="badge bg-success">Επιβεβαιωμένο</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">Δεν υπάρχουν επερχόμενα ραντεβού.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Days Off Management -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fas fa-calendar-minus me-2"></i>Αιτήματα Άδειας</h5>
+    </div>
+    <div class="card-body">
+        <!-- Add Day Off Request Form -->
+        <form method="post" action="{% url 'accounts:employee_add_day_off' %}" class="mb-4">
+            {% csrf_token %}
+            <div class="row g-2 mb-3">
+                <div class="col-md-3">
+                    <label class="form-label small">Ημερομηνία</label>
+                    <input type="date" name="date" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">Λόγος</label>
+                    <input type="text" name="reason" class="form-control" placeholder="π.χ. Προσωπικοί λόγοι, Ιατρική εξέταση">
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label small">Σημειώσεις (προαιρετικό)</label>
+                    <input type="text" name="request_notes" class="form-control" placeholder="Πρόσθετες πληροφορίες για τον εργοδότη">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane me-2"></i>Υποβολή Αιτήματος
+            </button>
+        </form>
+
+        <hr>
+
+        {% if absence_requests %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ημερομηνία</th>
+                        <th>Λόγος</th>
+                        <th>Κατάσταση</th>
+                        <th>Απάντηση</th>
+                        <th style="width:100px;">Ενέργειες</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in absence_requests %}
+                    <tr>
+                        <td>{{ request.date|date:"d/m/Y" }}</td>
+                        <td>{{ request.reason|default:"-" }}</td>
+                        <td>
+                            {% if request.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-clock me-1"></i>Αναμονή
+                                </span>
+                            {% elif request.status == 'approved' %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i>Εγκρίθηκε
+                                </span>
+                            {% elif request.status == 'rejected' %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-times me-1"></i>Απορρίφθηκε
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if request.admin_response %}
+                                <small class="text-muted">{{ request.admin_response }}</small>
+                            {% else %}
+                                <small class="text-muted">-</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'accounts:employee_absence_request_detail' request.id %}"
+                                   class="btn btn-sm btn-outline-primary" title="Συνομιλία">
+                                    <i class="fas fa-comments"></i>
+                                </a>
+                                {% if request.status == 'pending' %}
+                                <form method="post" action="{% url 'accounts:employee_remove_day_off' request.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="event.preventDefault(); customConfirm('Θέλετε να ακυρώσετε αυτό το αίτημα;', 'Ακύρωση Αιτήματος').then(confirmed => { if (confirmed) this.closest('form').submit(); }); return false;"
+                                            title="Ακύρωση αιτήματος">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3 p-3 bg-light rounded">
+            <h6 class="mb-2">Κατάσταση Αιτημάτων:</h6>
+            <div class="d-flex gap-3 flex-wrap small">
+                <div><span class="badge bg-warning text-dark">Αναμονή</span> - Το αίτημα εκκρεμεί έγκριση</div>
+                <div><span class="badge bg-success">Εγκρίθηκε</span> - Η άδεια εγκρίθηκε</div>
+                <div><span class="badge bg-danger">Απορρίφθηκε</span> - Η άδεια απορρίφθηκε</div>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            Δεν έχετε υποβάλει αιτήματα άδειας. Χρησιμοποιήστε την παραπάνω φόρμα για να αιτηθείτε άδεια.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

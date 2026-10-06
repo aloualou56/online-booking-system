@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Αίτημα Άδειας #{{ absence_request.id }} — {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4><i class="fas fa-calendar-minus me-2"></i>Αίτημα Άδειας #{{ absence_request.id }}</h4>
+            <a href="{% url 'businesses:absence_requests' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i>Πίσω
+            </a>
+        </div>
+
+        <!-- Request Summary -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Στοιχεία Αιτήματος</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <strong>Υπάλληλος:</strong> {{ absence_request.employee.name }}
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Ημερομηνία:</strong> {{ absence_request.date|date:"d/m/Y" }}
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Κατάσταση:</strong>
+                        {% if absence_request.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Αναμονή</span>
+                        {% elif absence_request.status == 'approved' %}
+                            <span class="badge bg-success">Εγκρίθηκε</span>
+                        {% else %}
+                            <span class="badge bg-danger">Απορρίφθηκε</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Αιτήθηκε:</strong> {{ absence_request.requested_at|date:"d/m/Y H:i" }}
+                    </div>
+                    {% if absence_request.reason %}
+                    <div class="col-12">
+                        <strong>Λόγος:</strong> {{ absence_request.reason }}
+                    </div>
+                    {% endif %}
+                    {% if absence_request.request_notes %}
+                    <div class="col-12">
+                        <strong>Σημειώσεις:</strong> {{ absence_request.request_notes }}
+                    </div>
+                    {% endif %}
+                    {% if absence_request.admin_response %}
+                    <div class="col-12">
+                        <strong>Απάντησή σας:</strong> {{ absence_request.admin_response }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if absence_request.status == 'pending' %}
+                <div class="d-flex gap-2 mt-3">
+                    <a href="{% url 'businesses:approve_absence_request' absence_request.id %}"
+                       class="btn btn-success btn-sm">
+                        <i class="fas fa-check me-1"></i>Έγκριση
+                    </a>
+                    <a href="{% url 'businesses:reject_absence_request' absence_request.id %}"
+                       class="btn btn-danger btn-sm">
+                        <i class="fas fa-times me-1"></i>Απόρριψη
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Chat -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Συνομιλία</h5>
+            </div>
+            <div class="card-body">
+                {% if chat_messages %}
+                <div class="mb-3" style="max-height: 400px; overflow-y: auto;" id="chatBox">
+                    {% for msg in chat_messages %}
+                    <div class="d-flex mb-3 {% if msg.sender == request.user %}justify-content-end{% endif %}">
+                        <div class="p-3 rounded-3 {% if msg.sender == request.user %}bg-primary text-white{% else %}bg-light{% endif %}"
+                             style="max-width: 75%;">
+                            <div class="fw-semibold small mb-1">
+                                {% if msg.sender == request.user %}
+                                    Εσείς
+                                {% else %}
+                                    {{ msg.sender.get_full_name|default:msg.sender.username }}
+                                {% endif %}
+                            </div>
+                            <div>{{ msg.message }}</div>
+                            <div class="small opacity-75 mt-1">{{ msg.created_at|date:"d/m H:i" }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-3">Δεν υπάρχουν μηνύματα ακόμα.</p>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="message" class="form-control"
+                               placeholder="Γράψτε μήνυμα..." required maxlength="500">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-1"></i>Αποστολή
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-scroll chat to bottom
+    const chatBox = document.getElementById('chatBox');
+    if (chatBox) {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+{% endblock %}

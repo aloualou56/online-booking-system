@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{% if employee %}Επεξεργασία{% else %}Νέος{% endif %} Υπάλληλος{% endblock %}
+
+{% block content %}
+<h3 class="mb-4">
+    <i class="fas fa-user-{% if employee %}edit{% else %}plus{% endif %} me-2"></i>
+    {% if employee %}Επεξεργασία: {{ employee.name }}{% else %}Νέος Υπάλληλος{% endif %}
+</h3>
+<div class="card shadow-sm">
+    <div class="card-body p-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Ονοματεπώνυμο *</label>
+                    <input type="text" name="name" class="form-control" value="{% if employee %}{{ employee.name }}{% endif %}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Ειδικότητα / Ρόλος</label>
+                    <input type="text" name="title" class="form-control" value="{% if employee %}{{ employee.title }}{% endif %}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" value="{% if employee %}{{ employee.email }}{% endif %}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Τηλέφωνο</label>
+                    <input type="tel" name="phone" class="form-control" value="{% if employee %}{{ employee.phone }}{% endif %}" pattern="[0-9]{10}" title="Το τηλέφωνο πρέπει να είναι 10 ψηφία">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Φωτογραφία</label>
+                <input type="file" name="photo" class="form-control" accept="image/*">
+            </div>
+            {% if employee %}
+            <div class="mb-3">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="is_active" {% if employee.is_active %}checked{% endif %}>
+                    <label class="form-check-label">Ενεργός</label>
+                </div>
+            </div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Αποθήκευση
+            </button>
+            <a href="{% url 'businesses:employee_list' %}" class="btn btn-outline-secondary ms-2">Ακύρωση</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

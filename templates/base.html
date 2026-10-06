@@ -1,0 +1,1690 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Reserva{% endblock %}</title>
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico?v=20260404" sizes="any">
+    <link rel="shortcut icon" href="/favicon.ico?v=20260404">
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}?v=20260404">
+    <link rel="apple-touch-icon" href="{% static 'img/logo.png' %}?v=2026">
+    <link rel="manifest" href="{% url 'pwa_manifest' %}">
+    <meta name="theme-color" content="#c9a227">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Reserva">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- OpenGraph Meta Tags for Google Search & Social Media -->
+    <meta property="og:site_name" content="Reserva">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}Reserva — Κλείστε Ραντεβού Online{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Κλείστε ραντεβού online σε 30 Δευτερόλεπτα. Ελεύθερη δοκιμή, χωρίς τηλεφώνημα.{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}https://reserva.gr/{% endblock %}">
+    <meta property="og:image" content="https://reserva.gr/static/img/logo.png?v=2026">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="description" content="{% block meta_description %}Κλείστε ραντεβού online σε 30 Δευτερόλεπτα. Ελεύθερη δοκιμή, χωρίς τηλεφώνημα.{% endblock %}">
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}Reserva — Κλείστε Ραντεβού Online{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Κλείστε ραντεβού online σε 30 Δευτερόλεπτα. Ελεύθερη δοκιμή, χωρίς τηλεφώνημα.{% endblock %}">
+    <meta name="twitter:image" content="https://reserva.gr/static/img/logo.png?v=2026">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    {% if request.user.is_authenticated and request.user.role != 'customer' and not hide_sidebar %}
+    <link href="{% static 'css/business-panel.css' %}" rel="stylesheet">
+    {% endif %}
+    <style>
+        /* Hide stray text nodes - applied inline for immediate effect */
+        .main-content, body > .container-fluid { font-size: 0; }
+        .main-content > *, body > .container-fluid > * { font-size: 1rem; }
+        .user-display-name {
+            display: inline-block;
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: bottom;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if request.user.is_authenticated and request.user.role != 'customer' and not hide_sidebar %}
+    <!-- Sidebar for professionals & admins -->
+    <div class="sidebar d-flex flex-column" id="sidebar">
+        <div class="sidebar-header px-3 py-3">
+            <a href="{% url 'landing' %}" class="d-flex align-items-center gap-2 text-decoration-none">
+                <img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva" class="sidebar-logo-img"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+                <i class="fas fa-calendar-check" style="display:none;color:var(--gold-light);"></i>
+                <h5 class="mb-0 fw-bold" style="color: var(--gold-light);">Reserva</h5>
+            </a>
+        </div>
+        <hr class="sidebar-divider my-2" style="border-top: 1px solid rgba(255,255,255,.55);">
+        <nav class="sidebar-nav flex-grow-1 d-flex flex-column px-2 mt-2">
+            {% if request.user.is_super_admin and not request.session.superadmin_business_access_id %}
+            <a href="{% url 'superadmin:dashboard' %}" class="nav-link {% if 'superadmin' in request.path and 'pending' not in request.path and 'professional' not in request.path and 'stats' not in request.path %}active{% endif %}">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a href="{% url 'superadmin:pending_professionals' %}" class="nav-link {% if 'pending' in request.path %}active{% endif %}">
+                <i class="fas fa-user-clock me-2"></i>Εκκρεμείς Εγκρίσεις
+            </a>
+            <a href="{% url 'superadmin:manage_professionals' %}" class="nav-link {% if 'professionals' in request.path %}active{% endif %}">
+                <i class="fas fa-users-cog me-2"></i>Επαγγελματίες
+            </a>
+            <a href="{% url 'superadmin:manage_customers' %}" class="nav-link {% if '/superadmin/customers/' in request.path %}active{% endif %}">
+                <i class="fas fa-user-shield me-2"></i>Πελάτες
+            </a>
+            <a href="{% url 'superadmin:platform_stats' %}" class="nav-link {% if 'stats' in request.path %}active{% endif %}">
+                <i class="fas fa-chart-bar me-2"></i>Στατιστικά
+            </a>
+            <a href="{% url 'superadmin:admin_reports' %}" class="nav-link {% if 'reports' in request.path %}active{% endif %}">
+                <i class="fas fa-flag me-2"></i>Αναφορές
+            </a>
+            <a href="{% url 'superadmin:manage_news' %}" class="nav-link {% if 'news' in request.path %}active{% endif %}">
+                <i class="fas fa-newspaper me-2"></i>Ειδήσεις
+            </a>
+            <a href="{% url 'superadmin:business_access' %}" class="nav-link {% if 'business-access' in request.path %}active{% endif %}">
+                <i class="fas fa-toolbox me-2"></i>Business Access
+            </a>
+            {% elif request.user.is_professional and request.user.is_approved or request.user.is_super_admin and request.session.superadmin_business_access_id %}
+            {% if request.user.is_super_admin and request.session.superadmin_business_access_id %}
+            <a href="{% url 'superadmin:exit_business_access' %}" class="nav-link">
+                <i class="fas fa-right-from-bracket me-2"></i>Έξοδος Troubleshooting
+            </a>
+            {% endif %}
+            <a href="{% url 'businesses:dashboard' %}" class="nav-link {% if request.path == '/business/dashboard/' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a href="{% url 'businesses:booking_list' %}" class="nav-link {% if 'bookings' in request.path %}active{% endif %}">
+                <i class="fas fa-calendar-alt me-2"></i>Ραντεβού
+            </a>
+            <a href="{% url 'businesses:customers_list' %}" class="nav-link {% if 'customers' in request.path and 'notifications' not in request.path %}active{% endif %}">
+                <i class="fas fa-user-friends me-2"></i>Πελάτες μου
+            </a>
+            <a href="{% url 'businesses:employee_list' %}" class="nav-link {% if 'employees' in request.path %}active{% endif %}">
+                <i class="fas fa-users me-2"></i>Υπάλληλοι
+            </a>
+            <a href="{% url 'businesses:absence_requests' %}" class="nav-link {% if 'absence-requests' in request.path %}active{% endif %}">
+                <i class="fas fa-calendar-minus me-2"></i>Αιτήματα Άδειας
+            </a>
+            <a href="{% url 'businesses:service_list' %}" class="nav-link {% if 'services' in request.path %}active{% endif %}">
+                <i class="fas fa-concierge-bell me-2"></i>Υπηρεσίες
+            </a>
+            <a href="{% url 'businesses:settings' %}" class="nav-link {% if 'settings' in request.path %}active{% endif %}">
+                <i class="fas fa-cog me-2"></i>Ρυθμίσεις
+            </a>
+            <a href="{% url 'businesses:closures' %}" class="nav-link {% if 'closures' in request.path %}active{% endif %}">
+                <i class="fas fa-door-closed me-2"></i>Προσωρινό Κλείσιμο
+            </a>
+            <a href="{% url 'businesses:reviews' %}" class="nav-link {% if 'reviews' in request.path %}active{% endif %}">
+                <i class="fas fa-star me-2"></i>Κριτικές
+            </a>
+            <a href="{% url 'notifications:center' %}" class="nav-link {% if '/notifications/' in request.path %}active{% endif %}">
+                <i class="fas fa-bell me-2"></i>Ειδοποιήσεις
+            </a>
+            <a href="{% url 'businesses:tutorial' %}" class="nav-link {% if 'tutorial' in request.path %}active{% endif %}">
+                <i class="fas fa-question-circle me-2"></i>Βοήθεια
+            </a>
+            {% elif request.user.is_employee %}
+            {% with employee_profiles=request.user.employee_profiles.all %}
+            <a href="{% url 'accounts:employee_dashboard' %}" class="nav-link {% if request.path == '/accounts/employee/' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a href="{% url 'accounts:employee_bookings' %}" class="nav-link {% if '/accounts/employee/bookings/' in request.path %}active{% endif %}">
+                <i class="fas fa-calendar-alt me-2"></i>Ραντεβού
+            </a>
+            <a href="{% url 'accounts:employee_help' %}" class="nav-link {% if '/accounts/employee/help/' in request.path %}active{% endif %}">
+                <i class="fas fa-question-circle me-2"></i>Βοήθεια
+            </a>
+            {% if employee_profiles|length > 1 %}
+            <div class="px-3 pt-2 pb-1" style="color: rgba(245,230,192,.55); font-size: .72rem; text-transform: uppercase; letter-spacing: .06em;">
+                Θέση Εργασίας
+            </div>
+            {% for workplace in employee_profiles %}
+            <a href="{% url 'accounts:switch_employee_workplace' workplace.id %}?next={{ request.path }}"
+               class="nav-link {% if request.session.active_employee_profile_id == workplace.id %}active{% endif %}">
+                <i class="fas fa-briefcase me-2"></i>{{ workplace.business.name }}
+            </a>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+            {% endif %}
+
+            <hr class="sidebar-divider my-2" style="border-top: 1px solid rgba(255,255,255,.55);">
+            <a href="{% url 'accounts:profile' %}" class="nav-link">
+                <i class="fas fa-user me-2"></i>Προφίλ
+            </a>
+            <a href="{% url 'accounts:logout' %}" class="nav-link">
+                <i class="fas fa-sign-out-alt me-2"></i>Αποσύνδεση
+            </a>
+        </nav>
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    {% if request.user.is_authenticated and request.user.role != 'customer' and not hide_sidebar %}
+    <div class="main-content">
+    {% else %}
+    <div class="container-fluid">
+    {% endif %}
+
+        {% if request.user.is_authenticated and request.user.role != 'customer' and not hide_sidebar %}
+        <!-- Mobile overlay backdrop (tap outside sidebar to close) -->
+        <div id="sidebarOverlay"></div>
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white rounded shadow-sm mb-4">
+            <div class="container-fluid">
+                <button class="btn btn-link px-2 py-1" id="sidebarToggle" aria-label="Toggle navigation"
+                        style="font-size:1.25rem;color:#333;line-height:1;">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="ms-auto d-flex align-items-center gap-3">
+                    {% if request.user.is_professional %}
+                    <a href="{% url 'notifications:center' %}" class="btn btn-sm btn-outline-warning" title="Κέντρο Ειδοποιήσεων">
+                        <i class="fas fa-bell me-1"></i><span class="d-none d-md-inline">Ειδοποιήσεις</span>
+                    </a>
+                    {% endif %}
+                    {% if request.user.is_professional or request.user.is_employee %}
+                    <a href="{% url 'accounts:my_bookings' %}" class="btn btn-sm btn-outline-primary" title="Κράτηση ως πελάτης">
+                        <i class="fas fa-exchange-alt me-1"></i><span class="d-none d-md-inline">Λειτουργία Πελάτη</span>
+                    </a>
+                    {% endif %}
+                    <button id="pwa-install-btn" class="btn btn-sm btn-outline-warning d-none" title="Εγκατάσταση εφαρμογής">
+                        <i class="fas fa-download me-1"></i><span class="d-none d-md-inline">Εγκατάσταση</span>
+                    </button>
+                    <div class="dropdown">
+                        <button id="accountMenuToggle" class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="accountMenu">
+                            <i class="fas fa-user-circle me-1"></i>
+                            {% with display_name=request.user.get_full_name|default:request.user.username %}
+                            <span class="user-display-name" title="{{ display_name }}">{{ display_name|slice:":5" }}{% if display_name|length > 5 %}...{% endif %}</span>
+                            {% endwith %}
+                        </button>
+                        <ul id="accountMenu" class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <span class="dropdown-item-text">
+                                    <span class="badge bg-{% if request.user.is_super_admin %}danger{% elif request.user.is_professional %}primary{% elif request.user.is_employee %}info{% else %}success{% endif %}">
+                                        {{ request.user.get_role_display }}
+                                    </span>
+                                </span>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:switch_account' %}">
+                                <i class="fas fa-users me-2"></i>Αλλαγή Λογαριασμού
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                <i class="fas fa-user-cog me-2"></i>Προφίλ
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:welcome_flow' %}">
+                                <i class="fas fa-circle-play me-2"></i>Οδηγός Καλωσορίσματος
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Αποσύνδεση
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        {% elif request.user.is_authenticated and request.user.role == 'customer' %}
+        <!-- Customer Navbar -->
+        <nav class="navbar navbar-expand-lg customer-navbar">
+            <div class="container-fluid" style="max-width: 1200px; margin: 0 auto;">
+                <a class="navbar-brand" href="{% url 'landing' %}">
+                    <img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+                    <i class="fas fa-calendar-check" style="display:none"></i>
+                    Reserva
+                </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="color: var(--gold-text);">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'landing' %}">
+                                <i class="fas fa-home me-1"></i> Αρχική
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:my_bookings' %}">
+                                <i class="fas fa-calendar me-1"></i> Τα Ραντεβού μου
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:customer_help' %}">
+                                <i class="fas fa-question-circle me-1"></i> Βοήθεια
+                            </a>
+                        </li>
+                        <li class="nav-item" id="pwa-install-nav-item" style="display:none;">
+                            <button id="pwa-install-btn-customer" class="nav-link btn btn-link border-0 px-2" style="color:var(--gold-text);font-weight:600;">
+                                <i class="fas fa-download me-1"></i> Εγκατάσταση
+                            </button>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <button class="nav-link dropdown-toggle btn btn-link border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i>
+                                {% with display_name=request.user.get_full_name|default:request.user.username %}
+                                <span class="user-display-name" title="{{ display_name }}">{{ display_name|slice:":5" }}{% if display_name|length > 5 %}...{% endif %}</span>
+                                {% endwith %}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'accounts:switch_account' %}">
+                                    <i class="fas fa-users me-2"></i>Αλλαγή Λογαριασμού
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                    <i class="fas fa-user-cog me-2"></i>Προφίλ
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:welcome_flow' %}">
+                                    <i class="fas fa-circle-play me-2"></i>Οδηγός Καλωσορίσματος
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Αποσύνδεση
+                                </a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        {% endif %}
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="site-flash-stack" aria-live="polite" aria-atomic="true">
+            {% for message in messages %}
+            <div class="site-flash js-site-flash {% if 'success' in message.tags %}site-flash--success{% elif 'error' in message.tags or 'danger' in message.tags %}site-flash--error{% elif 'warning' in message.tags %}site-flash--warning{% else %}site-flash--info{% endif %}"
+                 role="{% if 'error' in message.tags or 'danger' in message.tags %}alert{% else %}status{% endif %}"
+                 data-autohide="{% if 'error' in message.tags or 'danger' in message.tags %}false{% else %}true{% endif %}">
+                <div class="site-flash__icon" aria-hidden="true">
+                    {% if 'success' in message.tags %}
+                    <i class="fas fa-check"></i>
+                    {% elif 'error' in message.tags or 'danger' in message.tags %}
+                    <i class="fas fa-exclamation"></i>
+                    {% elif 'warning' in message.tags %}
+                    <i class="fas fa-triangle-exclamation"></i>
+                    {% else %}
+                    <i class="fas fa-circle-info"></i>
+                    {% endif %}
+                </div>
+                <div class="site-flash__body">{{ message }}</div>
+                <button type="button" class="site-flash__close js-site-flash-close" aria-label="Κλείσιμο">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if request.user.is_super_admin and request.session.superadmin_business_access_id %}
+        <div class="alert alert-warning d-flex align-items-center justify-content-between" role="alert">
+            <div>
+                <i class="fas fa-triangle-exclamation me-2"></i>
+                Είστε σε λειτουργία troubleshooting για επιχείρηση:
+                <strong>{{ request.session.superadmin_business_access_name|default:'Επιλεγμένη Επιχείρηση' }}</strong>
+            </div>
+            <a href="{% url 'superadmin:exit_business_access' %}" class="btn btn-sm btn-outline-dark">Έξοδος</a>
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row align-items-center g-3">
+                <div class="col-lg-4 text-center text-lg-start">
+                    <div class="site-footer__brand d-inline-flex align-items-center gap-2">
+                        <img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva" style="height:30px;width:auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
+                        <i class="fas fa-calendar-check" style="display:none;color:#c9a227;"></i>
+                        <span>Reserva</span>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="site-footer__social">
+                        <span class="text-muted small fw-semibold">Follow us</span>
+                        <a class="site-footer__social-link site-footer__social-link--instagram" href="https://www.instagram.com/reserva_hellas?igsh=MXdnNHNnOWU0emIxcQ%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-instagram"></i>
+                            <span>Instagram</span>
+                        </a>
+                        <a class="site-footer__social-link site-footer__social-link--tiktok" href="https://www.tiktok.com/@reserva.gr?_r=1&_t=ZN-95GZazU35og" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-tiktok"></i>
+                            <span>TikTok</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center text-lg-end">
+                    <small class="text-muted">&copy; 2026 Reserva</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Modal System -->
+    <div class="modal fade" id="customModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content custom-modal-content">
+                <div class="modal-header custom-modal-header">
+                    <h5 class="modal-title custom-modal-title" id="customModalTitle">Επιβεβαίωση</h5>
+                </div>
+                <div class="modal-body custom-modal-body">
+                    <div class="custom-modal-icon">
+                        <i id="customModalIcon" class="fas fa-question-circle"></i>
+                    </div>
+                    <p id="customModalMessage" class="custom-modal-message">Είστε σίγουροι;</p>
+                </div>
+                <div class="modal-footer custom-modal-footer">
+                    <button type="button" class="btn custom-modal-cancel" id="customModalCancel">Ακύρωση</button>
+                    <button type="button" class="btn custom-modal-confirm" id="customModalConfirm">Επιβεβαίωση</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div class="modal fade" id="customAlert" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content custom-modal-content">
+                <div class="modal-header custom-modal-header">
+                    <h5 class="modal-title custom-modal-title" id="customAlertTitle">Ειδοποίηση</h5>
+                </div>
+                <div class="modal-body custom-modal-body text-center">
+                    <div class="custom-modal-icon">
+                        <i id="customAlertIcon" class="fas fa-info-circle"></i>
+                    </div>
+                    <p id="customAlertMessage" class="custom-modal-message">Μήνυμα</p>
+                </div>
+                <div class="modal-footer custom-modal-footer justify-content-center">
+                    <button type="button" class="btn custom-modal-confirm" id="customAlertOk">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if not request.user.is_authenticated or request.user.role == 'customer' or hide_sidebar %}
+    <div id="cookieBanner" class="cookie-banner" role="dialog" aria-live="polite" aria-label="Ρυθμίσεις cookies" hidden>
+        <div class="cookie-banner__content">
+            <p class="cookie-banner__text mb-2 mb-md-0">
+                Χρησιμοποιούμε απαραίτητα cookies για ασφάλεια και λειτουργία. Προαιρετικά cookies ενεργοποιούνται μόνο με συγκατάθεση.
+                <a href="{% url 'privacy' %}#cookie-policy">Μάθετε περισσότερα</a>.
+            </p>
+            <div class="cookie-banner__actions">
+                <button id="cookieEssentialBtn" type="button" class="btn btn-sm btn-outline-secondary">Μόνο απαραίτητα</button>
+                <button id="cookieAcceptAllBtn" type="button" class="btn btn-sm btn-primary">Αποδοχή όλων</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ── Sidebar toggle (desktop: collapse/expand | mobile: slide in/out) ──
+        const sidebar   = document.getElementById('sidebar');
+        const overlay   = document.getElementById('sidebarOverlay');
+        const mainWrap  = document.querySelector('.main-content');
+        const toggle    = document.getElementById('sidebarToggle');
+
+        // Immediate cleanup: remove stray ">" text nodes in main-content or container-fluid
+        const contentWrap = mainWrap || document.querySelector('body > .container-fluid');
+        if (contentWrap) {
+            contentWrap.childNodes.forEach((n) => {
+                if (n.nodeType === Node.TEXT_NODE && n.textContent.trim() === '>') {
+                    n.remove();
+                }
+            });
+        }
+
+        function isMobile() { return window.innerWidth < 993; }
+
+        function openSidebar() {
+            if (!sidebar) return;
+            sidebar.classList.add('show');
+            sidebar.classList.remove('collapsed');
+            if (overlay) overlay.classList.add('show');
+            if (mainWrap && !isMobile()) mainWrap.classList.remove('expanded');
+        }
+
+        function closeSidebar() {
+            if (!sidebar) return;
+            sidebar.classList.remove('show');
+            sidebar.classList.add('collapsed');
+            if (overlay) overlay.classList.remove('show');
+            if (mainWrap && !isMobile()) mainWrap.classList.add('expanded');
+        }
+
+        function sidebarIsOpen() {
+            if (!sidebar) return false;
+            if (isMobile()) return sidebar.classList.contains('show');
+            return !sidebar.classList.contains('collapsed');
+        }
+
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                sidebarIsOpen() ? closeSidebar() : openSidebar();
+            });
+        }
+
+        // Close sidebar when tapping the overlay on mobile
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+
+        // On desktop, start expanded; on mobile start hidden
+        window.addEventListener('DOMContentLoaded', () => {
+            if (sidebar) {
+                if (isMobile()) {
+                    closeSidebar();
+                } else {
+                    // open by default on desktop
+                    sidebar.classList.remove('collapsed');
+                    if (mainWrap) mainWrap.classList.remove('expanded');
+                }
+            }
+        });
+
+        // Re-evaluate on resize
+        window.addEventListener('resize', () => {
+            if (!sidebar) return;
+            if (!isMobile() && sidebar.classList.contains('show')) {
+                sidebar.classList.remove('show');
+                if (overlay) overlay.classList.remove('show');
+            }
+        });
+
+        (function () {
+            const flashes = document.querySelectorAll('.js-site-flash');
+            if (!flashes.length) return;
+
+            function dismissFlash(flash) {
+                flash.classList.add('is-leaving');
+                window.setTimeout(() => flash.remove(), 220);
+            }
+
+            flashes.forEach((flash) => {
+                const closeBtn = flash.querySelector('.js-site-flash-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => dismissFlash(flash));
+                }
+
+                if (flash.dataset.autohide === 'true') {
+                    window.setTimeout(() => dismissFlash(flash), 4200);
+                }
+            });
+        })();
+    </script>
+
+    <!-- Language Toggle (GR/EN) for dashboard -->
+    {% if request.user.is_authenticated and request.user.role != 'customer' and not hide_sidebar %}
+    <button id="dashLangBtn" onclick="toggleDashLang()" title="Change Language"
+            style="position:fixed;bottom:24px;right:24px;z-index:9999;
+                   background:rgba(30,28,16,.92);border:1px solid rgba(201,162,39,.4);
+                   color:#f0c04a;border-radius:50px;padding:8px 16px;font-size:.8rem;
+                   font-weight:600;cursor:pointer;backdrop-filter:blur(8px);
+                   box-shadow:0 2px 12px rgba(0,0,0,.3);letter-spacing:.5px;">
+        <i class="fas fa-globe me-1"></i><span id="dashLangLabel">EN</span>
+    </button>
+    <script>
+    // Full GR→EN translation dictionary for all dashboard pages
+    const GR_EN = {
+        // ── Sidebar nav ─────────────────────────────────────
+        'Dashboard': 'Dashboard',
+        'Ραντεβού': 'Bookings',
+        'Υπάλληλοι': 'Employees',
+        'Υπηρεσίες': 'Services',
+        'Ρυθμίσεις': 'Settings',
+        'Προσωρινό Κλείσιμο': 'Temp Closure',
+        'Κριτικές': 'Reviews',
+        'SMS Log': 'SMS Log',
+        'Βοήθεια': 'Help',
+        'Προφίλ': 'Profile',
+        'Αποσύνδεση': 'Logout',
+        'Εκκρεμείς Εγκρίσεις': 'Pending Approvals',
+        'Επαγγελματίας': 'Businessman',
+        'Επαγγελματίες': 'Professionals',
+        'Στατιστικά': 'Statistics',
+        'Αναφορές': 'Reports',
+        'Αρχική': 'Home',
+        'Τα Ραντεβού μου': 'My Bookings',
+        'Λειτουργία Πελάτη': 'Customer Mode',
+        'Πίσω στην Επιχείρηση': 'Back to Business',
+        'Λειτουργία Επιχείρησης': 'Business Mode',
+        'Αλλαγή Λογαριασμού': 'Switch Account',
+        'Προφίλ': 'Profile',
+        'Αποσύνδεση': 'Logout',
+        // ── Business dashboard ───────────────────────────────
+        'Ραντεβού (μήνας)': 'Bookings (month)',
+        'Έσοδα (μήνας)': 'Revenue (month)',
+        'No-Shows': 'No-Shows',
+        'Σημερινά Ραντεβού': "Today's Bookings",
+        'Επόμενες 7 Ημέρες': 'Next 7 Days',
+        'Αναμονή Έγκρισης': 'Pending Approval',
+        'Quick Actions': 'Quick Actions',
+        'Widget / Iframe': 'Widget / Iframe',
+        'σύρε για αναδιάταξη': 'drag to reorder',
+        // ── Table headers ────────────────────────────────────
+        'Ώρα': 'Time',
+        'Πελάτης': 'Customer',
+        'Υπηρεσία': 'Service',
+        'Υπάλληλος': 'Employee',
+        'Κατάσταση': 'Status',
+        'Πληρωμή': 'Payment',
+        'Ημερομηνία': 'Date',
+        'Τιμή': 'Price',
+        'Ημ/νία': 'Date',
+        'Ενέργειες': 'Actions',
+        'Σύνολο': 'Total',
+        // ── Status values ────────────────────────────────────
+        'Σε αναμονή': 'Pending',
+        'Επιβεβαιωμένο': 'Confirmed',
+        'Ακυρωμένο': 'Cancelled',
+        'Ολοκληρωμένο': 'Completed',
+        'Δεν εμφανίστηκε': 'No-Show',
+        'Εκκρεμή': 'Pending',
+        'Επιβεβαιωμένα': 'Confirmed',
+        'Ολοκληρωμένα': 'Completed',
+        'Ακυρωμένα': 'Cancelled',
+        // New English status labels
+        'Pending': 'Σε αναμονή',
+        'Confirmed': 'Επιβεβαιωμένο',
+        'Cancelled': 'Ακυρωμένο',
+        'Completed': 'Ολοκληρωμένο',
+        'No-Show': 'Δεν εμφανίστηκε',
+        // ── Buttons / actions ────────────────────────────────
+        'Έγκριση': 'Approve',
+        'Απόρριψη': 'Reject',
+        'Επιβεβαίωση': 'Confirm',
+        'Ολοκλήρωση': 'Complete',
+        'Ακύρωση': 'Cancel',
+        'Επεξεργασία': 'Edit',
+        'Διαγραφή': 'Delete',
+        'Αποθήκευση': 'Save',
+        'Αποθήκευση Αλλαγών': 'Save Changes',
+        'Επιστροφή': 'Back',
+        'Άκυρο': 'Cancel',
+        'Ναι': 'Yes',
+        'Όχι': 'No',
+        'Φίλτρο': 'Filter',
+        // ── Quick actions ────────────────────────────────────
+        'Όλα τα Ραντεβού': 'All Bookings',
+        'Κριτικές Πελατών': 'Customer Reviews',
+        'Ρυθμίσεις Επιχείρησης': 'Business Settings',
+        'Διαχείριση Υπαλλήλων': 'Manage Employees',
+        // ── Booking list page ────────────────────────────────
+        'Φίλτρο ανά κατάσταση': 'Filter by status',
+        'Όλα': 'All',
+        'Αναμονή': 'Pending',
+        'Φίλτρο ανά υπάλληλο': 'Filter by employee',
+        'Όλοι οι υπάλληλοι': 'All employees',
+        'Φίλτρο ανά ημερομηνία': 'Filter by date',
+        'Δεν υπάρχουν ραντεβού.': 'No bookings.',
+        'Δεν βρέθηκαν ραντεβού.': 'No bookings found.',
+        'Δεν υπάρχουν ραντεβού με αυτά τα κριτήρια.': 'No bookings matching these criteria.',
+        'Επισκέπτης': 'Guest',
+        // ── Employee list ────────────────────────────────────
+        'Προσθήκη Υπαλλήλου': 'Add Employee',
+        'Διαθέσιμος': 'Available',
+        'Ενεργός': 'Active',
+        'Ανενεργός': 'Inactive',
+        'Κλειστό για Σήμερα': 'Closed Today',
+        'Άνοιγμα Σήμερα': 'Open Today',
+        'Κλείσιμο για Σήμερα': 'Close for Today',
+        'Ωράριο': 'Schedule',
+        'Ειδικότητα': 'Specialty',
+        'Δεν υπάρχουν υπάλληλοι.': 'No employees.',
+        // ── Employee form ────────────────────────────────────
+        'Νέος Υπάλληλος': 'New Employee',
+        'Επεξεργασία Υπαλλήλου': 'Edit Employee',
+        'Ονοματεπώνυμο': 'Full Name',
+        'Ειδικότητα / Ρόλος': 'Specialty / Role',
+        'Τηλέφωνο': 'Phone',
+        'Φωτογραφία': 'Photo',
+        // ── Services ────────────────────────────────────────
+        'Προσθήκη Υπηρεσίας': 'Add Service',
+        'Νέα Υπηρεσία': 'New Service',
+        'Επεξεργασία:': 'Edit:',
+        'Όνομα *': 'Name *',
+        'Διάρκεια (λεπτά) *': 'Duration (min) *',
+        'Τιμή (€) *': 'Price (€) *',
+        'Διάρκεια': 'Duration',
+        'λεπτά': 'min',
+        'Ενεργή': 'Active',
+        'Ανενεργή': 'Inactive',
+        'Περιγραφή': 'Description',
+        'Δεν υπάρχουν υπηρεσίες.': 'No services.',
+        // ── Settings ────────────────────────────────────────
+        'Βασικές Πληροφορίες': 'Basic Info',
+        'Ρυθμίσεις Booking': 'Booking Settings',
+        'Πολιτική Ακυρώσεων': 'Cancellation Policy',
+        'Ωράριο & Χωρητικότητα': 'Hours & Capacity',
+        'Χωρητικότητα': 'Capacity',
+        'Επωνυμία': 'Business Name',
+        'Κατηγορία': 'Category',
+        'Υγεία & Ιατρική': 'Health & Medical',
+        'Ομορφιά & Κομμωτική': 'Beauty & Hair',
+        'Fitness & Γυμναστήριο': 'Fitness & Gym',
+        'Εκπαίδευση & Φροντιστήρια': 'Education & Tutoring',
+        'Νομικές Υπηρεσίες': 'Legal Services',
+        'Λογιστικές Υπηρεσίες': 'Accounting Services',
+        'Αυτοκίνητο & Συνεργείο': 'Auto & Garage',
+        'Τεχνολογία & IT': 'Technology & IT',
+        'Άλλο': 'Other',
+        'Προσαρμοσμένη κατηγορία': 'Custom category',
+        'Συμπληρώστε τον τύπο επιχείρησης όταν επιλέγετε "Άλλο".': 'Fill in your business type when selecting "Other".',
+        'Διεύθυνση': 'Address',
+        'Email': 'Email',
+        'Logo': 'Logo',
+        'Τρέχον:': 'Current:',
+        'Αυτόματη επιβεβαίωση': 'Auto-confirm',
+        'Αν OFF → κάθε ραντεβού χρειάζεται χειροκίνητη έγκριση': 'If OFF -> every booking requires manual approval',
+        'Επιλογή υπαλλήλου': 'Employee selection',
+        'Αν OFF → αυτόματη ανάθεση υπαλλήλου': 'If OFF -> automatic employee assignment',
+        'Απαιτεί προκαταβολή': 'Requires deposit',
+        'Ποσοστό προκαταβολής (%)': 'Deposit percentage (%)',
+        'Ποσοστό προκαταβολής': 'Deposit percentage',
+        'Χρέωση ακύρωσης': 'Cancellation fee',
+        'Χρέωση σε περίπτωση ακύρωσης': 'Charge on cancellation',
+        'Κρατείται ποσοστό από το ποσό σε περίπτωση ακύρωσης από τον πελάτη': 'A percentage is kept when the customer cancels',
+        'Ποσοστό χρέωσης ακύρωσης (%)': 'Cancellation charge percentage (%)',
+        'π.χ. 30% = επιστροφή 70% του ποσού': 'e.g. 30% = 70% refund of the amount',
+        'Ορίστε ωράριο ανά ημέρα. Οι μέρες που είναι κλειστές δεν θα εμφανίζουν διαθέσιμα ραντεβού.': 'Set hours per day. Closed days will not show available booking slots.',
+        'Κλειστό': 'Closed',
+        'Χωρητικότητα ανά χρονοθυρίδα': 'Capacity per time slot',
+        'Πόσα ραντεβού μπορείτε να εξυπηρετήσετε ταυτόχρονα': 'How many bookings you can handle simultaneously',
+        // ── Closures ─────────────────────────────────────────
+        'Προσωρινό Κλείσιμο Επιχείρησης': 'Temporary Business Closure',
+        'Ορίστε ημέρες που η επιχείρηση θα είναι κλειστή (π.χ. αρρώστια, αργία). Οι πελάτες δεν θα μπορούν να κρατήσουν ραντεβού αυτές τις ημέρες.': 'Set days when the business will be closed (e.g. sick leave, holiday). Customers will not be able to book appointments on those days.',
+        'Προσθήκη Κλεισίματος': 'Add Closure',
+        'Λόγος (προαιρετικό)': 'Reason (optional)',
+        'π.χ. Αρρώστια, Αργία...': 'e.g. Sick leave, Holiday...',
+        'Κλείσιμο Ημέρας': 'Close Day',
+        'Προγραμματισμένα Κλεισίματα': 'Scheduled Closures',
+        'Αφαίρεση κλεισίματος;': 'Remove closure?',
+        'Πίσω στο Dashboard': 'Back to Dashboard',
+        'Νέο Κλείσιμο': 'New Closure',
+        'Λόγος': 'Reason',
+        'Επερχόμενα Κλεισίματα': 'Upcoming Closures',
+        'Δεν υπάρχουν προγραμματισμένα κλεισίματα.': 'No scheduled closures.',
+        'Ημερομηνία Κλεισίματος': 'Closure Date',
+        // ── Reviews ──────────────────────────────────────────
+        'Κριτικές Πελατών': 'Customer Reviews',
+        'Verified': 'Verified',
+        'κριτικές': 'reviews',
+        'Δεν υπάρχουν κριτικές ακόμα': 'No reviews yet',
+        'Οι κριτικές εμφανίζονται εδώ αφού ολοκληρωθούν ραντεβού και αξιολογηθούν από πελάτες.': 'Reviews appear here after bookings are completed and rated by customers.',
+        'Δεν υπάρχουν κριτικές ακόμα.': 'No reviews yet.',
+        'Βαθμολογία': 'Rating',
+        'Σχόλιο': 'Comment',
+        'Επαληθευμένη': 'Verified',
+        // ── Employee form ───────────────────────────────────
+        'Ονοματεπώνυμο *': 'Full Name *',
+        // ── SMS Log ───────────────────────────────────────────
+        'Ιστορικό SMS': 'SMS History',
+        'Τύπος': 'Type',
+        'Παραλήπτης': 'Recipient',
+        'Μήνυμα': 'Message',
+        'Δεν υπάρχουν SMS.': 'No SMS messages.',
+        'Εστάλη': 'Sent',
+        'Επιβεβαίωση ραντεβού': 'Booking confirmation',
+        'Υπενθύμιση 24ωρο': '24h reminder',
+        'Πρόσκληση αξιολόγησης': 'Review invite',
+        'Ακύρωση ραντεβού': 'Booking cancellation',
+        'Εγκρίθηκε ραντεβού': 'Booking approved',
+        'Απορρίφθηκε ραντεβού': 'Booking rejected',
+        'Νέο ραντεβού (προς επαγγελματία)': 'New booking (to business)',
+        // ── Schedule ─────────────────────────────────────────
+        'Ωράριο Εργασίας': 'Working Hours',
+        'Ωράριο:': 'Schedule:',
+        'Ορίστε τις ώρες εργασίας για κάθε ημέρα. Οι ημέρες με Ρεπό δεν θα εμφανίζονται για κράτηση.': 'Set working hours for each day. Days marked as day off will not be available for booking.',
+        'Ρεπό / Κλειστό': 'Day Off / Closed',
+        'Αποθήκευση Ωραρίου': 'Save Schedule',
+        'Ειδικές Αργίες / Απουσίες': 'Special Days Off / Absences',
+        'Προσθέστε συγκεκριμένες ημέρες που ο υπάλληλος δεν θα είναι διαθέσιμος.': 'Add specific dates when the employee is unavailable.',
+        'Προσθήκη': 'Add',
+        'Δεν υπάρχουν ειδικές αργίες.': 'No special days off.',
+        'Πίσω': 'Back',
+        'Δευτέρα': 'Monday',
+        'Τρίτη': 'Tuesday',
+        'Τετάρτη': 'Wednesday',
+        'Πέμπτη': 'Thursday',
+        'Παρασκευή': 'Friday',
+        'Σάββατο': 'Saturday',
+        'Κυριακή': 'Sunday',
+        'Ρεπό': 'Day Off',
+        'Ώρα Έναρξης': 'Start Time',
+        'Ώρα Λήξης': 'End Time',
+        // ── Admin panel ───────────────────────────────────────
+        'Πίνακας Ελέγχου Super Admin': 'Super Admin Dashboard',
+        'Συνολικοί Χρήστες': 'Total Users',
+        'Ενεργοί Επαγγελματίες': 'Active Professionals',
+        'Εκκρεμείς Αιτήσεις': 'Pending Requests',
+        'Δεν υπάρχουν εκκρεμείς αιτήσεις.': 'No pending requests.',
+        'Εγγραφή': 'Registered',
+        'Εκκρεμείς Αιτήσεις Επαγγελματιών': 'Pending Professional Requests',
+        // ── Admin reports ──────────────────────────────────
+        'Αναφορές Επιχειρήσεων': 'Business Reports',
+        'Νέες': 'New',
+        'Υπό εξέταση': 'Under Review',
+        'Επιλύθηκαν': 'Resolved',
+        'Απορρίφθηκαν': 'Dismissed',
+        'Αλλαγή Κατάστασης': 'Change Status',
+        'Σημειώσεις Διαχειριστή': 'Admin Notes',
+        'Σχετικό Ραντεβού': 'Related Booking',
+        'Αναφέρων': 'Reporter',
+        'Κατηγορία Αναφοράς': 'Report Category',
+        'Δεν υπάρχουν αναφορές': 'No reports',
+        // ── SMS Log ───────────────────────────────────────────
+        'SMS Log': 'SMS Log',
+        'Αποστολή': 'Sent',
+        'Αποτυχία': 'Failed',
+        // ── Common ────────────────────────────────────────────
+        'από': 'from',
+        'έως': 'to',
+        'στις': 'at',
+        'Δεν υπάρχουν αποτελέσματα.': 'No results.',
+        'Φόρτωση...': 'Loading...',
+        'Επιλογή': 'Select',
+        'Ακυρωμένο ραντεβού': 'Cancelled booking',
+    };
+
+    // Build reverse EN→GR map
+    const EN_GR = {};
+    Object.entries(GR_EN).forEach(([gr, en]) => { if (gr !== en) EN_GR[en] = gr; });
+
+    let dashLang = localStorage.getItem('dashLang') || 'gr';
+
+    function walkAndReplace(root, map) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        let node;
+        while ((node = walker.nextNode())) nodes.push(node);
+        nodes.forEach(n => {
+            const trimmed = n.textContent.trim();
+            // Never translate nodes that contain the brand name "Reserva"
+            if (trimmed && map[trimmed] !== undefined && trimmed.indexOf('Reserva') === -1) {
+                n.textContent = n.textContent.replace(trimmed, map[trimmed]);
+            }
+        });
+    }
+
+    function applyDashLang(lang) {
+        const map = lang === 'en' ? GR_EN : EN_GR;
+        walkAndReplace(document.body, map);
+        // Toggle full-page bilingual blocks (e.g. tutorial page)
+        document.querySelectorAll('.lang-gr').forEach(el => el.style.display = lang === 'en' ? 'none' : '');
+        document.querySelectorAll('.lang-en').forEach(el => el.style.display = lang === 'en' ? '' : 'none');
+        document.getElementById('dashLangLabel').textContent = lang === 'en' ? 'ΕΛ' : 'EN';
+    }
+
+    function toggleDashLang() {
+        dashLang = dashLang === 'gr' ? 'en' : 'gr';
+        localStorage.setItem('dashLang', dashLang);
+        applyDashLang(dashLang);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => applyDashLang(dashLang));
+    </script>
+    {% endif %}
+
+    <!-- Modern UI Enhancements -->
+    <script>
+    // Custom Modal System - Replace default browser popups
+    window.customConfirm = function(message, title = 'Επιβεβαίωση') {
+        return new Promise((resolve) => {
+            const modal = new bootstrap.Modal(document.getElementById('customModal'));
+            const titleEl = document.getElementById('customModalTitle');
+            const messageEl = document.getElementById('customModalMessage');
+            const confirmBtn = document.getElementById('customModalConfirm');
+            const cancelBtn = document.getElementById('customModalCancel');
+            const iconEl = document.getElementById('customModalIcon');
+
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            iconEl.className = 'fas fa-exclamation-triangle text-warning';
+
+            // Remove existing event listeners
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+            // Add new event listeners
+            newConfirmBtn.addEventListener('click', () => {
+                modal.hide();
+                resolve(true);
+            });
+
+            newCancelBtn.addEventListener('click', () => {
+                modal.hide();
+                resolve(false);
+            });
+
+            // Handle modal close
+            document.getElementById('customModal').addEventListener('hidden.bs.modal', () => {
+                resolve(false);
+            }, { once: true });
+
+            modal.show();
+        });
+    };
+
+    window.customAlert = function(message, title = 'Ειδοποίηση') {
+        return new Promise((resolve) => {
+            const modal = new bootstrap.Modal(document.getElementById('customAlert'));
+            const titleEl = document.getElementById('customAlertTitle');
+            const messageEl = document.getElementById('customAlertMessage');
+            const okBtn = document.getElementById('customAlertOk');
+            const iconEl = document.getElementById('customAlertIcon');
+
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            iconEl.className = 'fas fa-info-circle text-primary';
+
+            // Remove existing event listeners
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+
+            // Add new event listener
+            newOkBtn.addEventListener('click', () => {
+                modal.hide();
+                resolve();
+            });
+
+            // Handle modal close
+            document.getElementById('customAlert').addEventListener('hidden.bs.modal', () => {
+                resolve();
+            }, { once: true });
+
+            modal.show();
+        });
+    };
+
+    // Override default browser functions
+    window.confirm = window.customConfirm;
+    window.alert = window.customAlert;
+
+    // Customer navbar scroll effect
+    document.addEventListener('DOMContentLoaded', function() {
+        const customerNavbar = document.querySelector('.customer-navbar');
+        if (customerNavbar) {
+            let lastScrollTop = 0;
+            window.addEventListener('scroll', function() {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (scrollTop > 50) {
+                    customerNavbar.classList.add('scrolled');
+                } else {
+                    customerNavbar.classList.remove('scrolled');
+                }
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (this.dataset.bsToggle || href === '#') {
+                    return;
+                }
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Enhanced card hover animations
+        document.querySelectorAll('.stat-card, .booking-card-customer').forEach(card => {
+            // Add smooth entrance animation
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, Math.random() * 300 + 100);
+
+            // Enhanced hover effects
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-12px) scale(1.02)';
+                this.style.boxShadow = '0 25px 50px rgba(0, 0, 0, 0.15)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
+            });
+        });
+
+        // Form input focus enhancements
+        document.querySelectorAll('.form-control, .form-select').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+                if (this.classList.contains('form-control')) {
+                    this.style.transform = 'scale(1.02)';
+                    this.style.boxShadow = '0 8px 25px rgba(201, 162, 39, 0.15)';
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('focused');
+                if (this.classList.contains('form-control')) {
+                    this.style.transform = 'scale(1)';
+                    this.style.boxShadow = 'none';
+                }
+            });
+        });
+
+        // Button ripple effect
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (this.dataset.bsToggle === 'dropdown' || this.classList.contains('navbar-toggler')) {
+                    return;
+                }
+
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255, 255, 255, 0.4);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    pointer-events: none;
+                `;
+
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Status pill animations
+        document.querySelectorAll('.status-pill').forEach((pill, index) => {
+            pill.style.opacity = '0';
+            pill.style.transform = 'translateX(-20px)';
+
+            setTimeout(() => {
+                pill.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                pill.style.opacity = '1';
+                pill.style.transform = 'translateX(0)';
+            }, index * 100 + 200);
+        });
+
+        // Tab enhancement for customer pages
+        document.querySelectorAll('.customer-tabs .nav-link').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Smooth transition for tab content
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.style.opacity = '0';
+                    target.style.transform = 'translateY(20px)';
+
+                    setTimeout(() => {
+                        target.style.transition = 'all 0.3s ease';
+                        target.style.opacity = '1';
+                        target.style.transform = 'translateY(0)';
+                    }, 50);
+                }
+            });
+        });
+
+        // Loading state for forms
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn && !submitBtn.disabled) {
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Αποστολή...';
+                    submitBtn.disabled = true;
+
+                    // Re-enable after 3 seconds as fallback
+                    setTimeout(() => {
+                        if (submitBtn.disabled) {
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.disabled = false;
+                        }
+                    }, 3000);
+                }
+            });
+        });
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for scroll animations
+        document.querySelectorAll('.card, .alert, .table-responsive').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Cookie consent banner for public-facing pages
+        const cookieBanner = document.getElementById('cookieBanner');
+        const cookieEssentialBtn = document.getElementById('cookieEssentialBtn');
+        const cookieAcceptAllBtn = document.getElementById('cookieAcceptAllBtn');
+        const consentKey = 'reserva_cookie_consent';
+
+        function setConsent(value) {
+            const allowedValues = ['essential', 'all'];
+            if (!allowedValues.includes(value)) {
+                return;
+            }
+
+            localStorage.setItem(consentKey, value);
+            document.cookie = 'reserva_cookie_consent=' + value + '; path=/; max-age=' + (60 * 60 * 24 * 180) + '; SameSite=Lax';
+
+            if (cookieBanner) {
+                cookieBanner.hidden = true;
+            }
+        }
+
+        if (cookieBanner) {
+            const consent = localStorage.getItem(consentKey);
+            if (!consent) {
+                cookieBanner.hidden = false;
+            }
+
+            if (cookieEssentialBtn) {
+                cookieEssentialBtn.addEventListener('click', () => setConsent('essential'));
+            }
+
+            if (cookieAcceptAllBtn) {
+                cookieAcceptAllBtn.addEventListener('click', () => setConsent('all'));
+            }
+        }
+    });
+
+    // Add CSS for ripple animation and scroll animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes ripple {
+            to { transform: scale(2); opacity: 0; }
+        }
+
+        .focused .form-control {
+            border-color: var(--gold) !important;
+            box-shadow: 0 0 0 0.2rem rgba(201, 162, 39, 0.25) !important;
+        }
+
+        .animate-in {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .card:not(.animate-in), .alert:not(.animate-in) {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        /* Enhanced customer page styles */
+        .customer-navbar .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .customer-navbar .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .customer-navbar .nav-link:hover::before,
+        .customer-navbar .nav-link.active::before {
+            width: 80%;
+        }
+
+        /* Custom Modal Styling */
+        .custom-modal-content {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        .custom-modal-header {
+            border-bottom: 1px solid rgba(201, 162, 39, 0.2);
+            border-radius: 20px 20px 0 0;
+            background: linear-gradient(135deg, rgba(201, 162, 39, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%);
+            padding: 1.5rem 2rem 1rem;
+        }
+
+        .custom-modal-title {
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 1.2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-modal-body {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .custom-modal-icon {
+            background: rgba(201, 162, 39, 0.1);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .custom-modal-icon i {
+            font-size: 2.5rem;
+        }
+
+        .custom-modal-message {
+            font-size: 1.1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .custom-modal-footer {
+            border-top: 1px solid rgba(201, 162, 39, 0.2);
+            padding: 1rem 2rem 1.5rem;
+            border-radius: 0 0 20px 20px;
+            background: rgba(248, 250, 252, 0.5);
+            gap: 1rem;
+        }
+
+        .custom-modal-confirm {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            border: none;
+            color: #1a1400;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(201, 162, 39, 0.3);
+        }
+
+        .custom-modal-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(201, 162, 39, 0.4);
+            color: #1a1400;
+        }
+
+        .custom-modal-cancel {
+            background: transparent;
+            border: 2px solid #e2e8f0;
+            color: #64748b;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .custom-modal-cancel:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #475569;
+            transform: translateY(-2px);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Enhanced Empty States */
+        .empty-state-modern {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 24px;
+            border: 1px solid rgba(201, 162, 39, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .empty-state-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+        }
+
+        .empty-state-modern .empty-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, rgba(201, 162, 39, 0.1) 0%, rgba(201, 162, 39, 0.05) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .empty-state-modern .empty-icon i {
+            font-size: 3.5rem;
+            color: var(--gold);
+            opacity: 0.8;
+        }
+
+        .empty-state-modern h3 {
+            color: #2d3748;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .empty-state-modern p {
+            color: #64748b;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .empty-state-modern .empty-action {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: #1a1400;
+            font-weight: 600;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            border: none;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(201, 162, 39, 0.25);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .empty-state-modern .empty-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(201, 162, 39, 0.35);
+            color: #1a1400;
+        }
+
+        .cookie-banner {
+            position: fixed;
+            left: 16px;
+            right: 16px;
+            bottom: 16px;
+            z-index: 2000;
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 14px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.16);
+            backdrop-filter: blur(8px);
+            padding: 12px 14px;
+        }
+
+        .cookie-banner__content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .cookie-banner__text {
+            color: #2d3748;
+            font-size: 0.92rem;
+            line-height: 1.45;
+            margin: 0;
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .cookie-banner__actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .site-footer {
+            margin-top: 2rem;
+            padding: 1.1rem 0 1.35rem;
+            border-top: 1px solid rgba(201, 162, 39, 0.14);
+            background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(248,250,252,0.98) 100%);
+        }
+
+        .site-footer__brand {
+            color: #1f2937;
+            font-weight: 700;
+        }
+
+        .site-footer__social {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+        }
+
+        .site-footer__social-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.58rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid rgba(201, 162, 39, 0.18);
+            background: #fff;
+            color: #1f2937;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+
+        .site-footer__social-link:hover {
+            transform: translateY(-1px);
+            border-color: rgba(201, 162, 39, 0.4);
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+            color: #111827;
+        }
+
+        .site-footer__social-link i {
+            font-size: 1.05rem;
+        }
+
+        .site-footer__social-link--instagram i {
+            color: #e1306c;
+        }
+
+        .site-footer__social-link--tiktok i {
+            color: #111111;
+        }
+
+        @media (max-width: 576px) {
+            .cookie-banner {
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                padding: 10px;
+            }
+
+            .cookie-banner__actions {
+                width: 100%;
+            }
+
+            .cookie-banner__actions .btn {
+                flex: 1;
+            }
+
+            .site-footer {
+                padding: 1rem 0 1.2rem;
+            }
+
+            .site-footer__social-link {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    `;
+    document.head.appendChild(style);
+    </script>
+
+    {% if request.user.is_authenticated %}
+    <script>
+    (function () {
+        const endpoint = "{% url 'live_bookings_state' %}";
+        const intervalMs = 20000;
+        const fallbackReloadMs = 60000;
+        let baselineMarker = null;
+        let inFlight = false;
+        let pendingReload = false;
+        let lastSuccessfulPoll = 0;
+
+        function isRealtimePanelPath() {
+            const path = window.location.pathname || '';
+            return path.indexOf('/business/') === 0
+                || path.indexOf('/superadmin/') === 0
+                || path.indexOf('/accounts/my-bookings/') === 0;
+        }
+
+        function canRefreshNow() {
+            if (document.visibilityState !== 'visible') {
+                return false;
+            }
+            const active = document.activeElement;
+            if (!active) {
+                return true;
+            }
+            const tag = (active.tagName || '').toUpperCase();
+            return !['INPUT', 'TEXTAREA', 'SELECT'].includes(tag);
+        }
+
+        function pollBookingState() {
+            if (inFlight) {
+                return;
+            }
+            inFlight = true;
+
+            fetch(endpoint, {
+                method: 'GET',
+                cache: 'no-store',
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache',
+                },
+            })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('poll failed');
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    const nextMarker = (data && data.marker) ? data.marker : '';
+                    lastSuccessfulPoll = Date.now();
+                    if (baselineMarker === null) {
+                        baselineMarker = nextMarker;
+                        return;
+                    }
+
+                    if (nextMarker && baselineMarker && nextMarker !== baselineMarker) {
+                        if (canRefreshNow()) {
+                            window.location.reload();
+                            return;
+                        }
+                        pendingReload = true;
+                    }
+
+                    baselineMarker = nextMarker;
+                })
+                .catch(function () {
+                    // Ignore transient polling errors.
+                })
+                .finally(function () {
+                    inFlight = false;
+                });
+        }
+
+        function attemptPendingReload() {
+            if (pendingReload && canRefreshNow()) {
+                window.location.reload();
+            }
+        }
+
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') {
+                attemptPendingReload();
+                pollBookingState();
+            }
+        });
+
+        document.addEventListener('focusin', function () {
+            window.setTimeout(attemptPendingReload, 120);
+        });
+
+        document.addEventListener('click', function () {
+            window.setTimeout(attemptPendingReload, 120);
+        });
+
+        pollBookingState();
+        window.setInterval(pollBookingState, intervalMs);
+
+        if (isRealtimePanelPath()) {
+            window.setInterval(function () {
+                const stalePolling = !lastSuccessfulPoll || (Date.now() - lastSuccessfulPoll > (intervalMs * 3));
+                if (stalePolling) {
+                    pendingReload = true;
+                    attemptPendingReload();
+                    return;
+                }
+
+                if (canRefreshNow()) {
+                    window.location.reload();
+                    return;
+                }
+                pendingReload = true;
+            }, fallbackReloadMs);
+        }
+    })();
+    </script>
+    {% endif %}
+
+    <script>
+    (function () {
+        if (!('serviceWorker' in navigator)) {
+            return;
+        }
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('{% url "pwa_service_worker" %}')
+                .catch(function () {
+                    // Ignore registration failures (e.g. unsupported environment).
+                });
+        });
+    })();
+    </script>
+
+    <script>
+    (function () {
+        var deferredPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            var btn = document.getElementById('pwa-install-btn');
+            var btnCustomer = document.getElementById('pwa-install-btn-customer');
+            var navItem = document.getElementById('pwa-install-nav-item');
+
+            if (btn) btn.classList.remove('d-none');
+            if (navItem) navItem.style.display = '';
+
+            function triggerInstall() {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function () {
+                    deferredPrompt = null;
+                    if (btn) btn.classList.add('d-none');
+                    if (navItem) navItem.style.display = 'none';
+                });
+            }
+
+            if (btn) btn.addEventListener('click', triggerInstall);
+            if (btnCustomer) btnCustomer.addEventListener('click', triggerInstall);
+        });
+
+        // iOS: show a one-time hint — iOS does not support beforeinstallprompt
+        var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        var isStandalone = window.navigator.standalone === true;
+        if (isIos && !isStandalone && !sessionStorage.getItem('pwa-ios-hint')) {
+            sessionStorage.setItem('pwa-ios-hint', '1');
+            var hint = document.createElement('div');
+            hint.style.cssText = [
+                'position:fixed', 'bottom:16px', 'left:50%', 'transform:translateX(-50%)',
+                'z-index:9999', 'background:#1f2937', 'color:#fff', 'border-radius:12px',
+                'padding:12px 16px', 'max-width:320px', 'width:90%', 'font-size:14px',
+                'box-shadow:0 8px 24px rgba(0,0,0,.3)', 'display:flex',
+                'align-items:flex-start', 'gap:10px'
+            ].join(';');
+
+            var icon = document.createElement('span');
+            icon.textContent = '\uD83D\uDCF1';
+            icon.style.cssText = 'font-size:20px;flex-shrink:0;margin-top:1px;';
+
+            var text = document.createElement('span');
+            text.style.lineHeight = '1.5';
+            var line1 = document.createTextNode('Για εγκατάσταση: πατήστε ');
+            var share = document.createElement('strong');
+            share.textContent = 'Κοινοποίηση';
+            var line2 = document.createTextNode(' → ');
+            var add = document.createElement('strong');
+            add.textContent = 'Προσθήκη στην Αρχική Οθόνη';
+            text.appendChild(line1);
+            text.appendChild(share);
+            text.appendChild(document.createTextNode(line2.textContent));
+            text.appendChild(add);
+
+            var closeBtn = document.createElement('button');
+            closeBtn.textContent = '\u00d7';
+            closeBtn.setAttribute('aria-label', 'Κλείσιμο');
+            closeBtn.style.cssText = 'background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer;flex-shrink:0;line-height:1;padding:0;margin-top:-2px;';
+            closeBtn.addEventListener('click', function () { hint.remove(); });
+
+            hint.appendChild(icon);
+            hint.appendChild(text);
+            hint.appendChild(closeBtn);
+            document.body.appendChild(hint);
+            setTimeout(function () { if (hint.parentElement) hint.remove(); }, 9000);
+        }
+    })();
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

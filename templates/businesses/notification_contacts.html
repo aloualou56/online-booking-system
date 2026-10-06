@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Επαφές Ειδοποιήσεων — {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h3><i class="fas fa-bell me-2"></i>Επαφές Ειδοποιήσεων</h3>
+    <a href="{% url 'businesses:settings' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Πίσω στις Ρυθμίσεις
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Καταχωρημένες Επαφές</h5>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addContactModal">
+                    <i class="fas fa-plus me-1"></i>Προσθήκη Επαφής
+                </button>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Οι πρόσθετες επαφές θα λαμβάνουν ειδοποιήσεις για νέα ραντεβού μαζί με την κύρια επιχειρησιακή σας επαφή.
+                </p>
+
+                {% if contacts %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Τύπος</th>
+                                <th>Επαφή</th>
+                                <th>Ετικέτα</th>
+                                <th>Κατάσταση</th>
+                                <th width="100">Ενέργειες</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in contacts %}
+                            <tr>
+                                <td>
+                                    {% if contact.contact_type == 'email' %}
+                                        <i class="fas fa-envelope text-primary me-1"></i>Email
+                                    {% else %}
+                                        <i class="fas fa-phone text-success me-1"></i>Τηλέφωνο
+                                    {% endif %}
+                                </td>
+                                <td>{{ contact.value }}</td>
+                                <td>
+                                    {% if contact.label %}
+                                        <span class="badge bg-light text-dark">{{ contact.label }}</span>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if contact.is_active %}
+                                        <span class="badge bg-success">Ενεργό</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Ανενεργό</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="post" action="{% url 'businesses:delete_notification_contact' contact.id %}" class="d-inline"
+                                          onsubmit="event.preventDefault(); customConfirm('Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτή την επαφή;', 'Διαγραφή Επαφής').then(confirmed => { if (confirmed) this.submit(); }); return false;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Διαγραφή">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-bell-slash text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-3">Δεν υπάρχουν πρόσθετες επαφές</p>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContactModal">
+                        <i class="fas fa-plus me-1"></i>Προσθήκη Πρώτης Επαφής
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-question-circle me-1"></i>Πληροφορίες</h6>
+            </div>
+            <div class="card-body">
+                <h6>Τι είναι οι επαφές ειδοποιήσεων;</h6>
+                <p class="small text-muted">
+                    Μπορείτε να προσθέσετε επιπλέον emails και τηλέφωνα που θα λαμβάνουν ειδοποιήσεις για:
+                </p>
+                <ul class="small text-muted">
+                    <li>Νέα ραντεβού</li>
+                    <li>Ακυρώσεις ραντεβού</li>
+                    <li>Αλλαγές κατάστασης</li>
+                </ul>
+
+                <h6 class="mt-3">Παραδείγματα χρήσης:</h6>
+                <ul class="small text-muted">
+                    <li><strong>Υπεύθυνος βάρδιας:</strong> manager@salon.gr</li>
+                    <li><strong>Ιδιοκτήτης:</strong> +30 6912345678</li>
+                    <li><strong>Γραμματεία:</strong> info@business.com</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Contact Modal -->
+<div class="modal fade" id="addContactModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i>Προσθήκη Επαφής Ειδοποιήσεων
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'businesses:add_notification_contact' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="contact_type" class="form-label">Τύπος Επαφής</label>
+                        <select class="form-select" id="contact_type" name="contact_type" required>
+                            <option value="email">📧 Email</option>
+                            <option value="phone">📱 Τηλέφωνο</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="value" class="form-label">Επαφή</label>
+                        <input type="text" class="form-control" id="value" name="value"
+                               placeholder="π.χ. manager@salon.gr ή +30 6912345678" required>
+                        <div class="form-text">
+                            Εισάγετε το email ή το τηλέφωνο που θα λαμβάνει τις ειδοποιήσεις
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="label" class="form-label">Ετικέτα (προαιρετικό)</label>
+                        <input type="text" class="form-control" id="label" name="label"
+                               placeholder="π.χ. Ιδιοκτήτης, Υπεύθυνος, Γραμματεία">
+                        <div class="form-text">
+                            Μια σύντομη περιγραφή για αυτή την επαφή
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Προσθήκη
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Update placeholder and validation based on contact type
+document.getElementById('contact_type').addEventListener('change', function() {
+    const valueInput = document.getElementById('value');
+    if (this.value === 'email') {
+        valueInput.type = 'email';
+        valueInput.placeholder = 'π.χ. manager@salon.gr';
+    } else {
+        valueInput.type = 'tel';
+        valueInput.placeholder = 'π.χ. +30 6912345678';
+    }
+});
+</script>
+{% endblock %}

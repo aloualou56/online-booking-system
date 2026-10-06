@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ business.name }} — Online Booking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a227;
+            --gold-light: #f0c04a;
+            --gold-dark: #8a6500;
+            --gold-glow: rgba(201, 162, 39, .35);
+            --gold-bg: rgba(201, 162, 39, .1);
+            --dark: #0e0d08;
+            --dark2: #1a180e;
+            --surface: #ffffff;
+            --bg: #f7f4ed;
+            --text: #1a1400;
+            --text-muted: #6b5f3a;
+            --border: #e8e2d0;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 1px 4px rgba(0, 0, 0, .05), 0 4px 20px rgba(0, 0, 0, .06);
+            --shadow-lg: 0 8px 40px rgba(0, 0, 0, .12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(201, 162, 39, 0.10), transparent 34%),
+                linear-gradient(180deg, #f7f4ed 0%, #f2ede4 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            padding: 1rem;
+            -webkit-font-smoothing: antialiased;
+            color: var(--text);
+        }
+
+        .widget-container {
+            max-width: 650px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .business-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            border-radius: 1.2rem;
+            padding: 2rem 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .business-name {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            letter-spacing: -.5px;
+        }
+
+        .business-category {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .theme-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            border-radius: 999px;
+            padding: .45rem .8rem;
+            background: var(--gold-bg);
+            color: var(--gold-dark);
+            font-size: .8rem;
+            font-weight: 700;
+            letter-spacing: .02em;
+            margin-bottom: .9rem;
+        }
+
+        .step-card {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            border-radius: 1.2rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideInUp 0.8s ease-out forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
+        }
+
+        .step-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .step-header {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+            color: #fff;
+            padding: 1.2rem 2rem;
+            font-weight: 900;
+            font-size: 1.05rem;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: -.3px;
+        }
+
+        .step-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .step-body {
+            padding: 2rem;
+        }
+
+        .modern-select {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 1.5rem;
+            font-family: inherit;
+            color: var(--text);
+        }
+
+        .modern-select:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px var(--gold-bg);
+            background: var(--surface);
+        }
+
+        .modern-btn {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+            border: none;
+            color: #fff;
+            font-weight: 900;
+            padding: 1rem 2rem;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            font-family: inherit;
+            letter-spacing: -.2px;
+        }
+
+        .modern-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: #fff;
+        }
+
+        .modern-btn:disabled {
+            background: rgba(169, 169, 169, 0.3);
+            color: rgba(0, 0, 0, 0.4);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .date-btn, .slot-btn {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            color: var(--text);
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-sm);
+            margin: 0.4rem;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            min-width: 120px;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .date-btn::before, .slot-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.15), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .date-btn:hover, .slot-btn:hover {
+            background: var(--surface);
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .date-btn:hover::before, .slot-btn:hover::before {
+            left: 100%;
+        }
+
+        .date-btn.active, .slot-btn.active {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+            border-color: var(--gold-light);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--gold-glow);
+            font-weight: 700;
+        }
+
+        .date-btn.active::before, .slot-btn.active::before {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        /* Calendar Widget Styling */
+        .cal-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .cal-nav-btn {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: 1rem;
+        }
+
+        .cal-nav-btn:hover:not(:disabled) {
+            background: var(--gold-bg);
+            color: var(--gold);
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .cal-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .cal-month-label {
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: var(--text);
+            letter-spacing: -.3px;
+        }
+
+        .cal-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.8rem;
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 2rem;
+        }
+
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: default;
+            user-select: none;
+            transition: all 0.2s;
+            background: transparent;
+        }
+
+        .cal-day.today {
+            font-weight: 700;
+            color: var(--text);
+            border: 1.5px solid var(--border);
+            background: rgba(201, 162, 39, .08);
+        }
+
+        .cal-day.available {
+            cursor: pointer;
+            color: var(--gold-dark);
+            background: var(--gold-bg);
+            font-weight: 600;
+        }
+
+        .cal-day.available:hover {
+            background: rgba(201, 162, 39, .15);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .cal-day.selected {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light)) !important;
+            color: #fff !important;
+            font-weight: 800;
+            box-shadow: 0 4px 12px var(--gold-glow);
+            transform: translateY(-2px);
+        }
+
+        @keyframes selectedPulse {
+            0% {
+                box-shadow: 0 8px 30px rgba(201, 162, 39, 0.4);
+            }
+            100% {
+                box-shadow: 0 12px 40px rgba(201, 162, 39, 0.6);
+            }
+        }
+
+        .alert-modern {
+            background: rgba(201, 162, 39, .08);
+            border: 1px solid rgba(201, 162, 39, .2);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.5rem;
+            color: var(--gold-dark);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-list {
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: var(--gold-dark);
+        }
+
+        .modern-input {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 1rem;
+            font-family: inherit;
+            color: var(--text);
+        }
+
+        .modern-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px var(--gold-bg);
+            background: var(--surface);
+        }
+
+        .modern-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .contact-preference {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        .contact-preference-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .contact-option {
+            display: flex;
+            align-items: center;
+            padding: 0.6rem 0.8rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--surface);
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .contact-option:hover {
+            border-color: var(--gold);
+            background: var(--gold-bg);
+        }
+
+        .contact-option.selected {
+            border-color: var(--gold);
+            background: var(--gold-bg);
+            color: var(--gold-dark);
+            font-weight: 600;
+        }
+
+        .contact-option input[type="radio"] {
+            margin-right: 0.6rem;
+            accent-color: var(--gold);
+        }
+
+        .contact-option .contact-icon {
+            margin-left: auto;
+            color: var(--gold);
+            font-size: 0.8rem;
+        }
+
+        .success-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .success-btn:hover:not(:disabled) {
+            box-shadow: 0 15px 40px rgba(72, 187, 120, 0.4);
+            color: white;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(201, 162, 39, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--gold);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .widget-lang-btn {
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+            z-index: 1000;
+            background: rgba(30, 28, 16, 0.95);
+            backdrop-filter: blur(10px);
+            color: var(--gold-light);
+            border: 1px solid rgba(201, 162, 39, 0.4);
+            border-radius: 50px;
+            padding: 0.8rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .widget-lang-btn:hover {
+            background: rgba(201, 162, 39, 0.9);
+            color: #1a1400;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(201, 162, 39, 0.3);
+        }
+
+        .powered-by {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .powered-by a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .powered-by a:hover {
+            color: var(--gold-light);
+        }
+
+        .floating-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        #step-2, #step-3 {
+            display: none;
+        }
+
+        /* Animations */
+        @keyframes activeGlow {
+            0% {
+                box-shadow:
+                    0 15px 45px rgba(201, 162, 39, 0.45),
+                    0 0 20px rgba(201, 162, 39, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            }
+            100% {
+                box-shadow:
+                    0 20px 60px rgba(201, 162, 39, 0.6),
+                    0 0 35px rgba(201, 162, 39, 0.5),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .widget-container {
+                max-width: 100%;
+            }
+
+            .business-header {
+                padding: 1.5rem 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .business-name {
+                font-size: 1.5rem;
+            }
+
+            .step-body {
+                padding: 1.5rem;
+            }
+
+            .date-btn, .slot-btn {
+                min-width: 90px;
+                font-size: 0.8rem;
+                padding: 0.6rem 0.8rem;
+            }
+
+            .widget-lang-btn {
+                right: 0.5rem;
+                bottom: 0.5rem;
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .contact-options {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .contact-option {
+                padding: 0.5rem 0.6rem;
+                font-size: 0.85rem;
+            }
+
+            .contact-option .contact-icon {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body data-allow-employee-selection="{{ business.allow_employee_selection|yesno:'true,false' }}">
+<div class="widget-container">
+    <!-- Business Header -->
+    <div class="business-header">
+        <div class="business-name">{{ business.name }}</div>
+        {% if business.category == 'other' %}
+            {% if business.custom_category_gr or business.custom_category_en or business.custom_category %}
+                <div class="business-category" data-custom-category-gr="{{ business.custom_category_gr|default:business.custom_category }}" data-custom-category-en="{{ business.custom_category_en|default:business.custom_category }}">
+                    {{ business.custom_category_gr|default:business.custom_category_en|default:business.custom_category }}
+                </div>
+            {% else %}
+                <div class="business-category" data-i18n-category="{{ business.category }}">{{ business.get_category_display }}</div>
+            {% endif %}
+        {% else %}
+            <div class="business-category" data-i18n-category="{{ business.category }}">{{ business.get_category_display }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Step 1: Service & Employee Selection -->
+    <div id="step-1" class="step-card" style="animation-delay: 0.1s;">
+        <div class="step-header">
+            <i class="fas fa-clipboard-list me-2 floating-icon"></i>
+            <span data-i18n="step1_title">1. Υπηρεσία{% if business.allow_employee_selection %} & Υπάλληλος{% endif %}</span>
+        </div>
+        <div class="step-body">
+            <select id="serviceSelect" class="modern-select">
+                <option value="" id="servicePlaceholderOption">Επιλέξτε υπηρεσία</option>
+                {% for svc in services %}
+                <option value="{{ svc.id }}" data-price="{{ svc.price }}">{{ svc.name }} — {{ svc.duration_minutes }}' — {% if svc.price > 0 %}{{ svc.price }}€{% else %}Δωρεάν{% endif %}</option>
+                {% endfor %}
+            </select>
+
+            {% if business.allow_employee_selection %}
+            <select id="employeeSelect" class="modern-select">
+                <option value="" id="employeePlaceholderOption">Επιλέξτε υπάλληλο</option>
+                <option value="auto" id="employeeAutoOption">Automatic selection</option>
+                {% for emp in employees %}
+                <option value="{{ emp.id }}">{{ emp.name }}</option>
+                {% endfor %}
+            </select>
+            {% else %}
+            <input type="hidden" id="employeeSelect" value="auto">
+            <div class="alert-modern">
+                <i class="fas fa-info-circle me-2"></i>
+                <span data-i18n="auto_employee">Ο υπάλληλος θα επιλεγεί αυτόματα</span>
+            </div>
+            {% endif %}
+
+            <button id="toStep2" class="modern-btn" disabled>
+                <span data-i18n="continue">Συνέχεια</span>
+                <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 2: Date & Time Selection -->
+    <div id="step-2" class="step-card" style="animation-delay: 0.2s;">
+        <div class="step-header">
+            <i class="fas fa-calendar-alt me-2 floating-icon"></i>
+            <span data-i18n="step2_title">2. Ημ/νία & Ώρα</span>
+        </div>
+        <div class="step-body">
+            <!-- Calendar widget -->
+            <div id="calendarWidget">
+                <div class="cal-nav">
+                    <button class="cal-nav-btn" id="calPrev" onclick="calNav(-1)" disabled type="button">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span class="cal-month-label" id="calMonth"></span>
+                    <button class="cal-nav-btn" id="calNext" onclick="calNav(1)" type="button">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="cal-weekdays" id="calWeekdays">
+                    <div data-i18n-day="mon">Δε</div><div data-i18n-day="tue">Τρ</div><div data-i18n-day="wed">Τε</div><div data-i18n-day="thu">Πε</div><div data-i18n-day="fri">Πα</div><div data-i18n-day="sat">Σα</div><div data-i18n-day="sun">Κυ</div>
+                </div>
+                <div class="cal-grid" id="calGrid"></div>
+            </div>
+
+            <div id="datesLoading" class="text-center py-3" style="display:none">
+                <div class="loading-spinner"></div>
+                <div class="mt-2 text-muted">Φόρτωση διαθέσιμων ημερών...</div>
+            </div>
+            <div id="datesEmpty" class="alert-modern d-none" style="background: rgba(245, 101, 101, 0.1); border-color: rgba(245, 101, 101, 0.2); color: #c53030;">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span data-i18n="no_dates">Δεν βρέθηκαν διαθέσιμες ημέρες</span>
+            </div>
+
+            <hr style="border-color: rgba(201, 162, 39, 0.2); margin: 2rem 0;">
+
+            <div class="booking-card-title" style="margin-bottom: 1rem; color: #374151; font-size: 1.1rem; font-weight: 600;">
+                <i class="fas fa-clock me-2 floating-icon"></i>
+                <span data-i18n="select_time">Επιλέξτε ώρα</span>
+            </div>
+
+            <div id="slotsContainer" class="d-flex flex-wrap"></div>
+            <div id="slotsLoading" class="text-center py-3 d-none">
+                <div class="loading-spinner"></div>
+                <div class="mt-2 text-muted">Φόρτωση διαθέσιμων ωρών...</div>
+            </div>
+            <div id="noSlots" class="alert-modern d-none" style="background: rgba(245, 101, 101, 0.1); border-color: rgba(245, 101, 101, 0.2); color: #c53030;">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span data-i18n="no_slots">Δεν υπάρχουν διαθέσιμες ώρες.</span>
+            </div>
+
+            <button id="toStep3" class="modern-btn mt-3" disabled>
+                <span data-i18n="continue">Συνέχεια</span>
+                <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 3: Confirmation -->
+    <div id="step-3" class="step-card" style="animation-delay: 0.3s;">
+        <div class="step-header">
+            <i class="fas fa-check-circle me-2 floating-icon"></i>
+            <span data-i18n="step3_title">3. Επιβεβαίωση</span>
+        </div>
+        <div class="step-body">
+            <div class="summary-list">
+                <div class="summary-item">
+                    <span class="summary-label" data-i18n="service_label">Υπηρεσία:</span>
+                    <span class="summary-value" id="sumService"></span>
+                </div>
+                {% if business.allow_employee_selection %}
+                <div class="summary-item">
+                    <span class="summary-label" data-i18n="employee_label">Υπάλληλος:</span>
+                    <span class="summary-value" id="sumEmployee"></span>
+                </div>
+                {% endif %}
+                <div class="summary-item">
+                    <span class="summary-label" data-i18n="date_label">Ημ/νία:</span>
+                    <span class="summary-value" id="sumDate"></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label" data-i18n="time_label">Ώρα:</span>
+                    <span class="summary-value" id="sumTime"></span>
+                </div>
+            </div>
+
+            <form method="post" action="{% url 'public_booking:booking_create' business.slug %}">
+                {% csrf_token %}
+                <input type="hidden" name="from_widget" value="1">
+                <input type="hidden" name="service_id" id="fService">
+                <input type="hidden" name="employee_id" id="fEmployee">
+                <input type="hidden" name="date" id="fDate">
+                <input type="hidden" name="start_time" id="fTime">
+
+                {% if not user.is_authenticated %}
+                <div class="contact-preference">
+                    <div class="contact-preference-title">
+                        <i class="fas fa-address-book me-2"></i>
+                        <span data-i18n="contact_preference_title">Πώς θα θέλατε να επικοινωνήσουμε μαζί σας;</span>
+                    </div>
+                    <div class="contact-options">
+                        <label class="contact-option selected" data-preference="both">
+                            <input type="radio" name="guest_contact_preference" value="both" checked>
+                            <span data-i18n="contact_both">Τηλέφωνο & Email</span>
+                            <i class="fas fa-phone contact-icon me-1"></i>
+                            <i class="fas fa-envelope contact-icon"></i>
+                        </label>
+                        <label class="contact-option" data-preference="phone">
+                            <input type="radio" name="guest_contact_preference" value="phone">
+                            <span data-i18n="contact_phone">Μόνο Τηλέφωνο</span>
+                            <i class="fas fa-phone contact-icon"></i>
+                        </label>
+                        <label class="contact-option" data-preference="email">
+                            <input type="radio" name="guest_contact_preference" value="email">
+                            <span data-i18n="contact_email">Μόνο Email</span>
+                            <i class="fas fa-envelope contact-icon"></i>
+                        </label>
+                    </div>
+                </div>
+
+                <input type="text" name="guest_name" class="modern-input" required placeholder="Όνομα *" data-i18n-placeholder="guest_name_placeholder">
+                <input type="tel" name="guest_phone" class="modern-input" id="guestPhoneInput" required placeholder="Τηλέφωνο *" pattern="[0-9]{10}" title="Το τηλέφωνο πρέπει να είναι 10 ψηφία" data-i18n-placeholder="guest_phone_placeholder" data-i18n-title="guest_phone_title">
+                <input type="email" name="guest_email" class="modern-input" id="guestEmailInput" required placeholder="Email *" data-i18n-placeholder="guest_email_placeholder">
+                {% endif %}
+
+                <button type="submit" class="modern-btn success-btn">
+                    <i class="fas fa-check me-2"></i>
+                    <span data-i18n="book_button">Κράτηση</span>
+                </button>
+            </form>
+
+            {% if not user.is_authenticated %}
+            <div class="text-center mt-3">
+                <a href="{% url 'accounts:login' %}?next=/widget/{{ business.slug }}/" target="_top" style="color: var(--gold); text-decoration: none; font-weight: 600;" data-i18n="login_link">
+                    <i class="fas fa-sign-in-alt me-1"></i>Συνδεθείτε
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="powered-by">
+        <span data-i18n="powered_by">Powered by</span>
+        <a href="/" target="_blank">Reserva</a>
+    </div>
+</div>
+
+<!-- Language Toggle -->
+<button id="widgetLangBtn" class="widget-lang-btn" type="button">
+    <i class="fas fa-globe me-2"></i>
+    <span id="widgetLangLabel">EN</span>
+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Widget Configuration
+const slug = '{{ business.slug }}';
+let selSvc, selEmp, selDate, selTime, selDateDisplay;
+let availableDates = {};   // { 'YYYY-MM': Set of 'YYYY-MM-DD' }
+let calYear = null, calMonth = null;
+const rootElement = document.body;
+const svcSel = document.getElementById('serviceSelect');
+const empSel = document.getElementById('employeeSelect');
+const t2 = document.getElementById('toStep2'), t3 = document.getElementById('toStep3');
+const allowEmpSel = rootElement.dataset.allowEmployeeSelection === 'true';
+const widgetLangBtn = document.getElementById('widgetLangBtn');
+const widgetLangLabel = document.getElementById('widgetLangLabel');
+const servicePlaceholderOption = document.getElementById('servicePlaceholderOption');
+const employeePlaceholderOption = document.getElementById('employeePlaceholderOption');
+const employeeAutoOption = document.getElementById('employeeAutoOption');
+
+// Calendar
+const MONTH_NAMES = {
+    gr: ['Ιανουάριος','Φεβρουάριος','Μάρτιος','Απρίλιος','Μάιος','Ιούνιος',
+         'Ιούλιος','Αύγουστος','Σεπτέμβριος','Οκτώβριος','Νοέμβριος','Δεκέμβριος'],
+    en: ['January','February','March','April','May','June',
+         'July','August','September','October','November','December']
+};
+
+// Translations
+const translations = {
+    gr: {
+        step1_title: '1. Υπηρεσία{% if business.allow_employee_selection %} & Υπάλληλος{% endif %}',
+        step2_title: '2. Ημ/νία & Ώρα',
+        step3_title: '3. Επιβεβαίωση',
+        select_service: 'Επιλέξτε υπηρεσία',
+        select_employee: 'Επιλέξτε υπάλληλο',
+        auto_employee: 'Ο υπάλληλος θα επιλεγεί αυτόματα',
+        continue: 'Συνέχεια',
+        no_slots: 'Δεν υπάρχουν διαθέσιμες ώρες.',
+        no_dates: 'Δεν βρέθηκαν διαθέσιμες ημέρες',
+        select_time: 'Επιλέξτε ώρα',
+        service_label: 'Υπηρεσία:',
+        employee_label: 'Υπάλληλος:',
+        date_label: 'Ημ/νία:',
+        time_label: 'Ώρα:',
+        guest_name_placeholder: 'Όνομα *',
+        guest_phone_placeholder: 'Τηλέφωνο *',
+        guest_email_placeholder: 'Email *',
+        guest_phone_title: 'Το τηλέφωνο πρέπει να είναι 10 ψηφία',
+        contact_preference_title: 'Πώς θα θέλατε να επικοινωνήσουμε μαζί σας;',
+        contact_both: 'Τηλέφωνο & Email',
+        contact_phone: 'Μόνο Τηλέφωνο',
+        contact_email: 'Μόνο Email',
+        guest_phone_optional: 'Τηλέφωνο',
+        guest_email_optional: 'Email',
+        book_button: 'Κράτηση',
+        login_link: 'Συνδεθείτε',
+        powered_by: 'Powered by',
+        loading_slots: 'Φόρτωση διαθέσιμων ωρών...'
+    },
+    en: {
+        step1_title: '1. Service{% if business.allow_employee_selection %} & Employee{% endif %}',
+        step2_title: '2. Date & Time',
+        step3_title: '3. Confirmation',
+        select_service: 'Select service',
+        select_employee: 'Select employee',
+        auto_employee: 'The employee will be selected automatically',
+        continue: 'Continue',
+        no_slots: 'No available time slots.',
+        no_dates: 'No available dates found',
+        select_time: 'Select time',
+        service_label: 'Service:',
+        employee_label: 'Employee:',
+        date_label: 'Date:',
+        time_label: 'Time:',
+        guest_name_placeholder: 'Name *',
+        guest_phone_placeholder: 'Phone *',
+        guest_email_placeholder: 'Email *',
+        guest_phone_title: 'Phone number must be 10 digits',
+        contact_preference_title: 'How would you like us to contact you?',
+        contact_both: 'Phone & Email',
+        contact_phone: 'Phone Only',
+        contact_email: 'Email Only',
+        guest_phone_optional: 'Phone',
+        guest_email_optional: 'Email',
+        book_button: 'Book',
+        login_link: 'Log in',
+        powered_by: 'Powered by',
+        loading_slots: 'Loading available slots...'
+    }
+};
+
+const widgetCategories = {
+    gr: { health: 'Υγεία', beauty: 'Ομορφιά', fitness: 'Γυμναστήριο', education: 'Εκπαίδευση', legal: 'Νομικά', accounting: 'Λογιστική', auto: 'Αυτοκίνητο', tech: 'Τεχνολογία', other: 'Άλλο' },
+    en: { health: 'Health', beauty: 'Beauty', fitness: 'Fitness', education: 'Education', legal: 'Legal', accounting: 'Accounting', auto: 'Auto', tech: 'Tech', other: 'Other' }
+};
+
+const widgetDayNames = {
+    gr: { 'Δευ': 'Δευ', 'Τρι': 'Τρι', 'Τετ': 'Τετ', 'Πεμ': 'Πεμ', 'Παρ': 'Παρ', 'Σαβ': 'Σαβ', 'Κυρ': 'Κυρ' },
+    en: { 'Δευ': 'Mon', 'Τρι': 'Tue', 'Τετ': 'Wed', 'Πεμ': 'Thu', 'Παρ': 'Fri', 'Σαβ': 'Sat', 'Κυρ': 'Sun' }
+};
+
+const calendarDayNames = {
+    gr: { mon: 'Δε', tue: 'Τρ', wed: 'Τε', thu: 'Πε', fri: 'Πα', sat: 'Σα', sun: 'Κυ' },
+    en: { mon: 'Mo', tue: 'Tu', wed: 'We', thu: 'Th', fri: 'Fr', sat: 'Sa', sun: 'Su' }
+};
+
+let currentLang = localStorage.getItem('lang') || 'gr';
+
+// Validation and UI Updates
+function ck() {
+    if (allowEmpSel) {
+        t2.disabled = !(svcSel.value && empSel.value);
+    } else {
+        t2.disabled = !svcSel.value;
+    }
+
+    // Modern button animation
+    if (!t2.disabled) {
+        t2.style.animation = 'fadeInUp 0.3s ease-out';
+    }
+}
+
+function translateWidgetDay(dayName) {
+    return widgetDayNames[currentLang][dayName] || dayName;
+}
+
+function renderCalendar() {
+    const grid = document.getElementById('calGrid');
+    const monthLabel = document.getElementById('calMonth');
+    const monthNames = MONTH_NAMES[currentLang] || MONTH_NAMES.gr;
+    monthLabel.textContent = monthNames[calMonth] + ' ' + calYear;
+
+    const key = calYear + '-' + String(calMonth + 1).padStart(2, '0');
+    const avail = availableDates[key] || new Set();
+
+    const firstDayOfWeek = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const startOffset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1; // Mon-first
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let html = '';
+    for (let i = 0; i < startOffset; i++) html += '<div class="cal-day"></div>';
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = calYear + '-' + String(calMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        const thisDate = new Date(calYear, calMonth, d);
+        const isAvail = avail.has(dateStr);
+        const isSelected = dateStr === selDate;
+        const isToday = thisDate.toDateString() === today.toDateString();
+
+        let cls = 'cal-day';
+        if (isToday && !isAvail) cls += ' today';
+        if (isAvail) cls += ' available';
+        if (isSelected) cls += ' selected';
+
+        const click = isAvail ? ' onclick="selectDateCal(\'' + dateStr + '\')"' : '';
+        html += '<div class="' + cls + '"' + click + '>' + d + '</div>';
+    }
+    grid.innerHTML = html;
+
+    const months = Object.keys(availableDates).sort();
+    const curKey = calYear + '-' + String(calMonth + 1).padStart(2, '0');
+    document.getElementById('calPrev').disabled = curKey <= months[0];
+    document.getElementById('calNext').disabled = curKey >= months[months.length - 1];
+}
+
+function calNav(dir) {
+    calMonth += dir;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    if (calMonth < 0)  { calMonth = 11; calYear--; }
+    renderCalendar();
+}
+
+function selectDateCal(dateStr) {
+    selDate = dateStr;
+    const p = dateStr.split('-');
+    selDateDisplay = p[2] + '/' + p[1] + '/' + p[0];
+    selTime = null;
+    t3.disabled = true;
+    renderCalendar();
+    loadSlots(dateStr);
+}
+
+function renderDates() {
+    // This function is now replaced by renderCalendar()
+    // Keep for compatibility but calendar is rendered via renderCalendar()
+    if (Object.keys(availableDates).length > 0) {
+        renderCalendar();
+    }
+}
+
+function applyWidgetLanguage(lang) {
+    currentLang = lang;
+    const dict = translations[lang];
+
+    // Translate elements
+    document.querySelectorAll('[data-i18n]').forEach(function (element) {
+        const key = element.getAttribute('data-i18n');
+        if (dict[key] !== undefined) {
+            element.textContent = dict[key];
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function (element) {
+        const key = element.getAttribute('data-i18n-placeholder');
+        if (dict[key] !== undefined) {
+            element.placeholder = dict[key];
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach(function (element) {
+        const key = element.getAttribute('data-i18n-title');
+        if (dict[key] !== undefined) {
+            element.title = dict[key];
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-category]').forEach(function (element) {
+        const category = element.getAttribute('data-i18n-category');
+        if (widgetCategories[lang][category]) {
+            element.textContent = widgetCategories[lang][category];
+        }
+    });
+
+    document.querySelectorAll('[data-custom-category-gr]').forEach(function (element) {
+        const gr = element.getAttribute('data-custom-category-gr') || '';
+        const en = element.getAttribute('data-custom-category-en') || '';
+        element.textContent = lang === 'en' ? (en || gr) : (gr || en);
+    });
+
+    // Update calendar day names
+    document.querySelectorAll('[data-i18n-day]').forEach(function (element) {
+        const dayKey = element.getAttribute('data-i18n-day');
+        if (calendarDayNames[lang][dayKey]) {
+            element.textContent = calendarDayNames[lang][dayKey];
+        }
+    });
+
+    // Update placeholders
+    if (servicePlaceholderOption) {
+        servicePlaceholderOption.textContent = dict.select_service;
+    }
+    if (employeePlaceholderOption) {
+        employeePlaceholderOption.textContent = dict.select_employee;
+    }
+    if (employeeAutoOption) {
+        employeeAutoOption.textContent = 'Automatic selection';
+    }
+
+    // Update loading text
+    const loadingText = document.querySelector('#slotsLoading .mt-2');
+    if (loadingText) {
+        loadingText.textContent = dict.loading_slots;
+    }
+
+    widgetLangLabel.textContent = lang === 'gr' ? 'EN' : 'ΕΛ';
+    document.documentElement.lang = lang === 'gr' ? 'el' : 'en';
+    localStorage.setItem('lang', lang);
+
+    if (Object.keys(availableDates).length > 0) {
+        renderCalendar();
+    }
+
+    // Update contact preference placeholders if form exists
+    const selectedPreference = document.querySelector('.contact-option.selected');
+    if (selectedPreference) {
+        const preference = selectedPreference.dataset.preference;
+        const phoneInput = document.getElementById('guestPhoneInput');
+        const emailInput = document.getElementById('guestEmailInput');
+
+        if (phoneInput && emailInput) {
+            if (preference === 'both') {
+                phoneInput.placeholder = dict.guest_phone_placeholder;
+                emailInput.placeholder = dict.guest_email_placeholder;
+            } else if (preference === 'phone') {
+                phoneInput.placeholder = dict.guest_phone_placeholder;
+                emailInput.placeholder = dict.guest_email_optional;
+            } else if (preference === 'email') {
+                phoneInput.placeholder = dict.guest_phone_optional;
+                emailInput.placeholder = dict.guest_email_placeholder;
+            }
+        }
+    }
+}
+
+// Step Navigation
+t2.onclick = () => {
+    selSvc = svcSel.value;
+    selEmp = empSel.value || '';
+
+    // Smooth reveal animation
+    const step2 = document.getElementById('step-2');
+    step2.style.display = 'block';
+    step2.style.opacity = '0';
+    step2.style.transform = 'translateY(30px)';
+
+    setTimeout(() => {
+        step2.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        step2.style.opacity = '1';
+        step2.style.transform = 'translateY(0)';
+    }, 50);
+
+    t2.disabled = true;
+    loadDates();
+};
+
+t3.onclick = () => {
+    // Smooth reveal animation for step 3
+    const step3 = document.getElementById('step-3');
+    step3.style.display = 'block';
+    step3.style.opacity = '0';
+    step3.style.transform = 'translateY(30px)';
+
+    setTimeout(() => {
+        step3.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        step3.style.opacity = '1';
+        step3.style.transform = 'translateY(0)';
+    }, 50);
+
+    // Update summary
+    document.getElementById('sumService').textContent = svcSel.options[svcSel.selectedIndex].textContent;
+    if (allowEmpSel) {
+        document.getElementById('sumEmployee').textContent = empSel.options[empSel.selectedIndex].textContent;
+    }
+    document.getElementById('sumDate').textContent = selDateDisplay || selDate;
+    document.getElementById('sumTime').textContent = selTime;
+
+    // Update form fields
+    document.getElementById('fService').value = selSvc;
+    document.getElementById('fEmployee').value = selEmp !== 'auto' ? selEmp : '';
+    document.getElementById('fDate').value = selDate;
+    document.getElementById('fTime').value = selTime;
+
+    t3.disabled = true;
+};
+
+// API Calls
+function loadDates() {
+    document.getElementById('datesLoading').style.display = '';
+    document.getElementById('calGrid').innerHTML = '';
+    document.getElementById('calMonth').textContent = '';
+    document.getElementById('datesEmpty').classList.add('d-none');
+    document.getElementById('calPrev').disabled = true;
+    document.getElementById('calNext').disabled = true;
+
+    const empParam = (selEmp && selEmp !== 'auto') ? `&employee_id=${selEmp}` : '';
+    fetch(`/b/${slug}/api/dates/?service_id=${selSvc}${empParam}`)
+    .then(r => r.json()).then(d => {
+        document.getElementById('datesLoading').style.display = 'none';
+        if (!d.dates.length) {
+            document.getElementById('datesEmpty').classList.remove('d-none');
+            return;
+        }
+
+        // Convert dates to calendar format
+        availableDates = {};
+        d.dates.forEach(dateObj => {
+            const parts = dateObj.date_str.split('-');
+            const key = parts[0] + '-' + parts[1];
+            if (!availableDates[key]) availableDates[key] = new Set();
+            availableDates[key].add(dateObj.date_str);
+        });
+
+        // Set initial month to first available date
+        const firstParts = d.dates[0].date_str.split('-');
+        calYear = parseInt(firstParts[0]);
+        calMonth = parseInt(firstParts[1]) - 1;
+
+        renderCalendar();
+    });
+}
+
+function loadSlots(date) {
+    const sc = document.getElementById('slotsContainer');
+    const ld = document.getElementById('slotsLoading');
+    const ns = document.getElementById('noSlots');
+
+    // Reset UI
+    sc.innerHTML = '';
+    ns.classList.add('d-none');
+    ld.classList.remove('d-none');
+    t3.disabled = true;
+
+    const empParam = (selEmp && selEmp !== 'auto') ? `&employee_id=${selEmp}` : '';
+
+    fetch(`/b/${slug}/api/slots/?service_id=${selSvc}${empParam}&date=${date}`)
+    .then(r => r.json()).then(d => {
+        ld.classList.add('d-none');
+
+        if (!d.slots.length) {
+            ns.classList.remove('d-none');
+            return;
+        }
+
+        // Render slots with animations
+        d.slots.forEach((slot, index) => {
+            const button = document.createElement('button');
+            button.className = 'slot-btn';
+            button.textContent = slot.start_str + ' - ' + slot.end_str;
+
+            // Add entrance animation
+            button.style.opacity = '0';
+            button.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                button.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                button.style.opacity = '1';
+                button.style.transform = 'translateY(0)';
+            }, index * 80);
+
+            button.onclick = () => {
+                // Smooth deselection
+                document.querySelectorAll('.slot-btn').forEach(x => x.classList.remove('active'));
+
+                // Selection animation
+                button.classList.add('active');
+                selTime = slot.start_str;
+                t3.disabled = false;
+
+                // Button ready animation
+                t3.style.animation = 'fadeInUp 0.3s ease-out';
+            };
+
+            sc.appendChild(button);
+        });
+    });
+}
+
+// Event Listeners
+svcSel.onchange = empSel.onchange = ck;
+
+widgetLangBtn.addEventListener('click', function () {
+    // Language switch animation
+    this.style.transform = 'scale(0.9)';
+    setTimeout(() => {
+        this.style.transform = 'scale(1)';
+        applyWidgetLanguage(currentLang === 'gr' ? 'en' : 'gr');
+    }, 150);
+});
+
+// Enhanced form interactions
+document.querySelectorAll('.modern-input').forEach(input => {
+    input.addEventListener('focus', function() {
+        this.style.transform = 'translateY(-2px)';
+    });
+
+    input.addEventListener('blur', function() {
+        this.style.transform = 'translateY(0)';
+    });
+});
+
+// Contact preference handling
+document.querySelectorAll('.contact-option').forEach(option => {
+    option.addEventListener('click', function() {
+        // Update visual selection
+        document.querySelectorAll('.contact-option').forEach(opt => opt.classList.remove('selected'));
+        this.classList.add('selected');
+
+        // Get preference value
+        const preference = this.dataset.preference;
+        const phoneInput = document.getElementById('guestPhoneInput');
+        const emailInput = document.getElementById('guestEmailInput');
+        const dict = translations[currentLang];
+
+        // Update required fields and placeholders based on preference
+        if (preference === 'both') {
+            phoneInput.required = true;
+            emailInput.required = true;
+            phoneInput.placeholder = dict.guest_phone_placeholder;
+            emailInput.placeholder = dict.guest_email_placeholder;
+        } else if (preference === 'phone') {
+            phoneInput.required = true;
+            emailInput.required = false;
+            phoneInput.placeholder = dict.guest_phone_placeholder;
+            emailInput.placeholder = dict.guest_email_optional;
+        } else if (preference === 'email') {
+            phoneInput.required = false;
+            emailInput.required = true;
+            phoneInput.placeholder = dict.guest_phone_optional;
+            emailInput.placeholder = dict.guest_email_placeholder;
+        }
+
+        // Update visual styling
+        updateInputStyling(phoneInput, phoneInput.required);
+        updateInputStyling(emailInput, emailInput.required);
+    });
+});
+
+function updateInputStyling(input, isRequired) {
+    if (!input) return;
+
+    if (isRequired) {
+        input.style.opacity = '1';
+        input.style.borderColor = 'rgba(201, 162, 39, 0.2)';
+    } else {
+        input.style.opacity = '0.7';
+        input.style.borderColor = 'rgba(201, 162, 39, 0.1)';
+    }
+}
+
+// Form submission animation
+document.querySelector('form').addEventListener('submit', function() {
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+
+    submitBtn.innerHTML = '<div class="loading-spinner me-2"></div>Αποστολή...';
+    submitBtn.disabled = true;
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function () {
+    applyWidgetLanguage(currentLang);
+
+    // Add entrance animations to cards
+    setTimeout(() => {
+        document.querySelectorAll('.step-card').forEach((card, index) => {
+            card.style.animationDelay = (index * 0.1) + 's';
+        });
+    }, 100);
+});
+</script>
+</body>
+</html>

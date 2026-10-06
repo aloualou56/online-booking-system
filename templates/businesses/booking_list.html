@@ -1,0 +1,1720 @@
+{% extends "base.html" %}
+{% block title %}Ραντεβού — {{ business.name }}{% endblock %}
+
+{% block content %}
+<section class="bookings-redesign-shell">
+    <div class="bookings-redesign-top">
+        <h2 class="bookings-redesign-title"><i class="fas fa-calendar-alt me-2"></i>Ραντεβού</h2>
+        <div class="btn-group bookings-view-toggle" role="group" aria-label="Εναλλαγή προβολής ραντεβού">
+            <button type="button" class="btn btn-outline-primary active" data-bookings-view="list">
+                <i class="fas fa-list me-1"></i>Λίστα
+            </button>
+            <button type="button" class="btn btn-outline-primary" data-bookings-view="calendar">
+                <i class="fas fa-calendar-week me-1"></i>Ημερολόγιο
+            </button>
+        </div>
+    </div>
+
+    <div class="booking-filter-group booking-status-pills" role="group" aria-label="Booking filters">
+        <a href="{% url 'businesses:booking_list' %}" class="btn status-pill {% if not status_filter %}active{% endif %}">Όλα</a>
+        <a href="?status=pending" class="btn status-pill {% if status_filter == 'pending' %}active{% endif %}">Αναμονή</a>
+        <a href="?status=confirmed" class="btn status-pill {% if status_filter == 'confirmed' %}active{% endif %}">Επιβεβαιωμένα</a>
+        <a href="?status=completed" class="btn status-pill {% if status_filter == 'completed' %}active{% endif %}">Ολοκληρωμένα</a>
+        <a href="?status=cancelled" class="btn status-pill {% if status_filter == 'cancelled' %}active{% endif %}">Ακυρωμένα</a>
+        <a href="?status=no_show" class="btn status-pill {% if status_filter == 'no_show' %}active{% endif %}">No-Show</a>
+    </div>
+
+    <div id="bookingsListView">
+        <div class="booking-list-toolbar mb-3">
+            <div class="booking-list-search-wrap">
+                <i class="fas fa-search booking-list-search-icon"></i>
+                <input
+                    type="text"
+                    id="bookingListSearch"
+                    class="form-control"
+                    placeholder="Αναζήτηση πελάτη, υπηρεσία, #ραντεβού..."
+                >
+            </div>
+            <select id="bookingListSort" class="form-select form-select-sm d-none" aria-hidden="true" tabindex="-1">
+                <option value="date_desc">Νεότερα πρώτα</option>
+                <option value="date_asc">Παλαιότερα πρώτα</option>
+                <option value="pending_first">Προτεραιότητα σε εκκρεμή</option>
+            </select>
+            <div class="d-none" aria-hidden="true">
+                <input class="form-check-input" type="checkbox" id="bookingOnlyActionable" tabindex="-1">
+            </div>
+            <small class="text-muted d-none" id="bookingVisibleCount">0 αποτελέσματα</small>
+            <button type="button" class="btn btn-outline-secondary btn-sm d-none" id="bookingListClear">Καθαρισμός</button>
+        </div>
+
+        <div class="d-flex flex-column" id="bookingsDesktopBody">
+            {% for b in bookings %}
+            <article
+                class="booking-desktop-card booking-list-item status-{{ b.status }}"
+                data-booking-id="{{ b.id }}"
+                data-status="{{ b.status }}"
+                data-date="{{ b.date|date:'Y-m-d' }}"
+                data-start="{{ b.start_time|time:'H:i' }}"
+                data-datetime="{{ b.date|date:'Y-m-d' }}T{{ b.start_time|time:'H:i' }}"
+                data-customer="{% if b.customer %}{{ b.customer.get_full_name }}{% else %}{{ b.guest_name }}{% endif %}"
+                data-phone="{% if b.customer %}{{ b.customer.phone }}{% else %}{{ b.guest_phone }}{% endif %}"
+                data-service="{{ b.service.name }}"
+                data-employee="{{ b.employee.name }}"
+                data-notes="{{ b.notes|default:''|striptags }}"
+            >
+                <div class="booking-desktop-card__header">
+                    <span class="booking-desktop-card__id">#{{ b.id }}</span>
+                    <span class="booking-desktop-card__status status-pill-chip status-{{ b.status }}">{{ b.get_status_display }}</span>
+                </div>
+                <div class="booking-desktop-card__time">
+                    <h4>{% if b.date == today %}Σήμερα{% else %}{{ b.date|date:"d/m/Y" }}{% endif %}</h4>
+                    <p>{{ b.start_time|time:"H:i" }} – {{ b.end_time|time:"H:i" }}</p>
+                </div>
+                <div class="booking-desktop-card__details">
+                    <div class="booking-desktop-field">
+                        <span class="booking-desktop-field__label">ΠΕΛΑΤΗΣ</span>
+                        <div class="booking-desktop-field__value">
+                            {% if b.customer %}
+                            <strong>{{ b.customer.get_full_name }}</strong>
+                            <span>{{ b.customer.phone }}</span>
+                            {% else %}
+                            <strong>{{ b.guest_name }} <span class="badge bg-secondary">Επισκέπτης</span></strong>
+                            <span>{{ b.guest_phone }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="booking-desktop-field">
+                        <span class="booking-desktop-field__label">ΥΠΗΡΕΣΙΑ</span>
+                        <div class="booking-desktop-field__value">
+                            <strong>{{ b.service.name }}</strong>
+                            {% if b.notes %}<span>{{ b.notes|truncatechars:80 }}</span>{% else %}<span>—</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="booking-desktop-field">
+                        <span class="booking-desktop-field__label">ΥΠΑΛΛΗΛΟΣ</span>
+                        <div class="booking-desktop-field__value">
+                            <strong>{{ b.employee.name }}</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="booking-desktop-card__actions">
+                    {% if b.status == 'pending' %}
+                    <form method="post" action="{% url 'businesses:confirm_booking' b.id %}" class="d-inline js-confirm-action"
+                        data-confirm-title-gr="Επιβεβαίωση ραντεβού"
+                        data-confirm-title-en="Confirm booking"
+                        data-confirm-message-gr="Να επιβεβαιωθεί το ραντεβού #{{ b.id }};"
+                        data-confirm-message-en="Confirm booking #{{ b.id }}?"
+                        data-confirm-button-gr="Επιβεβαίωση"
+                        data-confirm-button-en="Confirm"
+                        data-confirm-button-class="btn-success">
+                        {% csrf_token %}
+                        <button class="btn booking-action-btn booking-action-btn--confirm"><i class="fas fa-check me-1"></i>Επιβεβαίωση</button>
+                    </form>
+                    {% endif %}
+
+                    {% if b.status == 'pending' or b.status == 'confirmed' %}
+                    <form method="post" action="{% url 'businesses:reject_booking' b.id %}" class="d-inline js-confirm-action"
+                        data-requires-reason="1"
+                        data-confirm-title-gr="Απόρριψη ραντεβού"
+                        data-confirm-title-en="Reject booking"
+                        data-confirm-message-gr="Να απορριφθεί το ραντεβού #{{ b.id }};"
+                        data-confirm-message-en="Reject booking #{{ b.id }}?"
+                        data-confirm-button-gr="Απόρριψη"
+                        data-confirm-button-en="Reject"
+                        data-confirm-button-class="btn-danger">
+                        {% csrf_token %}
+                        <input type="hidden" name="rejection_reason" value="" class="js-rejection-reason">
+                        <button class="btn booking-action-btn booking-action-btn--reject"><i class="fas fa-times me-1"></i>Απόρριψη</button>
+                    </form>
+                    {% endif %}
+
+                    {% if b.status == 'confirmed' %}
+                    <form method="post" action="{% url 'businesses:mark_completed' b.id %}" class="d-inline js-confirm-action"
+                        data-confirm-title-gr="Ολοκλήρωση ραντεβού"
+                        data-confirm-title-en="Complete booking"
+                        data-confirm-message-gr="Σημειώστε ως ολοκληρωμένο το ραντεβού #{{ b.id }};"
+                        data-confirm-message-en="Mark booking #{{ b.id }} as completed?"
+                        data-confirm-button-gr="Ολοκλήρωση"
+                        data-confirm-button-en="Complete"
+                        data-confirm-button-class="btn-success">
+                        {% csrf_token %}
+                        <button class="btn booking-action-btn booking-action-btn--complete"><i class="fas fa-check-double me-1"></i>Ολοκλήρωση</button>
+                    </form>
+                    {% if b.date <= today %}
+                    <form method="post" action="{% url 'businesses:mark_no_show' b.id %}" class="d-inline js-confirm-action"
+                        data-confirm-title-gr="Καταχώριση No-Show"
+                        data-confirm-title-en="Mark no-show"
+                        data-confirm-message-gr="Να σημειωθεί ως δεν εμφανίστηκε το ραντεβού #{{ b.id }};"
+                        data-confirm-message-en="Mark booking #{{ b.id }} as no-show?"
+                        data-confirm-button-gr="Δεν εμφανίστηκε"
+                        data-confirm-button-en="No-Show"
+                        data-confirm-button-class="btn-dark">
+                        {% csrf_token %}
+                        <button class="btn booking-action-btn booking-action-btn--no-show"><i class="fas fa-user-slash me-1"></i>No-Show</button>
+                    </form>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </article>
+            {% empty %}
+            <div id="bookingServerEmptyRow" class="booking-empty-message">Δεν βρέθηκαν ραντεβού.</div>
+            {% endfor %}
+            <div id="bookingNoResultsRow" class="booking-empty-message d-none">Δεν βρέθηκαν αποτελέσματα με τα φίλτρα σας.</div>
+        </div>
+
+<div class="d-none booking-mobile-list" id="bookingsMobileList">
+    {% for b in bookings %}
+    <article
+        class="card shadow-sm border-0 mb-3 booking-mobile-card booking-list-item"
+        data-booking-id="{{ b.id }}"
+        data-status="{{ b.status }}"
+        data-date="{{ b.date|date:'Y-m-d' }}"
+        data-start="{{ b.start_time|time:'H:i' }}"
+        data-datetime="{{ b.date|date:'Y-m-d' }}T{{ b.start_time|time:'H:i' }}"
+        data-customer="{% if b.customer %}{{ b.customer.get_full_name }}{% else %}{{ b.guest_name }}{% endif %}"
+        data-phone="{% if b.customer %}{{ b.customer.phone }}{% else %}{{ b.guest_phone }}{% endif %}"
+        data-service="{{ b.service.name }}"
+        data-employee="{{ b.employee.name }}"
+        data-notes="{{ b.notes|default:''|striptags }}"
+    >
+        <div class="card-body">
+            <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                <div>
+                    <div class="small text-muted">#{{ b.id }}</div>
+                    <h5 class="mb-1">{{ b.date|date:"d/m/Y" }}</h5>
+                    <div class="text-muted small">{{ b.start_time|time:"H:i" }}-{{ b.end_time|time:"H:i" }}</div>
+                </div>
+                <span class="badge bg-{% if b.status == 'confirmed' %}success{% elif b.status == 'pending' %}warning text-dark{% elif b.status == 'completed' %}info{% elif b.status == 'cancelled' %}danger{% else %}dark{% endif %}">{{ b.get_status_display }}</span>
+            </div>
+
+            <dl class="row small mb-3 booking-mobile-meta">
+                <dt class="col-4">Πελάτης</dt>
+                <dd class="col-8 mb-2">
+                    {% if b.customer %}
+                    {{ b.customer.get_full_name }}<br><span class="text-muted">{{ b.customer.phone }}</span>
+                    {% else %}
+                    {{ b.guest_name }} <span class="badge bg-secondary">Επισκέπτης</span><br><span class="text-muted">{{ b.guest_phone }}</span>
+                    {% endif %}
+                </dd>
+
+                <dt class="col-4">Υπηρεσία</dt>
+                <dd class="col-8 mb-2">{{ b.service.name }}</dd>
+
+                <dt class="col-4">Υπάλληλος</dt>
+                <dd class="col-8 mb-2">{{ b.employee.name }}</dd>
+
+                <dt class="col-4">Σημειώσεις</dt>
+                <dd class="col-8 mb-2">
+                    {% if b.notes %}
+                    {{ b.notes|linebreaksbr }}
+                    {% else %}
+                    <span class="text-muted">—</span>
+                    {% endif %}
+                </dd>
+
+                <dt class="col-4">Πληρωμή</dt>
+                <dd class="col-8 mb-0">
+                    {% if b.deposit_amount > 0 %}
+                    {{ b.deposit_amount }}€
+                    <span class="badge bg-{% if b.payment_status == 'paid' %}success{% elif b.payment_status == 'refunded' %}warning{% else %}secondary{% endif %}">{{ b.get_payment_status_display }}</span>
+                    {% else %}—{% endif %}
+                </dd>
+            </dl>
+
+            <div class="d-grid gap-2">
+                {% if b.status == 'pending' %}
+                <form method="post" action="{% url 'businesses:confirm_booking' b.id %}" class="js-confirm-action"
+                      data-confirm-title-gr="Επιβεβαίωση ραντεβού"
+                      data-confirm-title-en="Confirm booking"
+                      data-confirm-message-gr="Να επιβεβαιωθεί το ραντεβού #{{ b.id }};"
+                      data-confirm-message-en="Confirm booking #{{ b.id }}?"
+                      data-confirm-button-gr="Επιβεβαίωση"
+                      data-confirm-button-en="Confirm"
+                      data-confirm-button-class="btn-success">
+                    {% csrf_token %}
+                    <button class="btn btn-success w-100"><i class="fas fa-check me-1"></i>Επιβεβαίωση</button>
+                </form>
+                {% endif %}
+
+                {% if b.status == 'pending' or b.status == 'confirmed' %}
+                <form method="post" action="{% url 'businesses:reject_booking' b.id %}" class="js-confirm-action"
+                                            data-requires-reason="1"
+                      data-confirm-title-gr="Απόρριψη ραντεβού"
+                      data-confirm-title-en="Reject booking"
+                      data-confirm-message-gr="Να απορριφθεί το ραντεβού #{{ b.id }};"
+                      data-confirm-message-en="Reject booking #{{ b.id }}?"
+                      data-confirm-button-gr="Απόρριψη"
+                      data-confirm-button-en="Reject"
+                      data-confirm-button-class="btn-danger">
+                    {% csrf_token %}
+                                        <input type="hidden" name="rejection_reason" value="" class="js-rejection-reason">
+                    <button class="btn btn-danger w-100"><i class="fas fa-times me-1"></i>Απόρριψη</button>
+                </form>
+                {% endif %}
+
+                {% if b.status == 'confirmed' %}
+                <form method="post" action="{% url 'businesses:mark_completed' b.id %}" class="js-confirm-action"
+                      data-confirm-title-gr="Ολοκλήρωση ραντεβού"
+                      data-confirm-title-en="Complete booking"
+                      data-confirm-message-gr="Σημειώστε ως ολοκληρωμένο το ραντεβού #{{ b.id }};"
+                      data-confirm-message-en="Mark booking #{{ b.id }} as completed?"
+                      data-confirm-button-gr="Ολοκλήρωση"
+                      data-confirm-button-en="Complete"
+                      data-confirm-button-class="btn-success">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-success w-100"><i class="fas fa-check-double me-1"></i>Ολοκλήρωση</button>
+                </form>
+                {% if b.date <= today %}
+                <form method="post" action="{% url 'businesses:mark_no_show' b.id %}" class="js-confirm-action"
+                      data-confirm-title-gr="Καταχώριση δεν εμφανίστηκε"
+                      data-confirm-title-en="Mark no-show"
+                      data-confirm-message-gr="Να σημειωθεί ως δεν εμφανίστηκε το ραντεβού #{{ b.id }};"
+                      data-confirm-message-en="Mark booking #{{ b.id }} as no-show?"
+                      data-confirm-button-gr="Δεν εμφανίστηκε"
+                      data-confirm-button-en="No-Show"
+                      data-confirm-button-class="btn-dark">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-dark w-100"><i class="fas fa-user-slash me-1"></i>Δεν εμφανίστηκε</button>
+                </form>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </article>
+    {% empty %}
+    <div class="card shadow-sm border-0" id="bookingMobileServerEmpty">
+        <div class="card-body text-center text-muted py-4">Δεν βρέθηκαν ραντεβού.</div>
+    </div>
+    {% endfor %}
+    <div class="card shadow-sm border-0 d-none" id="bookingMobileNoResults">
+        <div class="card-body text-center text-muted py-4">Δεν βρέθηκαν αποτελέσματα με τα φίλτρα σας.</div>
+    </div>
+</div>
+
+</div>
+</section>
+
+<div id="bookingsCalendarView" class="d-none">
+    <div class="cmc-shell">
+        <div class="cmc-header">
+            <button class="cmc-nav-btn" id="cmcPrev" aria-label="Προηγούμενος μήνας">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="cmc-title" id="cmcTitle"></span>
+            <button class="cmc-nav-btn" id="cmcNext" aria-label="Επόμενος μήνας">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="cmc-weekday-row" aria-hidden="true">
+            <span>ΔΕΥ</span><span>ΤΡΙ</span><span>ΤΕΤ</span><span>ΠΕΜ</span><span>ΠΑΡ</span><span>ΣΑΒ</span><span>ΚΥΡ</span>
+        </div>
+        <div class="cmc-grid" id="cmcGrid" role="grid" aria-label="Ημερολόγιο ραντεβού"></div>
+        <div class="cmc-preview-strip" id="cmcPreviewStrip"></div>
+    </div>
+</div>
+
+{{ bookings_calendar_data|json_script:"bookingsCalendarData" }}
+
+<div class="modal fade" id="bookingActionModal" tabindex="-1" aria-labelledby="bookingActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content booking-action-modal">
+            <div class="modal-header booking-action-modal-header">
+                <h5 class="modal-title" id="bookingActionModalLabel">Επιβεβαίωση ενέργειας</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0" id="bookingActionModalMessage">Επιβεβαιώστε ότι θέλετε να συνεχίσετε.</p>
+                <div class="mt-3 d-none" id="bookingRejectReasonWrap">
+                    <label for="bookingRejectReasonInput" class="form-label fw-semibold mb-1" id="bookingRejectReasonLabel">Λόγος απόρριψης</label>
+                    <textarea id="bookingRejectReasonInput" class="form-control" rows="3" maxlength="500" placeholder="Γράψτε τον λόγο απόρριψης..." aria-describedby="bookingRejectReasonHelp"></textarea>
+                    <small class="text-muted" id="bookingRejectReasonHelp">Ο λόγος θα σταλεί στον πελάτη με email.</small>
+                    <div class="text-danger small mt-1 d-none" id="bookingRejectReasonError">Ο λόγος απόρριψης είναι υποχρεωτικός.</div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="bookingActionCancel">Άκυρο</button>
+                <button type="button" class="btn btn-success" id="bookingActionConfirm">Επιβεβαίωση</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="calendarBookingModal" tabindex="-1" aria-labelledby="calendarBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content booking-action-modal">
+            <div class="modal-header booking-action-modal-header">
+                <h5 class="modal-title" id="calendarBookingModalLabel">Λεπτομέρειες ραντεβού</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="calendarBookingModalBody"></div>
+            <div class="modal-footer border-0 pt-0" id="calendarBookingModalActions"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.bookings-redesign-shell {
+    max-width: 100%;
+}
+
+.bookings-redesign-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.bookings-redesign-title {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #231d0f;
+}
+
+.bookings-view-toggle .btn {
+    border-radius: 0.9rem !important;
+    font-weight: 800;
+    border-color: rgba(201, 162, 39, 0.65);
+    color: #76653d;
+    background: #fff;
+    padding: 0.4rem 0.74rem;
+    font-size: 0.86rem;
+}
+
+.bookings-view-toggle {
+    display: inline-flex;
+    gap: 0.6rem;
+}
+
+.bookings-view-toggle .btn.active {
+    background: linear-gradient(135deg, #ffffff, #f6efe0);
+    border-color: #c9a227;
+    color: #9a7600;
+}
+
+.booking-status-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+}
+
+.status-pill {
+    border: 1px solid #dbd7cf;
+    border-radius: 999px !important;
+    background: #ffffff;
+    color: #6f7179;
+    font-weight: 800;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.status-pill.active {
+    border-color: #c9a227;
+    background: #c9a227;
+    color: #13100a;
+}
+
+.booking-list-toolbar {
+    margin-bottom: 1.1rem;
+}
+
+.booking-list-search-wrap {
+    position: relative;
+    max-width: 500px;
+}
+
+.booking-list-search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aeb1b9;
+    z-index: 2;
+}
+
+.booking-list-search-wrap .form-control {
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid #d4d4d0;
+    background: #fff;
+    padding-left: 44px;
+    font-size: 0.92rem;
+    color: #5f6574;
+}
+
+.booking-list-search-wrap .form-control:focus {
+    border-color: #c9a227;
+    box-shadow: 0 0 0 0.2rem rgba(201, 162, 39, 0.16);
+}
+
+.booking-desktop-card {
+    background: #ffffff;
+    border: 1px solid #dfded9;
+    border-radius: 1.15rem;
+    margin-bottom: 0.75rem;
+    padding: 0.68rem 0.84rem 0.74rem;
+    box-shadow: 0 6px 18px rgba(29, 28, 25, 0.08);
+    border-left: 4px solid #c9a227;
+}
+
+.booking-desktop-card.status-confirmed {
+    border-left-color: #22a856;
+}
+
+.booking-desktop-card.status-completed {
+    border-left-color: #3b82f6;
+}
+
+.booking-desktop-card.status-cancelled {
+    border-left-color: #ef4444;
+}
+
+.booking-desktop-card.status-no_show {
+    border-left-color: #6b7280;
+}
+
+.booking-desktop-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.3rem;
+}
+
+.booking-desktop-card__id {
+    color: #b2b5ba;
+    font-weight: 700;
+}
+
+.status-pill-chip {
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 800;
+    padding: 0.2rem 0.68rem;
+}
+
+.status-pill-chip.status-pending {
+    background: #f8e8be;
+    color: #b26d00;
+}
+
+.status-pill-chip.status-confirmed {
+    background: #c9f0d6;
+    color: #13743e;
+}
+
+.status-pill-chip.status-completed {
+    background: #d6e8ff;
+    color: #1f5ec9;
+}
+
+.status-pill-chip.status-cancelled {
+    background: #ffd8dc;
+    color: #b42333;
+}
+
+.status-pill-chip.status-no_show {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.booking-desktop-card__time {
+    margin-bottom: 0.55rem;
+}
+
+.booking-desktop-card__time h4 {
+    margin: 0;
+    font-size: 1.35rem;
+    line-height: 1;
+    color: #172033;
+    font-weight: 900;
+}
+
+.booking-desktop-card__time p {
+    margin: 0.2rem 0 0;
+    color: #707989;
+    font-size: 0.95rem;
+    font-weight: 800;
+    line-height: 1.05;
+}
+
+.booking-desktop-card__details {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.9rem;
+    margin-bottom: 0.72rem;
+}
+
+.booking-desktop-field__label {
+    display: block;
+    margin-bottom: 0.15rem;
+    color: #a6abb4;
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.03em;
+}
+
+.booking-desktop-field__value {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+    color: #8e95a2;
+}
+
+.booking-desktop-field__value strong {
+    color: #182131;
+    font-size: 0.9rem;
+}
+
+.booking-desktop-field__value span {
+    font-size: 0.82rem;
+}
+
+.booking-desktop-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.booking-action-btn {
+    border-radius: 0.8rem;
+    font-weight: 800;
+    padding: 0.32rem 0.74rem;
+    font-size: 0.82rem;
+}
+
+.booking-action-btn--confirm {
+    background: #17a34a;
+    border-color: #17a34a;
+    color: #fff;
+}
+
+.booking-action-btn--reject {
+    background: #fff6f6;
+    border-color: #f6c9ce;
+    color: #e03440;
+}
+
+.booking-action-btn--complete {
+    background: #eef6ff;
+    border-color: #bfdaff;
+    color: #2c66dd;
+}
+
+.booking-action-btn--no-show {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+@media (min-width: 992px) {
+    .booking-desktop-card {
+        margin-bottom: 0.6rem;
+        padding: 0.54rem 0.67rem 0.59rem;
+    }
+
+    .booking-desktop-card__header {
+        margin-bottom: 0.24rem;
+    }
+
+    .booking-desktop-card__id {
+        font-size: 0.8rem;
+    }
+
+    .status-pill-chip {
+        font-size: 0.74rem;
+        padding: 0.16rem 0.54rem;
+    }
+
+    .booking-desktop-card__time {
+        margin-bottom: 0.44rem;
+    }
+
+    .booking-desktop-card__time h4 {
+        font-size: 1.08rem;
+    }
+
+    .booking-desktop-card__time p {
+        font-size: 0.76rem;
+    }
+
+    .booking-desktop-card__details {
+        gap: 0.72rem;
+        margin-bottom: 0.58rem;
+    }
+
+    .booking-desktop-field__label {
+        font-size: 0.59rem;
+    }
+
+    .booking-desktop-field__value strong {
+        font-size: 0.72rem;
+    }
+
+    .booking-desktop-field__value span {
+        font-size: 0.66rem;
+    }
+
+    .booking-desktop-card__actions {
+        gap: 0.4rem;
+    }
+
+    .booking-action-btn {
+        padding: 0.26rem 0.59rem;
+        font-size: 0.66rem;
+    }
+}
+
+.booking-empty-message {
+    border: 1px dashed #d2d6dd;
+    border-radius: 0.9rem;
+    padding: 1.2rem;
+    text-align: center;
+    color: #6b7280;
+    background: #fff;
+}
+
+.booking-list-item.is-hidden {
+    display: none !important;
+}
+
+.booking-action-modal {
+    border: 1px solid rgba(201, 162, 39, 0.25);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+}
+
+.booking-action-modal-header {
+    background: linear-gradient(135deg, #0e0d08 0%, #1a180e 100%);
+    color: #f5e6c0;
+    border-bottom: 1px solid rgba(201, 162, 39, 0.2);
+}
+
+.booking-action-modal .modal-body {
+    color: #3d3422;
+    font-size: 1rem;
+}
+
+.calendar-booking-detail-line {
+    margin-bottom: 0.35rem;
+    color: #4b5563;
+}
+
+.calendar-booking-detail-line strong {
+    color: #1f2937;
+}
+
+.booking-mobile-card {
+    border-radius: 1rem;
+}
+
+.booking-mobile-meta dt {
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.booking-mobile-meta dd {
+    color: #212529;
+}
+
+/* ── Custom Month Calendar ─────────────────────────── */
+.cmc-shell {
+    background: #0e0d08;
+    border-radius: 1.25rem;
+    padding: 1.25rem 1.1rem 1rem;
+    color: #f0e6c8;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.cmc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.cmc-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #d4b84a;
+    letter-spacing: 0.02em;
+    text-transform: capitalize;
+}
+
+.cmc-nav-btn {
+    background: rgba(201, 162, 39, 0.1);
+    border: 1px solid rgba(201, 162, 39, 0.2);
+    color: #c9a227;
+    border-radius: 0.55rem;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    font-size: 0.75rem;
+}
+
+.cmc-nav-btn:hover {
+    background: rgba(201, 162, 39, 0.22);
+    border-color: rgba(201, 162, 39, 0.45);
+}
+
+.cmc-weekday-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.3rem;
+    margin-bottom: 0.3rem;
+}
+
+.cmc-weekday-row span {
+    text-align: center;
+    font-size: 0.62rem;
+    font-weight: 800;
+    color: #3d3825;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.15rem 0;
+}
+
+.cmc-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.3rem;
+}
+
+.cmc-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.55rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #3a3522;
+    cursor: default;
+    min-height: 2.2rem;
+    transition: background 0.14s;
+    user-select: none;
+}
+
+.cmc-day.has-bookings {
+    background: #27230d;
+    color: #c9a227;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.cmc-day.has-bookings:hover {
+    background: #332d13;
+}
+
+.cmc-day.is-today {
+    background: linear-gradient(135deg, #d4a520 0%, #f2ca3e 100%);
+    color: #12100a;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(201, 162, 39, 0.42);
+    font-weight: 900;
+}
+
+.cmc-day.is-today:hover {
+    background: linear-gradient(135deg, #c9a020 0%, #e8c038 100%);
+}
+
+.cmc-day.is-today.has-bookings {
+    background: linear-gradient(135deg, #d4a520 0%, #f2ca3e 100%);
+    color: #12100a;
+}
+
+.cmc-day.is-selected:not(.is-today) {
+    outline: 2px solid rgba(201, 162, 39, 0.55);
+    outline-offset: -2px;
+}
+
+.cmc-day.other-month {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ── Preview strip ─────────────────────────────────── */
+.cmc-preview-strip {
+    margin-top: 0.9rem;
+    border-top: 1px solid rgba(201, 162, 39, 0.1);
+    padding-top: 0.75rem;
+    min-height: 3.2rem;
+}
+
+.cmc-preview-date-label {
+    font-size: 0.68rem;
+    color: #6a5d38;
+    font-weight: 800;
+    margin-bottom: 0.45rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+.cmc-preview-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.42rem 0 0.42rem 0.7rem;
+    border-left: 3px solid #c9a227;
+    cursor: pointer;
+    border-radius: 0 0.4rem 0.4rem 0;
+    transition: background 0.12s;
+}
+
+.cmc-preview-item:hover {
+    background: rgba(201, 162, 39, 0.07);
+}
+
+.cmc-preview-item + .cmc-preview-item {
+    margin-top: 0.3rem;
+}
+
+.cmc-preview-name {
+    font-size: 0.87rem;
+    font-weight: 700;
+    color: #dece96;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cmc-preview-time {
+    font-size: 0.72rem;
+    color: #6a5d38;
+    margin-top: 0.06rem;
+}
+
+.cmc-preview-badge {
+    flex-shrink: 0;
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 0.18rem 0.48rem;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.cmc-preview-badge.status-confirmed  { background: #c9f0d6; color: #13743e; }
+.cmc-preview-badge.status-pending    { background: #f8e8be; color: #b26d00; }
+.cmc-preview-badge.status-completed  { background: #d6e8ff; color: #1f5ec9; }
+.cmc-preview-badge.status-cancelled  { background: #ffd8dc; color: #b42333; }
+.cmc-preview-badge.status-no_show   { background: #e5e7eb; color: #374151; }
+
+.cmc-preview-empty {
+    color: #3d3825;
+    font-size: 0.82rem;
+    font-style: italic;
+    padding-left: 0.25rem;
+}
+
+@media (max-width: 991.98px) {
+    .bookings-redesign-title {
+        font-size: 1.15rem;
+    }
+
+    .bookings-redesign-top {
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+
+    .bookings-view-toggle {
+        width: auto;
+        display: inline-flex;
+        gap: 0.45rem;
+    }
+
+    .bookings-view-toggle .btn {
+        width: auto;
+        font-size: 0.9rem;
+        padding: 0.48rem 0.82rem;
+    }
+
+    .booking-status-pills {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 0.15rem;
+    }
+
+    .booking-status-pills::-webkit-scrollbar {
+        display: none;
+    }
+
+    .booking-desktop-card {
+        padding: 0.56rem 0.62rem 0.62rem;
+    }
+
+    .booking-desktop-card__time h4 {
+        font-size: 1.05rem;
+    }
+
+    .booking-desktop-card__time p {
+        font-size: 0.78rem;
+    }
+
+    .booking-desktop-card__time {
+        margin-bottom: 0.34rem;
+    }
+
+    .booking-desktop-card__details {
+        grid-template-columns: 1fr;
+        gap: 0.45rem;
+        margin-bottom: 0.45rem;
+    }
+
+    .booking-desktop-field__label {
+        font-size: 0.58rem;
+    }
+
+    .booking-desktop-field__value strong {
+        font-size: 0.72rem;
+    }
+
+    .booking-desktop-field__value span {
+        font-size: 0.64rem;
+    }
+
+    .booking-desktop-card__actions {
+        gap: 0.34rem;
+    }
+
+    .booking-action-btn {
+        width: auto;
+        padding: 0.2rem 0.5rem;
+        font-size: 0.62rem;
+    }
+
+    .booking-filter-group {
+        display: flex;
+        width: 100%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .bookings-redesign-top {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.55rem;
+    }
+
+    .bookings-view-toggle {
+        width: auto;
+    }
+
+    .bookings-view-toggle .btn {
+        width: auto;
+        padding: 0.45rem 0.7rem;
+        font-size: 0.88rem;
+    }
+
+    .booking-list-search-wrap {
+        max-width: 100%;
+    }
+
+    .bookings-redesign-title {
+        font-size: 0.98rem;
+    }
+
+    .status-pill {
+        padding: 0.28rem 0.66rem;
+        font-size: 0.74rem;
+    }
+
+    .booking-list-search-wrap .form-control {
+        height: 36px;
+        font-size: 0.8rem;
+        padding-left: 36px;
+    }
+
+    .booking-list-search-icon {
+        left: 12px;
+        font-size: 0.8rem;
+    }
+
+    .booking-desktop-card {
+        padding: 0.46rem 0.52rem 0.5rem;
+        margin-bottom: 0.46rem;
+        border-left-width: 3px;
+    }
+
+    .booking-desktop-card__id {
+        font-size: 0.72rem;
+    }
+
+    .status-pill-chip {
+        font-size: 0.66rem;
+        padding: 0.12rem 0.46rem;
+    }
+
+    .booking-desktop-card__details {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.35rem 0.55rem;
+    }
+
+    .booking-action-btn {
+        padding: 0.16rem 0.44rem;
+        font-size: 0.58rem;
+        border-radius: 0.56rem;
+    }
+
+    .booking-filter-group {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modalElement = document.getElementById('bookingActionModal');
+    if (!modalElement || typeof bootstrap === 'undefined') {
+        return;
+    }
+
+    const modal = new bootstrap.Modal(modalElement);
+    const titleElement = document.getElementById('bookingActionModalLabel');
+    const messageElement = document.getElementById('bookingActionModalMessage');
+    const confirmButton = document.getElementById('bookingActionConfirm');
+    const cancelButton = document.getElementById('bookingActionCancel');
+    const reasonWrap = document.getElementById('bookingRejectReasonWrap');
+    const reasonInput = document.getElementById('bookingRejectReasonInput');
+    const reasonLabel = document.getElementById('bookingRejectReasonLabel');
+    const reasonHelp = document.getElementById('bookingRejectReasonHelp');
+    const reasonError = document.getElementById('bookingRejectReasonError');
+    let activeForm = null;
+
+    function currentLang() {
+        return localStorage.getItem('dashLang') || 'gr';
+    }
+
+    function readFormText(form, name) {
+        const lang = currentLang();
+        const attribute = 'confirm' + name + (lang === 'en' ? 'En' : 'Gr');
+        return form.dataset[attribute] || '';
+    }
+
+    document.addEventListener('submit', function (event) {
+        const form = event.target && event.target.closest ? event.target.closest('.js-confirm-action') : null;
+        if (!form) {
+            return;
+        }
+
+        if (form.dataset.confirmed === '1') {
+            form.dataset.confirmed = '0';
+            return;
+        }
+
+        event.preventDefault();
+        activeForm = form;
+        titleElement.textContent = readFormText(form, 'Title');
+        messageElement.textContent = readFormText(form, 'Message');
+        confirmButton.textContent = readFormText(form, 'Button');
+        cancelButton.textContent = currentLang() === 'en' ? 'Cancel' : 'Άκυρο';
+        confirmButton.className = 'btn ' + (form.dataset.confirmButtonClass || 'btn-success');
+
+        const needsReason = form.dataset.requiresReason === '1';
+        if (needsReason) {
+            reasonWrap.classList.remove('d-none');
+            reasonLabel.textContent = currentLang() === 'en' ? 'Rejection reason' : 'Λόγος απόρριψης';
+            reasonInput.placeholder = currentLang() === 'en' ? 'Write the reason for rejection...' : 'Γράψτε τον λόγο απόρριψης...';
+            reasonHelp.textContent = currentLang() === 'en'
+                ? 'This reason will be emailed to the customer.'
+                : 'Ο λόγος θα σταλεί στον πελάτη με email.';
+        } else {
+            reasonWrap.classList.add('d-none');
+            reasonInput.value = '';
+        }
+        reasonError.classList.add('d-none');
+        modal.show();
+    });
+
+    confirmButton.addEventListener('click', function () {
+        if (!activeForm) {
+            return;
+        }
+
+        if (activeForm.dataset.requiresReason === '1') {
+            const reasonValue = reasonInput.value.trim();
+            if (!reasonValue) {
+                reasonError.textContent = currentLang() === 'en'
+                    ? 'Rejection reason is required.'
+                    : 'Ο λόγος απόρριψης είναι υποχρεωτικός.';
+                reasonError.classList.remove('d-none');
+                reasonInput.focus();
+                return;
+            }
+            const hiddenReason = activeForm.querySelector('.js-rejection-reason');
+            if (hiddenReason) {
+                hiddenReason.value = reasonValue;
+            }
+        }
+
+        activeForm.dataset.confirmed = '1';
+        modal.hide();
+        activeForm.submit();
+    });
+
+    modalElement.addEventListener('hidden.bs.modal', function () {
+        reasonInput.value = '';
+        reasonError.classList.add('d-none');
+        reasonWrap.classList.add('d-none');
+        activeForm = null;
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Escape user-supplied strings before inserting into innerHTML.
+    function esc(v) {
+        return String(v || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    const listView = document.getElementById('bookingsListView');
+    const calendarView = document.getElementById('bookingsCalendarView');
+    const toggleButtons = document.querySelectorAll('[data-bookings-view]');
+    const preferenceKey = 'businessBookingsView_{{ business.id }}';
+    const dataElement = document.getElementById('bookingsCalendarData');
+    let csrfToken = '';
+
+    function getCookie(name) {
+        const value = '; ' + document.cookie;
+        const parts = value.split('; ' + name + '=');
+        if (parts.length === 2) {
+            return parts.pop().split(';').shift();
+        }
+        return '';
+    }
+
+    const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    if (csrfInput) {
+        csrfToken = csrfInput.value;
+    }
+    if (!csrfToken) {
+        csrfToken = getCookie('csrftoken');
+    }
+
+    // ── Custom Month Calendar ──────────────────────────────────────
+    const GREEK_MONTHS = ['Ιανουάριος','Φεβρουάριος','Μάρτιος','Απρίλιος','Μάιος','Ιούνιος',
+        'Ιούλιος','Αύγουστος','Σεπτέμβριος','Οκτώβριος','Νοέμβριος','Δεκέμβριος'];
+
+    let bookingsData = [];
+    try { bookingsData = JSON.parse(dataElement ? dataElement.textContent : '[]'); } catch (e) {}
+
+    const bookingsByDate = {};
+    bookingsData.forEach(function (b) {
+        if (!bookingsByDate[b.date]) bookingsByDate[b.date] = [];
+        bookingsByDate[b.date].push(b);
+    });
+
+    const todayObj = new Date();
+    const todayStr = todayObj.getFullYear() + '-'
+        + String(todayObj.getMonth() + 1).padStart(2, '0') + '-'
+        + String(todayObj.getDate()).padStart(2, '0');
+
+    let viewYear = todayObj.getFullYear();
+    let viewMonth = todayObj.getMonth();
+    let selectedDate = todayStr;
+
+    const cmcGrid = document.getElementById('cmcGrid');
+    const cmcTitle = document.getElementById('cmcTitle');
+    const cmcPrev = document.getElementById('cmcPrev');
+    const cmcNext = document.getElementById('cmcNext');
+    const cmcPreviewStrip = document.getElementById('cmcPreviewStrip');
+
+    function renderCalendar() {
+        if (!cmcGrid || !cmcTitle) return;
+        cmcTitle.textContent = GREEK_MONTHS[viewMonth] + ' ' + viewYear;
+
+        const firstDow = new Date(viewYear, viewMonth, 1).getDay();
+        const leadingBlanks = (firstDow + 6) % 7;
+        const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+        const cells = [];
+        for (let i = 0; i < leadingBlanks; i++) cells.push(null);
+        for (let d = 1; d <= daysInMonth; d++) {
+            cells.push(viewYear + '-'
+                + String(viewMonth + 1).padStart(2, '0') + '-'
+                + String(d).padStart(2, '0'));
+        }
+        const trailing = cells.length % 7;
+        if (trailing > 0) for (let i = 0; i < (7 - trailing); i++) cells.push(null);
+
+        // Build grid HTML — only class names and fixed labels; no user data here.
+        const html = cells.map(function (ds) {
+            if (!ds) return '<div class="cmc-day other-month" aria-hidden="true"></div>';
+            const day = parseInt(ds.slice(8), 10);
+            const isToday = ds === todayStr;
+            const hasBookings = Boolean(bookingsByDate[ds]);
+            const isSelected = ds === selectedDate;
+            let cls = 'cmc-day';
+            if (isToday) cls += ' is-today';
+            if (hasBookings) cls += ' has-bookings';
+            if (isSelected) cls += ' is-selected';
+            const clickable = hasBookings || isToday;
+            return '<div class="' + cls + '"'
+                + (clickable ? ' data-date="' + ds + '" tabindex="0" role="button" aria-label="' + day + '"' : '')
+                + '>' + day + '</div>';
+        }).join('');
+
+        // Safe: only day numbers (integers) and our own class/attribute strings.
+        cmcGrid.innerHTML = html;
+
+        cmcGrid.querySelectorAll('.cmc-day[data-date]').forEach(function (el) {
+            el.addEventListener('click', function () {
+                selectedDate = el.dataset.date;
+                renderCalendar();
+            });
+            el.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+            });
+        });
+
+        renderPreview(selectedDate);
+    }
+
+    function renderPreview(ds) {
+        if (!cmcPreviewStrip) return;
+        let bookings = ds ? (bookingsByDate[ds] || []) : [];
+
+        if (!bookings.length) {
+            const futureDates = Object.keys(bookingsByDate).filter(function (d) { return d >= todayStr; }).sort();
+            if (!futureDates.length) {
+                cmcPreviewStrip.textContent = '';
+                const empty = document.createElement('div');
+                empty.className = 'cmc-preview-empty';
+                empty.textContent = 'Δεν υπάρχουν προσεχή ραντεβού.';
+                cmcPreviewStrip.appendChild(empty);
+                return;
+            }
+            ds = futureDates[0];
+            bookings = bookingsByDate[ds];
+        }
+
+        const dateObj = new Date(ds + 'T00:00:00');
+        const dateLabel = dateObj.toLocaleDateString('el-GR', { weekday: 'long', day: 'numeric', month: 'long' });
+        const STATUS_LABELS = { pending:'ΑΝΑΜΟΝΗ', confirmed:'ΕΠΙΒΕΒΑΙΩΜΕΝΟ', completed:'ΟΛΟΚΛΗΡΩΘΗΚΕ', cancelled:'ΑΚΥΡΩΘΗΚΕ', no_show:'NO-SHOW' };
+        const sorted = bookings.slice().sort(function (a, b) { return (a.start_time || '').localeCompare(b.start_time || ''); });
+
+        cmcPreviewStrip.textContent = '';
+
+        const lbl = document.createElement('div');
+        lbl.className = 'cmc-preview-date-label';
+        lbl.textContent = dateLabel;
+        cmcPreviewStrip.appendChild(lbl);
+
+        sorted.forEach(function (b) {
+            const customerName = b.customer
+                ? (((b.customer.first_name || '') + ' ' + (b.customer.last_name || '')).trim() || b.customer.username || 'Πελάτης')
+                : (b.guest_name || 'Επισκέπτης');
+            const serviceName = b.service ? b.service.name : '';
+            const time = (b.start_time || '').slice(0, 5) + ' – ' + (b.end_time || '').slice(0, 5);
+            const status = b.status || 'pending';
+            const statusText = (b.status_display || STATUS_LABELS[status] || status).toUpperCase();
+
+            const item = document.createElement('div');
+            item.className = 'cmc-preview-item';
+            item.dataset.bookingId = String(b.id);
+
+            const textWrap = document.createElement('div');
+            textWrap.style.cssText = 'min-width:0;flex:1';
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'cmc-preview-name';
+            // textContent prevents XSS — user-supplied names are set as text, not markup.
+            nameEl.textContent = customerName + (serviceName ? ' — ' + serviceName : '');
+
+            const timeEl = document.createElement('div');
+            timeEl.className = 'cmc-preview-time';
+            timeEl.textContent = time;
+
+            textWrap.appendChild(nameEl);
+            textWrap.appendChild(timeEl);
+
+            const badge = document.createElement('span');
+            // status is a known fixed set ('pending','confirmed', etc.) — safe as class suffix.
+            badge.className = 'cmc-preview-badge status-' + status;
+            badge.textContent = statusText;
+
+            item.appendChild(textWrap);
+            item.appendChild(badge);
+            cmcPreviewStrip.appendChild(item);
+
+            item.addEventListener('click', function () {
+                const booking = bookings.find(function (bk) { return String(bk.id) === String(b.id); });
+                if (booking) openBookingModal(booking);
+            });
+        });
+    }
+
+    function postAction(url, extraFields) {
+        if (!url) return;
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = url;
+        const csrfField = document.createElement('input');
+        csrfField.type = 'hidden'; csrfField.name = 'csrfmiddlewaretoken'; csrfField.value = csrfToken;
+        form.appendChild(csrfField);
+        if (extraFields) {
+            Object.keys(extraFields).forEach(function (key) {
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden'; hidden.name = key; hidden.value = extraFields[key];
+                form.appendChild(hidden);
+            });
+        }
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function openBookingModal(booking) {
+        const modalEl = document.getElementById('calendarBookingModal');
+        const modalBody = document.getElementById('calendarBookingModalBody');
+        const modalActions = document.getElementById('calendarBookingModalActions');
+        const modalTitle = document.getElementById('calendarBookingModalLabel');
+        if (!modalEl || typeof bootstrap === 'undefined') return;
+        const bsModal = new bootstrap.Modal(modalEl);
+
+        const L = (localStorage.getItem('dashLang') || 'gr') === 'en';
+        const customerName = booking.customer
+            ? (((booking.customer.first_name || '') + ' ' + (booking.customer.last_name || '')).trim() || booking.customer.username || 'Πελάτης')
+            : (booking.guest_name || 'Επισκέπτης');
+        const serviceName = booking.service ? booking.service.name : '';
+        const time = (booking.start_time || '').slice(0, 5) + ' – ' + (booking.end_time || '').slice(0, 5);
+        const phone = booking.customer ? (booking.customer.phone || '') : (booking.guest_phone || '');
+        const employeeName = booking.employee ? (booking.employee.name || '') : '';
+
+        modalTitle.textContent = L ? 'Booking details' : 'Λεπτομέρειες ραντεβού';
+        modalBody.textContent = '';
+        modalActions.textContent = '';
+
+        function addLine(label, value, strong) {
+            const div = document.createElement('div');
+            div.className = 'calendar-booking-detail-line';
+            if (strong) {
+                const s = document.createElement('strong');
+                s.textContent = label + value;
+                div.appendChild(s);
+            } else {
+                div.textContent = label + value;
+            }
+            modalBody.appendChild(div);
+        }
+
+        addLine((L ? 'Booking #' : 'Ραντεβού #'), String(booking.id), true);
+        addLine((L ? 'Date: ' : 'Ημερομηνία: '), String(booking.date || ''), false);
+        addLine((L ? 'Time: ' : 'Ώρα: '), time, false);
+        addLine((L ? 'Customer: ' : 'Πελάτης: '), customerName, false);
+        if (serviceName) addLine((L ? 'Service: ' : 'Υπηρεσία: '), serviceName, false);
+        if (employeeName) addLine((L ? 'Employee: ' : 'Υπάλληλος: '), employeeName, false);
+        if (phone) addLine((L ? 'Phone: ' : 'Τηλέφωνο: '), phone, true);
+        if (booking.notes) {
+            const notesDiv = document.createElement('div');
+            notesDiv.className = 'calendar-booking-detail-line';
+            const noteLabel = document.createElement('strong');
+            noteLabel.textContent = L ? 'Notes: ' : 'Σημειώσεις: ';
+            const noteText = document.createElement('span');
+            noteText.textContent = booking.notes;
+            notesDiv.appendChild(noteLabel);
+            notesDiv.appendChild(noteText);
+            modalBody.appendChild(notesDiv);
+        }
+
+        function addBtn(label, cls, handler) {
+            const btn = document.createElement('button');
+            btn.type = 'button'; btn.className = cls; btn.textContent = label;
+            btn.addEventListener('click', handler);
+            modalActions.appendChild(btn);
+        }
+
+        const urls = booking.action_urls || {};
+        addBtn(L ? 'Close' : 'Κλείσιμο', 'btn btn-outline-secondary', function () { bsModal.hide(); });
+        if (booking.status === 'pending') {
+            addBtn(L ? 'Confirm' : 'Επιβεβαίωση', 'btn btn-success', function () { postAction(urls.confirm); });
+        }
+        if (booking.status === 'pending' || booking.status === 'confirmed') {
+            addBtn(L ? 'Reject' : 'Απόρριψη', 'btn btn-danger', function () {
+                const reason = window.prompt(L ? 'Enter rejection reason:' : 'Συμπληρώστε λόγο απόρριψης:', '');
+                if (reason === null) return;
+                if (!reason.trim()) {
+                    alert(L ? 'Rejection reason is required.' : 'Ο λόγος απόρριψης είναι υποχρεωτικός.');
+                    return;
+                }
+                postAction(urls.reject, { rejection_reason: reason.trim() });
+            });
+        }
+        if (booking.status === 'confirmed') {
+            addBtn(L ? 'Complete' : 'Ολοκλήρωση', 'btn btn-outline-success', function () { postAction(urls.complete); });
+            if (booking.can_no_show) {
+                addBtn(L ? 'No-Show' : 'Δεν εμφανίστηκε', 'btn btn-outline-dark', function () { postAction(urls.no_show); });
+            }
+        }
+        bsModal.show();
+    }
+
+    if (cmcPrev) cmcPrev.addEventListener('click', function () {
+        viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+        selectedDate = null; renderCalendar();
+    });
+    if (cmcNext) cmcNext.addEventListener('click', function () {
+        viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+        selectedDate = null; renderCalendar();
+    });
+
+    renderCalendar();
+
+    function setActiveToggle(view) {
+        toggleButtons.forEach(function (button) {
+            button.classList.toggle('active', button.dataset.bookingsView === view);
+        });
+    }
+
+    function applyView(view, persistChoice) {
+        const selected = view === 'calendar' ? 'calendar' : 'list';
+        setActiveToggle(selected);
+        if (listView) listView.classList.toggle('d-none', selected !== 'list');
+        if (calendarView) calendarView.classList.toggle('d-none', selected !== 'calendar');
+        if (persistChoice) localStorage.setItem(preferenceKey, selected);
+    }
+
+    toggleButtons.forEach(function (button) {
+        button.addEventListener('click', function () { applyView(button.dataset.bookingsView, true); });
+    });
+
+    const rememberedView = localStorage.getItem(preferenceKey) || 'list';
+    applyView(rememberedView, false);
+
+    const searchInput = document.getElementById('bookingListSearch');
+    const sortSelect = document.getElementById('bookingListSort');
+    const actionableOnlyCheckbox = document.getElementById('bookingOnlyActionable');
+    const clearButton = document.getElementById('bookingListClear');
+    const countLabel = document.getElementById('bookingVisibleCount');
+    const desktopBody = document.getElementById('bookingsDesktopBody');
+    const mobileList = document.getElementById('bookingsMobileList');
+    let desktopNoResults = null;
+    let mobileNoResults = null;
+    let desktopServerEmpty = null;
+    let mobileServerEmpty = null;
+    let desktopItems = [];
+    let mobileItems = [];
+
+    function collectBookingNodes() {
+        desktopNoResults = document.getElementById('bookingNoResultsRow');
+        mobileNoResults = document.getElementById('bookingMobileNoResults');
+        desktopServerEmpty = document.getElementById('bookingServerEmptyRow');
+        mobileServerEmpty = document.getElementById('bookingMobileServerEmpty');
+        desktopItems = desktopBody ? Array.from(desktopBody.querySelectorAll('.booking-desktop-card.booking-list-item')) : [];
+        mobileItems = mobileList ? Array.from(mobileList.querySelectorAll('.booking-mobile-card.booking-list-item')) : [];
+    }
+
+    collectBookingNodes();
+
+    function normalizeText(value) {
+        return (value || '').toString().trim().toLowerCase();
+    }
+
+    function isActionable(status) {
+        return status === 'pending' || status === 'confirmed';
+    }
+
+    function compareItems(a, b, mode) {
+        const aStatus = a.dataset.status || '';
+        const bStatus = b.dataset.status || '';
+        const aTime = Date.parse(a.dataset.datetime || '') || 0;
+        const bTime = Date.parse(b.dataset.datetime || '') || 0;
+
+        if (mode === 'pending_first') {
+            const aPriority = aStatus === 'pending' ? 0 : 1;
+            const bPriority = bStatus === 'pending' ? 0 : 1;
+            if (aPriority !== bPriority) {
+                return aPriority - bPriority;
+            }
+            return bTime - aTime;
+        }
+
+        if (mode === 'date_asc') {
+            return aTime - bTime;
+        }
+
+        return bTime - aTime;
+    }
+
+    function applyListFilters() {
+        const query = normalizeText(searchInput ? searchInput.value : '');
+        const sortMode = (sortSelect && sortSelect.value) ? sortSelect.value : 'date_desc';
+        const actionableOnly = Boolean(actionableOnlyCheckbox && actionableOnlyCheckbox.checked);
+
+        function matchesQuery(item) {
+            if (!query) {
+                return true;
+            }
+            const haystack = normalizeText([
+                item.dataset.bookingId,
+                item.dataset.customer,
+                item.dataset.phone,
+                item.dataset.service,
+                item.dataset.employee,
+                item.dataset.notes,
+                item.dataset.date,
+                item.dataset.start,
+            ].join(' '));
+            return haystack.includes(query);
+        }
+
+        function applyToItems(items) {
+            const sorted = items.slice().sort(function (a, b) {
+                return compareItems(a, b, sortMode);
+            });
+
+            let visibleCount = 0;
+            sorted.forEach(function (item) {
+                const status = item.dataset.status || '';
+                const visible = matchesQuery(item) && (!actionableOnly || isActionable(status));
+                item.classList.toggle('is-hidden', !visible);
+                if (visible) {
+                    visibleCount += 1;
+                }
+            });
+
+            return {
+                sorted: sorted,
+                visibleCount: visibleCount,
+            };
+        }
+
+        const desktopResult = applyToItems(desktopItems);
+        const mobileResult = applyToItems(mobileItems);
+
+        if (desktopBody) {
+            desktopResult.sorted.forEach(function (item) {
+                desktopBody.appendChild(item);
+            });
+        }
+        if (mobileList) {
+            mobileResult.sorted.forEach(function (item) {
+                mobileList.appendChild(item);
+            });
+        }
+
+        const visibleCount = Math.max(desktopResult.visibleCount, mobileResult.visibleCount);
+        if (countLabel) {
+            countLabel.textContent = visibleCount + (visibleCount === 1 ? ' αποτέλεσμα' : ' αποτελέσματα');
+        }
+
+        const hasItems = desktopItems.length > 0 || mobileItems.length > 0;
+        const showNoResults = hasItems && visibleCount === 0;
+
+        if (desktopNoResults) {
+            desktopNoResults.classList.toggle('d-none', !showNoResults);
+        }
+        if (mobileNoResults) {
+            mobileNoResults.classList.toggle('d-none', !showNoResults);
+        }
+
+        if (desktopServerEmpty) {
+            desktopServerEmpty.classList.toggle('d-none', hasItems);
+        }
+        if (mobileServerEmpty) {
+            mobileServerEmpty.classList.toggle('d-none', hasItems);
+        }
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', applyListFilters);
+    }
+    if (sortSelect) {
+        sortSelect.addEventListener('change', applyListFilters);
+    }
+    if (actionableOnlyCheckbox) {
+        actionableOnlyCheckbox.addEventListener('change', applyListFilters);
+    }
+    if (clearButton) {
+        clearButton.addEventListener('click', function () {
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            if (sortSelect) {
+                sortSelect.value = 'date_desc';
+            }
+            if (actionableOnlyCheckbox) {
+                actionableOnlyCheckbox.checked = false;
+            }
+            applyListFilters();
+        });
+    }
+
+    async function refreshBusinessBookingsSection() {
+        if (!desktopBody && !mobileList) {
+            return false;
+        }
+
+        const response = await fetch(window.location.href, {
+            method: 'GET',
+            cache: 'no-store',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'text/html',
+                'Cache-Control': 'no-cache',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to refresh bookings section');
+        }
+
+        const html = await response.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+
+        const nextDesktopBody = doc.getElementById('bookingsDesktopBody');
+        const nextMobileList = doc.getElementById('bookingsMobileList');
+        const nextCalendarData = doc.getElementById('bookingsCalendarData');
+
+        if (desktopBody && nextDesktopBody) {
+            desktopBody.innerHTML = nextDesktopBody.innerHTML;
+        }
+        if (mobileList && nextMobileList) {
+            mobileList.innerHTML = nextMobileList.innerHTML;
+        }
+        if (dataElement && nextCalendarData) {
+            dataElement.textContent = nextCalendarData.textContent;
+            bookingsData.length = 0;
+            try {
+                const fresh = JSON.parse(dataElement.textContent);
+                fresh.forEach(function (b) { bookingsData.push(b); });
+            } catch (e) {}
+            Object.keys(bookingsByDate).forEach(function (k) { delete bookingsByDate[k]; });
+            bookingsData.forEach(function (b) {
+                if (!bookingsByDate[b.date]) bookingsByDate[b.date] = [];
+                bookingsByDate[b.date].push(b);
+            });
+            renderCalendar();
+        }
+
+        collectBookingNodes();
+        applyListFilters();
+        return true;
+    }
+
+    window.refreshBusinessBookingsSection = refreshBusinessBookingsSection;
+    applyListFilters();
+});
+</script>
+{% endblock %}

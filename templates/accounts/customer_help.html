@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+{% block title %}Βοήθεια — Reserva{% endblock %}
+
+{% block extra_css %}
+<style>
+.help-hero {
+    background: linear-gradient(135deg, #1a180e 0%, #2d2810 50%, #1a180e 100%);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(201,162,39,.2);
+}
+.faq-item {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    margin-bottom: .75rem;
+    overflow: hidden;
+    transition: box-shadow .2s;
+}
+.faq-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+.faq-item .faq-q {
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: #1a1a1a;
+    background: #fff;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+.faq-item .faq-q:hover { background: #fafafa; }
+.faq-item .faq-q .chevron {
+    color: #c9a227;
+    transition: transform .25s;
+    flex-shrink: 0;
+}
+.faq-item.open .faq-q .chevron { transform: rotate(180deg); }
+.faq-item .faq-a {
+    display: none;
+    padding: 0 1.25rem 1.1rem;
+    color: #495057;
+    line-height: 1.65;
+    border-top: 1px solid #f0f0f0;
+    padding-top: .85rem;
+    background: #fff;
+}
+.faq-item.open .faq-a { display: block; }
+
+.help-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    border-left: 4px solid #c9a227;
+    padding-left: .75rem;
+    margin: 2rem 0 1rem;
+}
+.contact-card {
+    border-radius: 14px;
+    background: linear-gradient(135deg,#fff9e6,#fffdf5);
+    border: 1px solid rgba(201,162,39,.3);
+    padding: 1.5rem;
+    text-align: center;
+}
+
+#customerLangBtn {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    z-index: 9999;
+    background: rgba(30,28,16,.92);
+    border: 1px solid rgba(201,162,39,.4);
+    color: #f0c04a;
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0,0,0,.3);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-2" style="max-width:860px;">
+
+    <!-- Hero -->
+    <div class="help-hero">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2 class="fw-bold mb-1" style="color:#f0c04a;">
+                    <i class="fas fa-life-ring me-2"></i>
+                    <span class="lang-gr">Κέντρο Βοήθειας</span>
+                    <span class="lang-en" style="display:none">Help Center</span>
+                </h2>
+                <p style="color:rgba(245,230,192,.7);margin-bottom:0;">
+                    <span class="lang-gr">Βρείτε απαντήσεις στις πιο συχνές ερωτήσεις.</span>
+                    <span class="lang-en" style="display:none">Find answers to the most common questions.</span>
+                </p>
+            </div>
+            <div class="col-auto d-none d-md-block">
+                <i class="fas fa-question-circle" style="font-size:3.5rem;color:rgba(201,162,39,.3);"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ: Bookings -->
+    <div class="help-section-title lang-gr">
+        <i class="fas fa-calendar-alt me-2" style="color:#c9a227;"></i>Ραντεβού
+    </div>
+    <div class="help-section-title lang-en" style="display:none">
+        <i class="fas fa-calendar-alt me-2" style="color:#c9a227;"></i>Bookings
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+            <span class="lang-gr">Πώς κλείνω ένα ραντεβού;</span>
+            <span class="lang-en" style="display:none">How do I book an appointment?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="faq-a">
+            <span class="lang-gr">Από την αρχική σελίδα, βρείτε την επιχείρηση που σας ενδιαφέρει, επιλέξτε υπηρεσία, υπάλληλο (αν διαθέσιμο), χρησιμοποιήστε το νέο επαγγελματικό ημερολόγιο για να επιλέξετε ημερομηνία, επιλέξτε ώρα από τις διαθέσιμες, και συμπληρώστε τα στοιχεία σας.</span>
+            <span class="lang-en" style="display:none">From the home page, find the business you're interested in, select a service, employee (if available), use the new professional calendar to choose a date, select a time from available slots, and fill in your details.</span>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+            <span class="lang-gr">Τι νέες δυνατότητες έχει το σύστημα κράτησης;</span>
+            <span class="lang-en" style="display:none">What new features does the booking system have?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="faq-a">
+            <div class="lang-gr">
+                Το σύστημα έχει ανανεωθεί πλήρως με:
+                <ul class="mt-2">
+                    <li><strong>🗓️ Επαγγελματικό Ημερολόγιο:</strong> Εύκολη πλοήγηση ανά μήνα</li>
+                    <li><strong>📞📧 Επιλογές Επικοινωνίας:</strong> Επιλέξτε τηλέφωνο, email ή και τα δύο</li>
+                    <li><strong>🎨 Μοντέρνο Design:</strong> Glassmorphism εφέ και χρυσούς τόνους</li>
+                    <li><strong>🚀 Smooth Animations:</strong> Απαλές μεταβάσεις και glow εφέ</li>
+                    <li><strong>📱 Mobile Responsive:</strong> Βελτιστοποιημένο για κινητά</li>
+                    <li><strong>🌐 Πολυγλωσσικό:</strong> Άμεση εναλλαγή Ελληνικά/Αγγλικά</li>
+                </ul>
+            </div>
+            <div class="lang-en" style="display:none">
+                The system has been completely renewed with:
+                <ul class="mt-2">
+                    <li><strong>🗓️ Professional Calendar:</strong> Easy month-by-month navigation</li>
+                    <li><strong>📞📧 Contact Preferences:</strong> Choose phone, email, or both</li>
+                    <li><strong>🎨 Modern Design:</strong> Glassmorphism effects and golden themes</li>
+                    <li><strong>🚀 Smooth Animations:</strong> Gentle transitions and glow effects</li>
+                    <li><strong>📱 Mobile Responsive:</strong> Optimized for mobile devices</li>
+                    <li><strong>🌐 Multilingual:</strong> Instant Greek/English switching</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+            <span class="lang-gr">Πώς λειτουργούν οι επιλογές επικοινωνίας;</span>
+            <span class="lang-en" style="display:none">How do contact preferences work?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="faq-a">
+            <span class="lang-gr">Κατά την κράτηση, μπορείτε να επιλέξετε πώς θέλετε να επικοινωνήσει μαζί σας η επιχείρηση: <strong>μόνο τηλεφωνικά</strong>, <strong>μόνο με email</strong>, ή <strong>και τα δύο</strong>. Ανάλογα με την επιλογή σας, συμπληρώνετε μόνο τα απαραίτητα στοιχεία.</span>
+            <span class="lang-en" style="display:none">During booking, you can choose how you want the business to contact you: <strong>phone only</strong>, <strong>email only</strong>, or <strong>both</strong>. Based on your choice, you only need to fill in the required details.</span>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+            <span class="lang-gr">Πώς μπορώ να ακυρώσω ένα ραντεβού;</span>
+            <span class="lang-en" style="display:none">How can I cancel a booking?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="faq-a">
+            <span class="lang-gr">Μεταβείτε στα <a href="{% url 'accounts:my_bookings' %}">Ραντεβού μου</a>, βρείτε το επερχόμενο ραντεβού και κάντε κλικ στο κουμπί "Ακύρωση". Η ακύρωση είναι δυνατή μόνο πριν από την ώρα του ραντεβού.</span>
+            <span class="lang-en" style="display:none">Go to <a href="{% url 'accounts:my_bookings' %}">My Bookings</a>, find the upcoming appointment and click the "Cancel" button. Cancellation is only possible before the appointment time.</span>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+            <span class="lang-gr">Τι σημαίνει η κατάσταση "Σε αναμονή";</span>
+            <span class="lang-en" style="display:none">What does "Pending" status mean?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="faq-a">
+            <span class="lang-gr">Σημαίνει ότι η επιχείρηση δεν έχει ακόμα επιβεβαιώσει το ραντεβού σας. Μόλις επιβεβαιωθεί, θα λάβετε ενημέρωση.</span>
+            <span class="lang-en" style="display:none">It means the business hasn't confirmed your appointment yet. Once confirmed, you'll receive a notification.</span>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+            <span class="lang-gr">Μπορώ να αφήσω αξιολόγηση για μια επιχείρηση;</span>
+            <span class="lang-en" style="display:none">Can I leave a review for a business?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="faq-a">
+            <span class="lang-gr">Ναι! Μετά την ολοκλήρωση ενός ραντεβού, εμφανίζεται η επιλογή αξιολόγησης στα <a href="{% url 'accounts:my_bookings' %}">Ραντεβού μου</a>. Μπορείτε να αξιολογήσετε με 1–5 αστέρια και να αφήσετε σχόλιο.</span>
+            <span class="lang-en" style="display:none">Yes! After a booking is completed, a review option appears in <a href="{% url 'accounts:my_bookings' %}">My Bookings</a>. You can rate with 1–5 stars and leave a comment.</span>
+        </div>
+    </div>
+
+    <!-- FAQ: Reports -->
+    <div class="help-section-title lang-gr mt-4">
+        <i class="fas fa-flag me-2" style="color:#c9a227;"></i>Αναφορές Επιχειρήσεων
+    </div>
+    <div class="help-section-title lang-en mt-4" style="display:none">
+        <i class="fas fa-flag me-2" style="color:#c9a227;"></i>Business Reports
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+            <span class="lang-gr">Πώς μπορώ να αναφέρω μια επιχείρηση;</span>
+            <span class="lang-en" style="display:none">How do I report a business?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="faq-a">
+            <span class="lang-gr">Από τα ραντεβού σας (επερχόμενα ή ιστορικό), κάντε κλικ στο κουμπί <i class="fas fa-flag text-secondary"></i> δίπλα σε ένα ραντεβού για να υποβάλετε αναφορά για την αντίστοιχη επιχείρηση.</span>
+            <span class="lang-en" style="display:none">From your bookings (upcoming or history), click the <i class="fas fa-flag text-secondary"></i> button next to a booking to submit a report about that business.</span>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+            <span class="lang-gr">Τι κατηγορίες αναφοράς υπάρχουν;</span>
+            <span class="lang-en" style="display:none">What report categories are available?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="faq-a lang-gr">
+            Μπορείτε να αναφέρετε:
+            <ul class="mt-2">
+                <li>Δεν τήρησε το ραντεβού</li>
+                <li>Προσβλητική γλώσσα</li>
+                <li>Επιχείρηση δεν εμφανίστηκε</li>
+                <li>Κακή εξυπηρέτηση</li>
+                <li>Απάτη / Παραπλάνηση</li>
+                <li>Άλλο</li>
+            </ul>
+        </div>
+        <div class="faq-a lang-en" style="display:none">
+            You can report:
+            <ul class="mt-2">
+                <li>Missed appointment</li>
+                <li>Offensive language</li>
+                <li>Business didn't show up</li>
+                <li>Poor service</li>
+                <li>Fraud / Deception</li>
+                <li>Other</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+            <span class="lang-gr">Τι γίνεται μετά την υποβολή μιας αναφοράς;</span>
+            <span class="lang-en" style="display:none">What happens after submitting a report?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="faq-a">
+            <span class="lang-gr">Η αναφορά σας παραλαμβάνεται από τον διαχειριστή της πλατφόρμας, ο οποίος την εξετάζει και λαμβάνει τα κατάλληλα μέτρα. Η αναφορά παραμένει εμπιστευτική.</span>
+            <span class="lang-en" style="display:none">Your report is received by the platform administrator who reviews it and takes appropriate action. The report remains confidential.</span>
+        </div>
+    </div>
+
+    <!-- FAQ: Account -->
+    <div class="help-section-title lang-gr mt-4">
+        <i class="fas fa-user-circle me-2" style="color:#c9a227;"></i>Λογαριασμός
+    </div>
+    <div class="help-section-title lang-en mt-4" style="display:none">
+        <i class="fas fa-user-circle me-2" style="color:#c9a227;"></i>Account
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+            <span class="lang-gr">Πώς αλλάζω τα στοιχεία μου;</span>
+            <span class="lang-en" style="display:none">How do I update my details?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="faq-a">
+            <span class="lang-gr">Μεταβείτε στο <a href="{% url 'accounts:profile' %}">Προφίλ</a> για να ενημερώσετε το όνομα, το email και το τηλέφωνό σας.</span>
+            <span class="lang-en" style="display:none">Go to <a href="{% url 'accounts:profile' %}">Profile</a> to update your name, email and phone.</span>
+        </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="help-section-title lang-gr mt-4">
+        <i class="fas fa-envelope me-2" style="color:#c9a227;"></i>Επικοινωνία
+    </div>
+    <div class="help-section-title lang-en mt-4" style="display:none">
+        <i class="fas fa-envelope me-2" style="color:#c9a227;"></i>Contact
+    </div>
+
+    <div class="contact-card mb-5">
+        <i class="fas fa-headset fa-2x mb-3" style="color:#c9a227;"></i>
+        <h5 class="lang-gr">Χρειάζεστε επιπλέον βοήθεια;</h5>
+        <h5 class="lang-en" style="display:none">Need additional help?</h5>
+        <p class="text-muted mb-3 lang-gr">Επικοινωνήστε με την ομάδα υποστήριξης για οποιαδήποτε απορία.</p>
+        <p class="text-muted mb-3 lang-en" style="display:none">Contact the support team for any questions.</p>
+        <a href="mailto:support@reserva.gr" class="btn btn-warning">
+            <i class="fas fa-envelope me-2"></i>support@reserva.gr
+        </a>
+    </div>
+
+</div>
+
+<!-- Language Toggle -->
+<button id="customerLangBtn" onclick="toggleCustomerLang()" title="Change Language">
+    <i class="fas fa-globe me-1"></i><span id="customerLangLabel">EN</span>
+</button>
+
+<script>
+function toggleFaq(btn) {
+    var item = btn.closest('.faq-item');
+    item.classList.toggle('open');
+}
+
+(function () {
+    var lang = localStorage.getItem('customerLang') || 'gr';
+
+    function applyLang(l) {
+        document.querySelectorAll('.lang-gr').forEach(function(el) {
+            el.style.display = l === 'en' ? 'none' : '';
+        });
+        document.querySelectorAll('.lang-en').forEach(function(el) {
+            el.style.display = l === 'en' ? '' : 'none';
+        });
+        var lbl = document.getElementById('customerLangLabel');
+        if (lbl) lbl.textContent = l === 'en' ? 'ΕΛ' : 'EN';
+    }
+
+    window.toggleCustomerLang = function() {
+        lang = lang === 'gr' ? 'en' : 'gr';
+        localStorage.setItem('customerLang', lang);
+        applyLang(lang);
+    };
+
+    document.addEventListener('DOMContentLoaded', function() { applyLang(lang); });
+})();
+</script>
+{% endblock %}

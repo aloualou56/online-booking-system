@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Αναφορές Επιχειρήσεων — Super Admin{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="fas fa-flag me-2 text-danger"></i>Αναφορές Επιχειρήσεων</h3>
+
+<!-- Count badges -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-danger">
+            <div class="card-body py-3">
+                <div class="fs-2 fw-bold text-danger">{{ counts.new }}</div>
+                <div class="small text-muted">Νέες</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-warning">
+            <div class="card-body py-3">
+                <div class="fs-2 fw-bold text-warning">{{ counts.under_review }}</div>
+                <div class="small text-muted">Υπό εξέταση</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-success">
+            <div class="card-body py-3">
+                <div class="fs-2 fw-bold text-success">{{ counts.resolved }}</div>
+                <div class="small text-muted">Επιλύθηκαν</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-secondary">
+            <div class="card-body py-3">
+                <div class="fs-2 fw-bold text-secondary">{{ counts.dismissed }}</div>
+                <div class="small text-muted">Απορρίφθηκαν</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small">Κατηγορία</label>
+                <select name="category" class="form-select form-select-sm">
+                    <option value="">— Όλες —</option>
+                    {% for cat_value, cat_label in categories %}
+                    <option value="{{ cat_value }}" {% if active_category == cat_value %}selected{% endif %}>{{ cat_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small">Κατάσταση</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">— Όλες —</option>
+                    {% for st_value, st_label in statuses %}
+                    <option value="{{ st_value }}" {% if active_status == st_value %}selected{% endif %}>{{ st_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="fas fa-filter me-1"></i>Φίλτρο
+                </button>
+            </div>
+            {% if active_category or active_status %}
+            <div class="col-md-2">
+                <a href="{% url 'superadmin:admin_reports' %}" class="btn btn-outline-secondary btn-sm w-100">
+                    <i class="fas fa-times me-1"></i>Καθαρισμός
+                </a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- Reports List -->
+{% if reports %}
+<div class="row g-3">
+{% for report in reports %}
+<div class="col-12">
+    <div class="card shadow-sm border-{% if report.status == 'new' %}danger{% elif report.status == 'under_review' %}warning{% elif report.status == 'resolved' %}success{% else %}secondary{% endif %}">
+        <div class="card-body">
+            <div class="row align-items-start">
+                <div class="col-lg-8">
+                    <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                        <span class="badge bg-{% if report.status == 'new' %}danger{% elif report.status == 'under_review' %}warning text-dark{% elif report.status == 'resolved' %}success{% else %}secondary{% endif %}">
+                            {{ report.get_status_display }}
+                        </span>
+                        <span class="badge bg-dark">{{ report.get_category_display }}</span>
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>{{ report.created_at|date:"d/m/Y H:i" }}
+                        </small>
+                    </div>
+
+                    <h5 class="mb-1">
+                        <i class="fas fa-store me-2 text-muted"></i>{{ report.business.name }}
+                    </h5>
+                    <div class="text-muted small mb-2">
+                        <i class="fas fa-user me-1"></i>
+                        {{ report.reporter.get_full_name|default:report.reporter.username }}
+                        ({{ report.reporter.email }})
+                        {% if report.booking %}
+                        &nbsp;·&nbsp;
+                        <i class="fas fa-calendar me-1"></i>
+                        Ραντεβού: {{ report.booking.date|date:"d/m/Y" }} {{ report.booking.start_time|time:"H:i" }}
+                        — {{ report.booking.service.name }}
+                        {% endif %}
+                    </div>
+
+                    <div class="bg-light rounded p-3 mb-2">
+                        <i class="fas fa-quote-left text-muted me-2"></i>
+                        {{ report.description }}
+                    </div>
+
+                    {% if report.admin_notes %}
+                    <div class="bg-warning bg-opacity-10 border border-warning rounded p-2">
+                        <small><strong><i class="fas fa-sticky-note me-1"></i>Σημειώσεις Διαχειριστή:</strong> {{ report.admin_notes }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-4">
+                    <form method="post" class="mt-2 mt-lg-0">
+                        {% csrf_token %}
+                        <input type="hidden" name="report_id" value="{{ report.id }}">
+                        <div class="mb-2">
+                            <label class="form-label small fw-semibold">Αλλαγή Κατάστασης</label>
+                            <select name="new_status" class="form-select form-select-sm">
+                                {% for st_value, st_label in statuses %}
+                                <option value="{{ st_value }}" {% if report.status == st_value %}selected{% endif %}>{{ st_label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <textarea name="admin_notes" class="form-control form-control-sm" rows="2"
+                                      placeholder="Σημειώσεις (προαιρετικά)...">{{ report.admin_notes }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-save me-1"></i>Αποθήκευση
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="alert alert-success text-center py-5">
+    <i class="fas fa-check-circle fa-3x mb-3 d-block"></i>
+    <h5>Δεν υπάρχουν αναφορές{% if active_category or active_status %} με αυτά τα κριτήρια{% endif %}.</h5>
+</div>
+{% endif %}
+
+{% endblock %}

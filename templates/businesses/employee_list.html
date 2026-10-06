@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% block title %}Υπάλληλοι — {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="business-page-header">
+    <div>
+        <div class="business-page-header__eyebrow">Business Panel</div>
+        <h3 class="mb-1"><i class="fas fa-users me-2"></i>Υπάλληλοι</h3>
+        <p>Οργανώστε λογαριασμούς, διαθεσιμότητα και ενέργειες ραντεβού ανά υπάλληλο.</p>
+    </div>
+    <div class="business-page-header__actions">
+        <a href="{% url 'businesses:add_employee' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Νέος Υπάλληλος
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-3 employee-options-grid">
+    <div class="col-lg-6">
+        <div class="card shadow-sm employee-option-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="fas fa-user-cog fs-4 text-primary mt-1"></i>
+                        <div>
+                            <h5 class="mb-1">Λογαριασμοί Υπαλλήλων</h5>
+                            <small class="text-muted d-block">
+                                {% if business.allow_employee_accounts %}
+                                    Οι υπάλληλοι μπορούν να δημιουργήσουν λογαριασμούς.
+                                {% else %}
+                                    Οι υπάλληλοι δεν μπορούν να δημιουργήσουν λογαριασμούς.
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    <form method="post" action="{% url 'businesses:toggle_employee_accounts' %}" class="d-inline">
+                        {% csrf_token %}
+                        {% if business.allow_employee_accounts %}
+                            <button class="btn btn-success fw-bold px-3 py-2 employee-toggle-btn">
+                                <i class="fas fa-toggle-on me-1"></i>ON
+                            </button>
+                        {% else %}
+                            <button class="btn btn-secondary fw-bold px-3 py-2 employee-toggle-btn">
+                                <i class="fas fa-toggle-off me-1"></i>OFF
+                            </button>
+                        {% endif %}
+                    </form>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded small text-muted employee-option-note">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Οι λογαριασμοί δίνουν στους υπαλλήλους πρόσβαση σε διαθεσιμότητα και άδειες.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm employee-option-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="fas fa-calendar-check fs-4 text-success mt-1"></i>
+                        <div>
+                            <h5 class="mb-1">Ενέργειες Ραντεβού από Υπαλλήλους</h5>
+                            <small class="text-muted d-block">
+                                {% if business.allow_employee_booking_actions %}
+                                    Οι υπάλληλοι μπορούν να επιβεβαιώνουν/απορρίπτουν τα δικά τους ραντεβού.
+                                {% else %}
+                                    Οι υπάλληλοι μπορούν μόνο να βλέπουν τα ραντεβού τους.
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    <form method="post" action="{% url 'businesses:toggle_employee_booking_actions' %}" class="d-inline">
+                        {% csrf_token %}
+                        {% if business.allow_employee_booking_actions %}
+                            <button class="btn btn-success fw-bold px-3 py-2 employee-toggle-btn">
+                                <i class="fas fa-toggle-on me-1"></i>ON
+                            </button>
+                        {% else %}
+                            <button class="btn btn-secondary fw-bold px-3 py-2 employee-toggle-btn">
+                                <i class="fas fa-toggle-off me-1"></i>OFF
+                            </button>
+                        {% endif %}
+                    </form>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded small text-muted employee-option-note">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Αν είναι ενεργό, κάθε υπάλληλος μπορεί να ενεργεί στα ραντεβού που του έχουν ανατεθεί.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    {% for emp in employees %}
+    <div class="col-md-4">
+        <div class="card shadow-sm {% if not emp.is_active %}opacity-50{% endif %}">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    {% if emp.photo %}
+                    <img src="{{ emp.photo.url }}" class="rounded-circle me-3" width="50" height="50" style="object-fit:cover">
+                    {% else %}
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width:50px;height:50px">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <h6 class="mb-0">{{ emp.name }}</h6>
+                        <small class="text-muted">{{ emp.title }}</small>
+                    </div>
+                </div>
+
+                {# Today availability badge #}
+                {% if not emp.is_active %}
+                    <span class="badge bg-secondary mb-2">Ανενεργός</span>
+                {% elif emp.id in unavailable_today_ids %}
+                    <span class="badge bg-danger mb-2"><i class="fas fa-ban me-1"></i>Κλειστό για Σήμερα</span>
+                {% else %}
+                    <span class="badge bg-success mb-2"><i class="fas fa-check me-1"></i>Διαθέσιμος</span>
+                {% endif %}
+
+                {# Account status badges #}
+                {% if emp.user %}
+                    <span class="badge bg-success mb-2"><i class="fas fa-user-check me-1"></i>Έχει Λογαριασμό</span>
+                {% elif emp.has_pending_invitation %}
+                    <span class="badge bg-warning text-dark mb-2"><i class="fas fa-envelope me-1"></i>Αναμονή Απάντησης</span>
+                {% elif business.allow_employee_accounts %}
+                    <span class="badge bg-info mb-2"><i class="fas fa-user-plus me-1"></i>Μπορεί Λογαριασμός</span>
+                {% endif %}
+
+                <div class="d-flex gap-1 flex-wrap mt-2">
+                    <a href="{% url 'businesses:schedule' emp.id %}" class="btn btn-sm btn-outline-info" title="Ωράριο"><i class="fas fa-clock"></i></a>
+                    <a href="{% url 'businesses:edit_employee' emp.id %}" class="btn btn-sm btn-outline-primary" title="Επεξεργασία"><i class="fas fa-edit"></i></a>
+
+                    {# Employee account invitation buttons #}
+                    {% if business.allow_employee_accounts %}
+                        {% if emp.user %}
+                            <span class="btn btn-sm btn-outline-success disabled" title="Έχει ήδη λογαριασμό">
+                                <i class="fas fa-user-check"></i>
+                            </span>
+                        {% elif emp.has_pending_invitation %}
+                            <form method="post" action="{% url 'businesses:resend_employee_invitation' emp.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-warning" title="Επαναποστολή Πρόσκλησης">
+                                    <i class="fas fa-envelope"></i>
+                                </button>
+                            </form>
+                        {% elif emp.email %}
+                            <form method="post" action="{% url 'businesses:send_employee_invitation' emp.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="email" value="{{ emp.email }}">
+                                <button class="btn btn-sm btn-outline-primary" title="Αποστολή Πρόσκλησης">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </form>
+                        {% else %}
+                            <span class="btn btn-sm btn-outline-secondary disabled" title="Χρειάζεται email για πρόσκληση">
+                                <i class="fas fa-envelope-open"></i>
+                            </span>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if emp.is_active %}
+                    <form method="post" action="{% url 'businesses:toggle_employee_today' emp.id %}" class="d-inline">
+                        {% csrf_token %}
+                        {% if emp.id in unavailable_today_ids %}
+                        <button class="btn btn-sm btn-success" title="Διαθέσιμος για σήμερα"><i class="fas fa-check me-1"></i>Διαθέσιμος σήμερα</button>
+                        {% else %}
+                        <button class="btn btn-sm btn-warning" title="Ρεπό για σήμερα"><i class="fas fa-ban me-1"></i>Ρεπό σήμερα</button>
+                        {% endif %}
+                    </form>
+                    {% endif %}
+                    <form method="post" action="{% url 'businesses:delete_employee' emp.id %}" class="d-inline" onsubmit="event.preventDefault(); customConfirm('Σίγουρα θέλετε να διαγράψετε αυτόν τον υπάλληλο;', 'Διαγραφή Υπαλλήλου').then(confirmed => { if (confirmed) this.submit(); }); return false;">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-outline-danger" title="Διαγραφή"><i class="fas fa-trash"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">Δεν υπάρχουν υπάλληλοι. Προσθέστε τον πρώτο!</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.employee-option-card .card-body {
+    padding: 0.9rem;
+}
+
+.employee-option-card h5 {
+    font-size: 1.03rem;
+}
+
+.employee-option-card .text-muted {
+    font-size: 0.82rem;
+}
+
+.employee-toggle-btn {
+    font-size: 0.86rem;
+    border-radius: 0.8rem;
+}
+
+.employee-option-note {
+    line-height: 1.35;
+}
+
+@media (max-width: 991.98px) {
+    .employee-option-card .card-body {
+        padding: 0.78rem;
+    }
+
+    .employee-option-card h5 {
+        font-size: 0.95rem;
+    }
+
+    .employee-toggle-btn {
+        font-size: 0.8rem;
+        padding: 0.32rem 0.62rem !important;
+    }
+}
+</style>
+{% endblock %}

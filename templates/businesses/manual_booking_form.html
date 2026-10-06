@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Νέο Ραντεβού{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-0 pb-0">
+                <h3 class="mb-1"><i class="fas fa-plus-circle me-2"></i>Νέο Ραντεβού</h3>
+                <p class="text-muted mb-0">Καταχώρηση για τηλεφώνημα, walk-in ή χειροκίνητη κράτηση από το panel.</p>
+            </div>
+            <div class="card-body pt-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Όνομα πελάτη</label>
+                            <input type="text" name="guest_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Τηλέφωνο</label>
+                            <input type="text" name="guest_phone" class="form-control" maxlength="10" inputmode="numeric" placeholder="10 ψηφία" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="guest_email" class="form-control" placeholder="Προαιρετικό">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Κατάσταση</label>
+                            <select name="status" class="form-select">
+                                <option value="confirmed" selected>Επιβεβαιωμένο</option>
+                                <option value="pending">Σε αναμονή</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Υπηρεσία</label>
+                            <select name="service_id" class="form-select" required>
+                                <option value="">Επιλέξτε υπηρεσία</option>
+                                {% for service in services %}
+                                <option value="{{ service.id }}">{{ service.name }} ({{ service.duration_minutes }}λ)</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Υπάλληλος</label>
+                            <select name="employee_id" class="form-select">
+                                <option value="auto">Αυτόματη ανάθεση</option>
+                                {% for employee in employees %}
+                                <option value="{{ employee.id }}">{{ employee.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ημερομηνία</label>
+                            <input type="date" name="date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ώρα έναρξης</label>
+                            <input type="time" name="start_time" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Σημειώσεις</label>
+                            <textarea name="notes" class="form-control" rows="4" placeholder="Προαιρετικές σημειώσεις"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-1"></i>Αποθήκευση
+                        </button>
+                        <a href="{% url 'businesses:booking_list' %}" class="btn btn-outline-secondary">Ακύρωση</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

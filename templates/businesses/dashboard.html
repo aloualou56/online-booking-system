@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Dashboard — {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="business-page-header">
+    <div>
+        <div class="business-page-header__eyebrow">Business Panel</div>
+        <h3 class="mb-1"><i class="fas fa-tachometer-alt me-2"></i>Dashboard — {{ business.name }}</h3>
+        <p>Γρήγορη εικόνα για ραντεβού, έγκριση και λειτουργίες της επιχείρησης.</p>
+    </div>
+    <div class="business-page-header__actions">
+        <a href="{% url 'businesses:manual_booking_add' %}" class="btn btn-primary"><i class="fas fa-plus me-2"></i>Νέο Ραντεβού</a>
+        <a href="{% url 'businesses:booking_list' %}" class="btn btn-outline-secondary"><i class="fas fa-list me-2"></i>Όλα τα Ραντεβού</a>
+    </div>
+</div>
+
+{% if overdue_bookings %}
+<div class="overdue-banner">
+    <div class="ob-icon"><i class="fas fa-hourglass-end"></i></div>
+    <div class="ob-info">
+        <div class="ob-title">{{ overdue_bookings|length }} ραντεβού χρειάζονται ενέργεια</div>
+        <div class="ob-detail">Υπάρχουν ραντεβού στο παρελθόν που παραμένουν ανοιχτά.</div>
+    </div>
+    <div class="ob-acts">
+        <a href="#today-bookings" class="btn ob-btn-done"><i class="fas fa-arrow-down me-1"></i>Μετάβαση</a>
+        <a href="{% url 'businesses:booking_list' %}?status=pending" class="btn ob-btn-noshow">Εκκρεμή</a>
+    </div>
+</div>
+{% endif %}
+
+<div class="dashboard-stats-grid">
+    <div class="dashboard-stat">
+        <div class="dashboard-stat__label"><i class="fas fa-calendar-check me-2" style="color:#2563eb"></i>Ραντεβού μήνα</div>
+        <div class="dashboard-stat__value" style="color:#2563eb">{{ stats.month_bookings }}</div>
+    </div>
+    <div class="dashboard-stat">
+        <div class="dashboard-stat__label"><i class="fas fa-euro-sign me-2" style="color:#16a34a"></i>Έσοδα μήνα</div>
+        <div class="dashboard-stat__value" style="color:#16a34a">{{ stats.month_revenue }}€</div>
+    </div>
+    <div class="dashboard-stat">
+        <div class="dashboard-stat__label"><i class="fas fa-times-circle me-2" style="color:#dc2626"></i>No-Shows</div>
+        <div class="dashboard-stat__value" style="color:#dc2626">{{ stats.no_shows }}</div>
+    </div>
+    <div class="dashboard-stat">
+        <div class="dashboard-stat__label"><i class="fas fa-users me-2" style="color:var(--panel-gold-dark)"></i>Υπάλληλοι</div>
+        <div class="dashboard-stat__value" style="color:var(--panel-gold-dark)">{{ stats.employees }}</div>
+    </div>
+</div>
+
+<div class="dashboard-columns">
+    <div class="dashboard-stack">
+        <div class="card" id="today-bookings">
+            <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                <span><i class="fas fa-calendar-day me-2" style="color:var(--panel-gold-dark);"></i>Σημερινά Ραντεβού</span>
+                <a href="{% url 'businesses:booking_list' %}" class="btn btn-sm btn-outline-secondary">Προβολή όλων</a>
+            </div>
+            <div class="card-body p-0">
+                {% if today_bookings %}
+                <div class="dashboard-list">
+                    {% for b in today_bookings %}
+                    <div class="dashboard-row {% if b.status == 'pending' %}is-pending{% elif b.status == 'confirmed' %}is-confirmed{% elif b.status == 'completed' %}is-completed{% else %}is-cancelled{% endif %}">
+                        <div class="dashboard-time">{{ b.start_time|time:"H:i" }}<small>{{ b.end_time|time:"H:i" }}</small></div>
+                        <div class="dashboard-meta">
+                            <div class="fw-semibold text-truncate">{{ b.customer.get_full_name|default:b.guest_name }}</div>
+                            <div class="small text-muted text-truncate">{{ b.service.name }} · {{ b.employee.name }}</div>
+                        </div>
+                        <span class="badge bg-{% if b.status == 'confirmed' %}success{% elif b.status == 'pending' %}warning text-dark{% elif b.status == 'completed' %}info{% else %}secondary{% endif %}">{{ b.get_status_display }}</span>
+                        <div class="dashboard-actions">
+                            {% if b.status == 'confirmed' %}
+                            <form method="post" action="{% url 'businesses:mark_completed' b.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-success" title="Ολοκλήρωση"><i class="fas fa-check-double"></i></button>
+                            </form>
+                            <form method="post" action="{% url 'businesses:mark_no_show' b.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-dark" title="No-Show"><i class="fas fa-user-slash"></i></button>
+                            </form>
+                            {% elif b.status == 'pending' %}
+                            <form method="post" action="{% url 'businesses:approve_booking' b.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-success" title="Έγκριση"><i class="fas fa-check"></i></button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="py-4 text-center text-muted">Δεν υπάρχουν σημερινά ραντεβού.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                <span><i class="fas fa-calendar-week me-2" style="color:var(--panel-gold-dark);"></i>Επόμενες 7 Ημέρες</span>
+                {% if upcoming_bookings %}<span class="badge bg-primary">{{ upcoming_bookings|length }}</span>{% endif %}
+            </div>
+            <div class="card-body p-0">
+                {% if upcoming_bookings %}
+                <div class="dashboard-list">
+                    {% for b in upcoming_bookings %}
+                    <div class="dashboard-row">
+                        <div class="dashboard-time">{{ b.date|date:"d/m" }}<small>{{ b.start_time|time:"H:i" }}</small></div>
+                        <div class="dashboard-meta">
+                            <div class="fw-semibold text-truncate">{{ b.customer.get_full_name|default:b.guest_name|default:'Επισκέπτης' }}</div>
+                            <div class="small text-muted text-truncate">{{ b.service.name }} · {{ b.employee.name }}</div>
+                        </div>
+                        <span class="badge bg-{% if b.status == 'confirmed' %}success{% else %}warning text-dark{% endif %}">{{ b.get_status_display }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="py-4 text-center text-muted">Δεν υπάρχουν ραντεβού τις επόμενες 7 ημέρες.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if latest_news %}
+        <div class="card">
+            <div class="card-header"><i class="fas fa-newspaper me-2" style="color:var(--panel-gold-dark);"></i>Ειδήσεις & Ανακοινώσεις</div>
+            <div class="card-body">
+                <div class="news-stack">
+                    {% for news in latest_news %}
+                    <article class="news-card">
+                        <div class="news-card__media">
+                            {% if news.image and news.image.url %}
+                            <img src="{{ news.image.url }}" alt="{{ news.title_gr }}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                            <div class="news-card__fallback" style="display:none;"><i class="fas fa-bullhorn"></i></div>
+                            {% else %}
+                            <div class="news-card__fallback"><i class="fas fa-bullhorn"></i></div>
+                            {% endif %}
+                        </div>
+                        <div class="news-card__body">
+                            <h6 class="mb-1 fw-semibold">{{ news.get_title }}</h6>
+                            <p class="small text-muted mb-2">{{ news.get_description|truncatewords:20 }}</p>
+                            <small class="text-muted"><i class="fas fa-calendar me-1"></i>{{ news.published_at|date:"d/m/Y" }}</small>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="dashboard-stack">
+        <div class="card">
+            <div class="card-header bg-warning-subtle"><i class="fas fa-clock me-2" style="color:#f59e0b;"></i>Αναμονή Έγκρισης</div>
+            <div class="card-body">
+                {% if pending_bookings %}
+                <div class="pending-stack">
+                    {% for b in pending_bookings %}
+                    <div class="pending-card-soft">
+                        <div class="fw-semibold mb-1">{{ b.customer.get_full_name|default:b.guest_name }}</div>
+                        <div class="small text-muted mb-2">{{ b.service.name }} · {{ b.employee.name }} · {{ b.date|date:"d/m/Y" }} {{ b.start_time|time:"H:i" }}</div>
+                        <div class="d-grid gap-2">
+                            <form method="post" action="{% url 'businesses:approve_booking' b.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-success w-100"><i class="fas fa-check me-2"></i>Έγκριση</button>
+                            </form>
+                            <form method="post" action="{% url 'businesses:reject_booking' b.id %}" class="d-grid gap-2">
+                                {% csrf_token %}
+                                <input type="text" name="rejection_reason" class="form-control" placeholder="Λόγος απόρριψης" required>
+                                <button class="btn btn-outline-danger w-100"><i class="fas fa-times me-2"></i>Απόρριψη</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="py-4 text-center text-muted">Δεν υπάρχουν εκκρεμότητες.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-bolt me-2" style="color:var(--panel-gold-dark);"></i>Quick Actions</div>
+            <div class="card-body">
+                <div class="quick-action-grid">
+                    <a href="{% url 'businesses:booking_list' %}" class="quick-action-tile"><i class="fas fa-list text-primary"></i><span>Όλα τα Ραντεβού</span></a>
+                    <a href="{% url 'businesses:customers_list' %}" class="quick-action-tile"><i class="fas fa-user-friends" style="color:#8b5cf6"></i><span>Πελάτες</span></a>
+                    <a href="{% url 'businesses:service_list' %}" class="quick-action-tile"><i class="fas fa-concierge-bell" style="color:var(--panel-gold-dark);"></i><span>Υπηρεσίες</span></a>
+                    <a href="{% url 'businesses:settings' %}" class="quick-action-tile"><i class="fas fa-cog text-secondary"></i><span>Ρυθμίσεις</span></a>
+                    <a href="{% url 'notifications:center' %}" class="quick-action-tile"><i class="fas fa-bell" style="color:#f59e0b"></i><span>Ειδοποιήσεις</span></a>
+                    <a href="{% url 'businesses:closures' %}" class="quick-action-tile"><i class="fas fa-door-closed text-danger"></i><span>Κλείσιμο</span></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-code me-2" style="color:var(--panel-gold-dark);"></i>Widget / Iframe</div>
+            <div class="card-body">
+                <p class="small text-muted mb-2">Ενσωματώστε το booking widget στο website σας.</p>
+                <textarea readonly class="form-control business-code-snippet" rows="3">&lt;iframe src="https://reserva.gr/widget/{{ business.slug }}/" width="100%" height="700" frameborder="0"&gt;&lt;/iframe&gt;</textarea>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}{% endblock %}
+

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Αναμονή Έγκρισης — Reserva{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 text-center">
+            <div class="card shadow p-5">
+                <i class="fas fa-hourglass-half fa-4x text-warning mb-4"></i>
+                <h3>Αναμονή Έγκρισης</h3>
+                <p class="text-muted mt-3">
+                    Ο λογαριασμός σας βρίσκεται υπό εξέταση.<br>
+                    Θα ενημερωθείτε μόλις εγκριθεί από τον διαχειριστή.
+                </p>
+                <a href="{% url 'landing' %}" class="btn btn-outline-primary mt-3 me-2"><i class="fas fa-home me-1"></i>Αρχική</a>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-outline-secondary mt-3">Αποσύνδεση</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

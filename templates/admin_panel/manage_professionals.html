@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Διαχείριση Επαγγελματιών{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="fas fa-store me-2"></i>Διαχείριση Επαγγελματιών</h3>
+
+<div class="table-responsive">
+    <table class="table table-hover bg-white shadow-sm">
+        <thead class="table-light">
+            <tr><th>Όνομα</th><th>Επιχείρηση</th><th>Email</th><th>Ραντεβού</th><th>Κατάσταση</th><th>Εγγραφή</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for p in professionals %}
+            <tr class="{% if not p.user.is_active %}opacity-50{% endif %}">
+                <td><strong>{{ p.user.get_full_name }}</strong></td>
+                <td>
+                    {% if p.business %}
+                    <a href="/b/{{ p.business.slug }}/" target="_blank">{{ p.business.name }}</a>
+                    {% else %}—{% endif %}
+                </td>
+                <td>{{ p.user.email }}</td>
+                <td>{{ p.booking_count }}</td>
+                <td>
+                    {% if p.user.is_active and p.user.is_approved %}
+                    <span class="badge bg-success">Ενεργός</span>
+                    {% elif not p.user.is_approved %}
+                    <span class="badge bg-warning text-dark">Αναμονή</span>
+                    {% else %}
+                    <span class="badge bg-danger">Ανενεργός</span>
+                    {% endif %}
+                </td>
+                <td>{{ p.user.date_joined|date:"d/m/Y" }}</td>
+                <td>
+                    <a href="{% url 'superadmin:professional_detail' p.user.id %}" class="btn btn-sm btn-outline-primary me-1" title="Προφίλ"><i class="fas fa-eye"></i></a>
+                    <form method="post" action="{% url 'superadmin:toggle_professional' p.user.id %}" class="d-inline">
+                        {% csrf_token %}
+                        {% if p.user.is_active %}
+                        <button class="btn btn-sm btn-outline-danger" title="Απενεργοποίηση"><i class="fas fa-ban"></i></button>
+                        {% else %}
+                        <button class="btn btn-sm btn-outline-success" title="Ενεργοποίηση"><i class="fas fa-check"></i></button>
+                        {% endif %}
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center text-muted py-4">Δεν υπάρχουν επαγγελματίες.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

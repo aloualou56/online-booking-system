@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+{% block title %}Οδηγός Χρήσης — Reserva{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+<!-- ═══════════════════ GREEK VERSION ═══════════════════ -->
+<div class="lang-gr">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-graduation-cap me-2 text-primary"></i>Οδηγός Χρήσης Reserva</h2>
+            <p class="text-muted">Πλήρης οδηγός για όλες τις λειτουργίες της πλατφόρμας — ραντεβού, υπαλλήλους, κλεισίματα, κριτικές και ρυθμίσεις</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-rocket me-2"></i>Γρήγορη Εκκίνηση</h5></div>
+                <div class="card-body">
+                    <h6 class="text-primary">1. Ρυθμίστε την Επιχείρησή σας</h6>
+                    <p class="small">Πηγαίνετε στις <a href="{% url 'businesses:settings' %}">Ρυθμίσεις</a> και συμπληρώστε:</p>
+                    <ul class="small">
+                        <li>Βασικές πληροφορίες (όνομα, διεύθυνση, τηλέφωνο)</li>
+                        <li>Ωράριο λειτουργίας <strong>ανά ημέρα</strong> (Δε–Κυ)</li>
+                        <li>Χωρητικότητα ανά ώρα</li>
+                        <li>Ρυθμίσεις προκαταβολής (αν χρειάζεται)</li>
+                    </ul>
+                    <h6 class="text-primary mt-3">2. Προσθέστε Υπηρεσίες</h6>
+                    <p class="small">Στις <a href="{% url 'businesses:service_list' %}">Υπηρεσίες</a> δημιουργήστε τις υπηρεσίες που προσφέρετε:</p>
+                    <ul class="small">
+                        <li>Όνομα υπηρεσίας</li>
+                        <li>Διάρκεια (λεπτά)</li>
+                        <li>Τιμή — <strong>κλειδώνεται</strong> τη στιγμή της κράτησης</li>
+                        <li>Περιγραφή</li>
+                    </ul>
+                    <h6 class="text-primary mt-3">3. Προσθέστε Υπαλλήλους (Προαιρετικό)</h6>
+                    <p class="small">Αν έχετε προσωπικό, πηγαίνετε στους <a href="{% url 'businesses:employee_list' %}">Υπαλλήλους</a>:</p>
+                    <ul class="small">
+                        <li>Προσθέστε κάθε υπάλληλο με ατομικό ωράριο</li>
+                        <li>Σημειώστε ημέρες αδείας ανά υπάλληλο</li>
+                        <li>Κλείστε γρήγορα έναν υπάλληλο για σήμερα με ένα κλικ</li>
+                    </ul>
+                    <div class="alert alert-info small mt-3"><i class="fas fa-lightbulb me-1"></i><strong>Συμβουλή:</strong> Αν δουλεύετε μόνοι σας, δεν χρειάζεται να δημιουργήσετε υπαλλήλους. Ορίστε χωρητικότητα στις ρυθμίσεις και το σύστημα αναλαμβάνει αυτόματα.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-success text-white"><h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Διαχείριση Ραντεβού</h5></div>
+                <div class="card-body">
+                    <h6 class="text-success">Νέα Ραντεβού από Πελάτες</h6>
+                    <p class="small">Οι πελάτες μπορούν να κλείνουν ραντεβού μέσω:</p>
+                    <ul class="small">
+                        <li><strong>Δημόσιο Link:</strong> <code>/b/{{ business.slug }}/</code></li>
+                        <li><strong>Widget:</strong> Ενσωματώστε το στην ιστοσελίδα σας</li>
+                        <li>Κράτηση χωρίς λογαριασμό (guest bookings)</li>
+                    </ul>
+                    <h6 class="text-success mt-3">Έγκριση & Διαχείριση</h6>
+                    <p class="small">Στην ενότητα <a href="{% url 'businesses:booking_list' %}">Ραντεβού</a>:</p>
+                    <ul class="small">
+                        <li>Δείτε όλα τα ραντεβού ανά κατάσταση</li>
+                        <li>Εγκρίνετε ή απορρίπτετε εκκρεμή αιτήματα</li>
+                        <li>Σημειώστε ραντεβού ως ολοκληρωμένα</li>
+                        <li>Διαχειριστείτε ακυρώσεις και no-shows</li>
+                    </ul>
+                    <h6 class="text-success mt-3">Τιμή Κλειδωμένη στην Κράτηση</h6>
+                    <p class="small">Η τιμή που εμφανίζεται στην κράτηση <strong>είναι η τιμή κατά τη στιγμή της κράτησης</strong>. Αν αλλάξετε αργότερα την τιμή μιας υπηρεσίας, οι παλιές κρατήσεις <strong>δεν επηρεάζονται</strong>.</p>
+                    <h6 class="text-success mt-3">Αυτόματη Επιβεβαίωση</h6>
+                    <ul class="small">
+                        <li><strong>ON:</strong> Τα ραντεβού επιβεβαιώνονται αυτόματα</li>
+                        <li><strong>OFF:</strong> Χρειάζεται χειροκίνητη έγκριση</li>
+                    </ul>
+                    <div class="alert alert-warning small mt-3"><i class="fas fa-exclamation-triangle me-1"></i><strong>Σημαντικό:</strong> Οι πελάτες λαμβάνουν ειδοποιήσεις για επιβεβαίωση, ακύρωση και υπενθύμιση.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="fas fa-star me-2"></i>Νέες Λειτουργίες</h5></div>
+                <div class="card-body">
+                    <h6 class="text-warning"><i class="fas fa-door-closed me-1"></i>Προσωρινό Κλείσιμο Επιχείρησης</h6>
+                    <p class="small">Μέσω του <a href="{% url 'businesses:closures' %}">Προσωρινού Κλεισίματος</a> μπορείτε να καταχωρήσετε συγκεκριμένες ημερομηνίες που η επιχείρηση δεν λειτουργεί (π.χ. αργίες, διακοπές). Κατά τις ημέρες αυτές <strong>δεν εμφανίζονται διαθέσιμες ώρες</strong> στους πελάτες.</p>
+                    <h6 class="text-warning mt-3"><i class="fas fa-user-times me-1"></i>Κλείσιμο Υπαλλήλου για Σήμερα</h6>
+                    <p class="small">Στη λίστα <a href="{% url 'businesses:employee_list' %}">Υπαλλήλων</a>, κάθε υπάλληλος έχει κουμπί <strong>"Κλείστε για Σήμερα"</strong>. Πατώντας το, ο υπάλληλος δεν εμφανίζεται ως διαθέσιμος για νέα ραντεβού σήμερα.</p>
+                    <h6 class="text-warning mt-3"><i class="fas fa-star me-1"></i>Κριτικές Πελατών</h6>
+                    <p class="small">Στην ενότητα <a href="{% url 'businesses:reviews' %}">Κριτικές</a> βλέπετε όλες τις αξιολογήσεις που έχουν αφήσει οι πελάτες σας — βαθμολογία, σχόλιο, υπηρεσία και ημερομηνία.</p>
+                    <h6 class="text-warning mt-3"><i class="fas fa-calendar-day me-1"></i>Ωράριο ανά Ημέρα</h6>
+                    <p class="small">Στις Ρυθμίσεις → <strong>Ωράριο</strong>, ορίζετε ξεχωριστή ώρα έναρξης/λήξης για κάθε ημέρα της εβδομάδας. Μπορείτε να σημειώσετε μια ημέρα ως "κλειστή" και δεν θα εμφανίζεται στις κρατήσεις.</p>
+                    <div class="alert alert-success small mt-3"><i class="fas fa-globe me-1"></i><strong>Αλλαγή Γλώσσας:</strong> Χρησιμοποιήστε το κουμπί <strong>GR / EN</strong> κάτω δεξιά για εναλλαγή γλώσσας.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-info text-white"><h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Ρυθμίσεις & Προχωρημένα</h5></div>
+                <div class="card-body">
+                    <h6 class="text-info">Επιλογή Υπαλλήλου από Πελάτη</h6>
+                    <ul class="small"><li><strong>ON:</strong> Οι πελάτες επιλέγουν ποιος θα τους εξυπηρετήσει</li><li><strong>OFF:</strong> Αυτόματη ανάθεση βάσει διαθεσιμότητας</li></ul>
+                    <h6 class="text-info mt-3">Προκαταβολή</h6>
+                    <ul class="small"><li>Ενεργοποιήστε "Απαιτεί προκαταβολή"</li><li>Ορίστε ποσοστό (10%–100%)</li><li>Συνδέστε το Stripe για online πληρωμές</li></ul>
+                    <h6 class="text-info mt-3">Χρέωση Ακύρωσης</h6>
+                    <p class="small">Μπορείτε να ορίσετε ποσοστό χρέωσης σε περίπτωση ακύρωσης κράτησης αν χρησιμοποιείται πληρωμή.</p>
+                    <h6 class="text-info mt-3">Χωρητικότητα (χωρίς υπαλλήλους)</h6>
+                    <ul class="small"><li>Ορίστε πόσα ραντεβού εξυπηρετείτε ταυτόχρονα</li><li>Παράδειγμα: Γυμναστήριο με 5 μηχανήματα → χωρητικότητα 5</li><li>Το σύστημα ελέγχει αυτόματα τη διαθεσιμότητα βάσει ωραρίου και κλεισίματος</li></ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-secondary text-white"><h5 class="mb-0"><i class="fas fa-code me-2"></i>Widget & Δημόσιο Link</h5></div>
+                <div class="card-body">
+                    <h6 class="text-secondary">Δημόσιο Link Κράτησης</h6>
+                    <p class="small">Δώστε αυτό το link στους πελάτες σας ή βάλτε το στα social media:</p>
+                    <div class="bg-light p-2 rounded mb-3"><code class="small">{{ request.scheme }}://{{ request.get_host }}/b/{{ business.slug }}/</code></div>
+                    <h6 class="text-secondary">Widget Ενσωμάτωσης</h6>
+                    <p class="small">Για να εμφανίζεται το σύστημα κράτησης μέσα στη δική σας ιστοσελίδα:</p>
+                    <div class="bg-light p-2 rounded"><code class="small">&lt;iframe src="{{ request.scheme }}://{{ request.get_host }}/widget/{{ business.slug }}/" width="100%" height="800" frameborder="0"&gt;&lt;/iframe&gt;</code></div>
+
+                    <h6 class="text-secondary mt-3"><i class="fas fa-magic me-1"></i>Νέες Δυνατότητες Widget 2024</h6>
+                    <div class="mt-2">
+                        <div class="mb-2"><span class="badge bg-warning text-dark me-1">✨ ΝΕΟ</span> <strong>Επαγγελματικό Ημερολόγιο:</strong> Πλέον με πλήρες ημερολόγιο αντί για απλά κουμπιά</div>
+                        <div class="mb-2"><span class="badge bg-success me-1">📞📧</span> <strong>Επιλογή Επικοινωνίας:</strong> Οι πελάτες επιλέγουν τηλέφωνο, email ή και τα δύο</div>
+                        <div class="mb-2"><span class="badge bg-primary me-1">🎨</span> <strong>Glassmorphism Design:</strong> Μοντέρνα εμφάνιση με χρυσούς τόνους και blur εφέ</div>
+                        <div class="mb-2"><span class="badge bg-info me-1">🚀</span> <strong>Smooth Animations:</strong> Απαλές μεταβάσεις και glow εφέ στα κουμπιά</div>
+                        <div class="mb-2"><span class="badge bg-secondary me-1">📱</span> <strong>Mobile Responsive:</strong> Βελτιστοποιημένο για κινητά και tablets</div>
+                    </div>
+
+                    <h6 class="text-secondary mt-3">Κρατήσεις Επισκεπτών</h6>
+                    <p class="small">Πελάτες χωρίς λογαριασμό μπορούν να κλείσουν ραντεβού δίνοντας <strong>όνομα, τηλέφωνο και/ή email</strong> ανάλογα με την επιλογή επικοινωνίας τους.</p>
+                    <h6 class="text-secondary mt-3"><i class="fas fa-globe me-1"></i>Διατομεακή Ενσωμάτωση</h6>
+                    <p class="small">Το widget μπορεί πλέον να ενσωματωθεί σε <strong>οποιονδήποτε ιστότοπο</strong> άλλης επιχείρησης χωρίς περιορισμούς CORS ή X-Frame-Options. Ιδανικό για συνέργειες και partnerships.</p>
+                    <div class="alert alert-secondary small mt-3"><i class="fas fa-info-circle me-1"></i>Το slug της επιχείρησής σας: <strong>{{ business.slug }}</strong>. Για αλλαγή επικοινωνήστε με τον διαχειριστή.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white"><h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Συχνές Ερωτήσεις</h5></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-dark">Πώς βλέπω τα σημερινά μου ραντεβού;</h6>
+                            <p class="small">Στο <a href="{% url 'businesses:dashboard' %}">Dashboard</a> εμφανίζονται τα ραντεβού της ημέρας με την κατάστασή τους.</p>
+                            <h6 class="text-dark mt-3">Μπορώ να έχω διαφορετικό ωράριο κάθε μέρα;</h6>
+                            <p class="small">Ναι! Στις Ρυθμίσεις → Ωράριο, ορίζετε ξεχωριστές ώρες για κάθε ημέρα Δευτέρα–Κυριακή. Αν έχετε υπαλλήλους, κάθε υπάλληλος έχει επίσης ατομικό ωράριο.</p>
+                            <h6 class="text-dark mt-3">Αν αλλάξω τιμή υπηρεσίας, επηρεάζονται παλιές κρατήσεις;</h6>
+                            <p class="small"><strong>Όχι.</strong> Η τιμή κλειδώνεται κατά τη δημιουργία κράτησης. Οι νέες κρατήσεις θα χρησιμοποιούν την ενημερωμένη τιμή.</p>
+                            <h6 class="text-dark mt-3">Πώς ακυρώνω ένα ραντεβού;</h6>
+                            <p class="small">Στα <a href="{% url 'businesses:booking_list' %}">Ραντεβού</a>, βρείτε το ραντεβού και αλλάξτε την κατάσταση σε "Ακυρωμένο".</p>
+                            <h6 class="text-dark mt-3">Πώς κλείνω μια ολόκληρη μέρα;</h6>
+                            <p class="small">Χρησιμοποιήστε το <a href="{% url 'businesses:closures' %}">Προσωρινό Κλείσιμο</a> για να καταχωρήσετε συγκεκριμένη ημερομηνία ως κλειστή.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-dark">Πώς βλέπω τι λένε οι πελάτες;</h6>
+                            <p class="small">Στις <a href="{% url 'businesses:reviews' %}">Κριτικές</a> βλέπετε όλες τις αξιολογήσεις με βαθμολογία, σχόλιο και ημερομηνία.</p>
+                            <h6 class="text-dark mt-3">Τι σημαίνει "Κλειστό για Σήμερα" σε υπάλληλο;</h6>
+                            <p class="small">Ενεργοποιείτε αυτή τη λειτουργία από τη λίστα υπαλλήλων και ο συγκεκριμένος υπάλληλος δεν εμφανίζεται ως επιλογή σε νέες κρατήσεις για σήμερα. Ακυρώνεται αυτόματα την επόμενη ημέρα.</p>
+                            <h6 class="text-dark mt-3">Πώς αλλάζω τη γλώσσα του dashboard;</h6>
+                            <p class="small">Υπάρχει κουμπί <strong>GR / EN</strong> κάτω δεξιά στην οθόνη — πατήστε το για εναλλαγή μεταξύ Ελληνικών και Αγγλικών.</p>
+                            <h6 class="text-dark mt-3">Πού βλέπω τα στατιστικά μου;</h6>
+                            <p class="small">Στο <a href="{% url 'businesses:dashboard' %}">Dashboard</a>: συνολικές κρατήσεις, έσοδα μήνα, ολοκληρωμένα, ακυρώσεις, no-shows και κριτικές.</p>
+                            <h6 class="text-dark mt-3">Πώς προσθέτω ημέρα αδείας σε υπάλληλο;</h6>
+                            <p class="small">Στους <a href="{% url 'businesses:employee_list' %}">Υπαλλήλους</a> → επιλέξτε υπάλληλο → Ωράριο → Προσθήκη Ειδικής Ημέρας Αδείας.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4 mb-4">
+        <div class="col">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="fas fa-external-link-alt me-2"></i>Γρήγοροι Σύνδεσμοι</h5>
+                    <div class="row g-2">
+                        <div class="col-md-2"><h6 class="small text-muted">Dashboard</h6><a href="{% url 'businesses:dashboard' %}" class="btn btn-sm btn-outline-info w-100"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></div>
+                        <div class="col-md-2"><h6 class="small text-muted">Ρυθμίσεις</h6><a href="{% url 'businesses:settings' %}" class="btn btn-sm btn-outline-secondary w-100"><i class="fas fa-cog me-1"></i>Ρυθμίσεις</a></div>
+                        <div class="col-md-2"><h6 class="small text-muted">Κλείσιμο</h6><a href="{% url 'businesses:closures' %}" class="btn btn-sm btn-outline-danger w-100"><i class="fas fa-door-closed me-1"></i>Κλεισίματα</a></div>
+                        <div class="col-md-2"><h6 class="small text-muted">Κριτικές</h6><a href="{% url 'businesses:reviews' %}" class="btn btn-sm btn-outline-warning w-100"><i class="fas fa-star me-1"></i>Κριτικές</a></div>
+                        <div class="col-md-2"><h6 class="small text-muted">Δημόσιο Link</h6><a href="/b/{{ business.slug }}/" target="_blank" class="btn btn-sm btn-outline-primary w-100"><i class="fas fa-link me-1"></i>Κρατήσεις</a></div>
+                        <div class="col-md-2"><h6 class="small text-muted">Widget</h6><a href="/widget/{{ business.slug }}/" target="_blank" class="btn btn-sm btn-outline-success w-100"><i class="fas fa-code me-1"></i>Widget</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- end .lang-gr -->
+
+
+<!-- ═══════════════════ ENGLISH VERSION ═══════════════════ -->
+<div class="lang-en" style="display:none">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-graduation-cap me-2 text-primary"></i>Reserva User Guide</h2>
+            <p class="text-muted">Complete guide for all platform features — bookings, employees, closures, reviews and settings</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-rocket me-2"></i>Quick Start</h5></div>
+                <div class="card-body">
+                    <h6 class="text-primary">1. Set Up Your Business</h6>
+                    <p class="small">Go to <a href="{% url 'businesses:settings' %}">Settings</a> and fill in:</p>
+                    <ul class="small">
+                        <li>Basic information (name, address, phone)</li>
+                        <li>Operating hours <strong>per day</strong> (Mon–Sun)</li>
+                        <li>Capacity per hour</li>
+                        <li>Deposit settings (if needed)</li>
+                    </ul>
+                    <h6 class="text-primary mt-3">2. Add Services</h6>
+                    <p class="small">In <a href="{% url 'businesses:service_list' %}">Services</a>, create the services you offer:</p>
+                    <ul class="small">
+                        <li>Service name</li>
+                        <li>Duration (minutes)</li>
+                        <li>Price — <strong>locked</strong> at the time of booking</li>
+                        <li>Description</li>
+                    </ul>
+                    <h6 class="text-primary mt-3">3. Add Employees (Optional)</h6>
+                    <p class="small">If you have staff, go to <a href="{% url 'businesses:employee_list' %}">Employees</a>:</p>
+                    <ul class="small">
+                        <li>Add each employee with their own schedule</li>
+                        <li>Mark days off per employee</li>
+                        <li>Quickly close an employee for today with one click</li>
+                    </ul>
+                    <div class="alert alert-info small mt-3"><i class="fas fa-lightbulb me-1"></i><strong>Tip:</strong> If you work alone, you don't need to create employees. Set the capacity in settings and the system handles everything automatically.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-success text-white"><h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Booking Management</h5></div>
+                <div class="card-body">
+                    <h6 class="text-success">New Bookings from Customers</h6>
+                    <p class="small">Customers can book appointments via:</p>
+                    <ul class="small">
+                        <li><strong>Public Link:</strong> <code>/b/{{ business.slug }}/</code></li>
+                        <li><strong>Widget:</strong> Embed it on your website</li>
+                        <li>Booking without an account (guest bookings)</li>
+                    </ul>
+                    <h6 class="text-success mt-3">Approval & Management</h6>
+                    <p class="small">In the <a href="{% url 'businesses:booking_list' %}">Bookings</a> section:</p>
+                    <ul class="small">
+                        <li>View all bookings by status</li>
+                        <li>Approve or reject pending requests</li>
+                        <li>Mark bookings as completed</li>
+                        <li>Manage cancellations and no-shows</li>
+                    </ul>
+                    <h6 class="text-success mt-3">Price Locked at Booking</h6>
+                    <p class="small">The price shown in a booking <strong>is the price at the moment of booking</strong>. If you later change a service price, existing bookings are <strong>not affected</strong>.</p>
+                    <h6 class="text-success mt-3">Auto-Confirmation</h6>
+                    <ul class="small">
+                        <li><strong>ON:</strong> Bookings are confirmed automatically</li>
+                        <li><strong>OFF:</strong> Manual approval required</li>
+                    </ul>
+                    <div class="alert alert-warning small mt-3"><i class="fas fa-exclamation-triangle me-1"></i><strong>Important:</strong> Customers receive notifications for confirmation, cancellation and reminders.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="fas fa-star me-2"></i>New Features</h5></div>
+                <div class="card-body">
+                    <h6 class="text-warning"><i class="fas fa-door-closed me-1"></i>Temporary Business Closure</h6>
+                    <p class="small">Through <a href="{% url 'businesses:closures' %}">Temporary Closures</a> you can register specific dates when the business is not operating (e.g. holidays, vacation). On those days <strong>no available slots are shown</strong> to customers.</p>
+                    <h6 class="text-warning mt-3"><i class="fas fa-user-times me-1"></i>Close Employee for Today</h6>
+                    <p class="small">In the <a href="{% url 'businesses:employee_list' %}">Employees</a> list, each employee has a <strong>"Close for Today"</strong> button. Pressing it removes that employee from available options for today's bookings.</p>
+                    <h6 class="text-warning mt-3"><i class="fas fa-star me-1"></i>Customer Reviews</h6>
+                    <p class="small">In the <a href="{% url 'businesses:reviews' %}">Reviews</a> section you can see all ratings left by your customers — score, comment, service and date.</p>
+                    <h6 class="text-warning mt-3"><i class="fas fa-calendar-day me-1"></i>Per-Day Schedule</h6>
+                    <p class="small">In Settings → <strong>Schedule</strong>, set separate open/close times for each day of the week. You can mark a day as "closed" and it won't appear in booking options.</p>
+                    <div class="alert alert-success small mt-3"><i class="fas fa-globe me-1"></i><strong>Language Toggle:</strong> Use the <strong>GR / EN</strong> button at the bottom-right to switch language.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-info text-white"><h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Settings & Advanced</h5></div>
+                <div class="card-body">
+                    <h6 class="text-info">Employee Selection by Customer</h6>
+                    <ul class="small"><li><strong>ON:</strong> Customers choose who will serve them</li><li><strong>OFF:</strong> Automatic assignment based on availability</li></ul>
+                    <h6 class="text-info mt-3">Deposit</h6>
+                    <ul class="small"><li>Enable "Requires deposit"</li><li>Set percentage (10%–100%)</li><li>Connect Stripe for online payments</li></ul>
+                    <h6 class="text-info mt-3">Cancellation Fee</h6>
+                    <p class="small">You can set a charge percentage for booking cancellations when payment is in use.</p>
+                    <h6 class="text-info mt-3">Capacity (without employees)</h6>
+                    <ul class="small"><li>Set how many bookings you handle simultaneously</li><li>Example: Gym with 5 machines → capacity 5</li><li>The system automatically checks availability based on schedule and closures</li></ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-secondary text-white"><h5 class="mb-0"><i class="fas fa-code me-2"></i>Widget & Public Link</h5></div>
+                <div class="card-body">
+                    <h6 class="text-secondary">Public Booking Link</h6>
+                    <p class="small">Share this link with your customers or post it on social media:</p>
+                    <div class="bg-light p-2 rounded mb-3"><code class="small">{{ request.scheme }}://{{ request.get_host }}/b/{{ business.slug }}/</code></div>
+                    <h6 class="text-secondary">Embed Widget</h6>
+                    <p class="small">To display the booking system inside your own website:</p>
+                    <div class="bg-light p-2 rounded"><code class="small">&lt;iframe src="{{ request.scheme }}://{{ request.get_host }}/widget/{{ business.slug }}/" width="100%" height="800" frameborder="0"&gt;&lt;/iframe&gt;</code></div>
+
+                    <h6 class="text-secondary mt-3"><i class="fas fa-magic me-1"></i>New Widget Features 2024</h6>
+                    <div class="mt-2">
+                        <div class="mb-2"><span class="badge bg-warning text-dark me-1">✨ NEW</span> <strong>Professional Calendar:</strong> Full calendar widget instead of simple buttons</div>
+                        <div class="mb-2"><span class="badge bg-success me-1">📞📧</span> <strong>Contact Preferences:</strong> Customers choose phone, email, or both per their preference</div>
+                        <div class="mb-2"><span class="badge bg-primary me-1">🎨</span> <strong>Glassmorphism Design:</strong> Modern appearance with golden themes and blur effects</div>
+                        <div class="mb-2"><span class="badge bg-info me-1">🚀</span> <strong>Smooth Animations:</strong> Gentle transitions and glow effects on buttons</div>
+                        <div class="mb-2"><span class="badge bg-secondary me-1">📱</span> <strong>Mobile Responsive:</strong> Optimized for phones and tablets</div>
+                    </div>
+
+                    <h6 class="text-secondary mt-3">Guest Bookings</h6>
+                    <p class="small">Customers without an account can book by providing their <strong>name, phone and/or email</strong> based on their chosen contact preferences.</p>
+                    <h6 class="text-secondary mt-3"><i class="fas fa-globe me-1"></i>Cross-Business Integration</h6>
+                    <p class="small">The widget can now be embedded in <strong>any external website</strong> without CORS or X-Frame-Options restrictions. Perfect for partnerships and business collaborations.</p>
+                    <div class="alert alert-secondary small mt-3"><i class="fas fa-info-circle me-1"></i>Your business slug: <strong>{{ business.slug }}</strong>. To change it, contact the administrator.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white"><h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Frequently Asked Questions</h5></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-dark">How do I see today's bookings?</h6>
+                            <p class="small">The <a href="{% url 'businesses:dashboard' %}">Dashboard</a> shows all bookings for the day with their status.</p>
+                            <h6 class="text-dark mt-3">Can I have different hours each day?</h6>
+                            <p class="small">Yes! In Settings → Schedule, set separate hours for each day Monday–Sunday. If you have employees, each employee also has their own individual schedule.</p>
+                            <h6 class="text-dark mt-3">If I change a service price, do old bookings get affected?</h6>
+                            <p class="small"><strong>No.</strong> The price is locked at the time the booking is created. New bookings will use the updated price.</p>
+                            <h6 class="text-dark mt-3">How do I cancel a booking?</h6>
+                            <p class="small">In <a href="{% url 'businesses:booking_list' %}">Bookings</a>, find the booking and change the status to "Cancelled".</p>
+                            <h6 class="text-dark mt-3">How do I close an entire day?</h6>
+                            <p class="small">Use <a href="{% url 'businesses:closures' %}">Temporary Closures</a> to register a specific date as closed.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-dark">How do I see what customers say?</h6>
+                            <p class="small">In <a href="{% url 'businesses:reviews' %}">Reviews</a> you can see all ratings with score, comment and date.</p>
+                            <h6 class="text-dark mt-3">What does "Closed for Today" mean for an employee?</h6>
+                            <p class="small">Activate this from the employee list and that employee won't appear as a booking option for today. It resets automatically the next day.</p>
+                            <h6 class="text-dark mt-3">How do I change the dashboard language?</h6>
+                            <p class="small">There is a <strong>GR / EN</strong> button at the bottom-right of the screen — press it to toggle between Greek and English.</p>
+                            <h6 class="text-dark mt-3">Where do I see my statistics?</h6>
+                            <p class="small">In the <a href="{% url 'businesses:dashboard' %}">Dashboard</a>: total bookings, monthly revenue, completed, cancellations, no-shows and reviews.</p>
+                            <h6 class="text-dark mt-3">How do I add a day off for an employee?</h6>
+                            <p class="small">In <a href="{% url 'businesses:employee_list' %}">Employees</a> → select employee → Schedule → Add Special Day Off.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4 mb-4">
+        <div class="col">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="fas fa-external-link-alt me-2"></i>Quick Links</h5>
+                    <div class="row g-2">
+                        <div class="col-md-2"><h6 class="small text-muted">Dashboard</h6><a href="{% url 'businesses:dashboard' %}" class="btn btn-sm btn-outline-info w-100"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></div>
+                        <div class="col-md-2"><h6 class="small text-muted">Settings</h6><a href="{% url 'businesses:settings' %}" class="btn btn-sm btn-outline-secondary w-100"><i class="fas fa-cog me-1"></i>Settings</a></div>
+                        <div class="col-md-2"><h6 class="small text-muted">Closures</h6><a href="{% url 'businesses:closures' %}" class="btn btn-sm btn-outline-danger w-100"><i class="fas fa-door-closed me-1"></i>Closures</a></div>
+                        <div class="col-md-2"><h6 class="small text-muted">Reviews</h6><a href="{% url 'businesses:reviews' %}" class="btn btn-sm btn-outline-warning w-100"><i class="fas fa-star me-1"></i>Reviews</a></div>
+                        <div class="col-md-2"><h6 class="small text-muted">Public Link</h6><a href="/b/{{ business.slug }}/" target="_blank" class="btn btn-sm btn-outline-primary w-100"><i class="fas fa-link me-1"></i>Bookings</a></div>
+                        <div class="col-md-2"><h6 class="small text-muted">Widget</h6><a href="/widget/{{ business.slug }}/" target="_blank" class="btn btn-sm btn-outline-success w-100"><i class="fas fa-code me-1"></i>Widget</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- end .lang-en -->
+
+</div><!-- container-fluid -->
+{% endblock %}

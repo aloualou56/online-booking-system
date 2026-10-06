@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Πελάτες μου — {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h3 class="mb-1"><i class="fas fa-user-friends me-2"></i>Πελάτες μου</h3>
+        <p class="text-muted mb-0">Όσοι έχουν κλείσει ραντεβού με την επιχείρησή σας, είτε με λογαριασμό είτε ως επισκέπτες.</p>
+    </div>
+    <a href="{% url 'businesses:booking_list' %}" class="btn btn-outline-primary">
+        <i class="fas fa-calendar-alt me-1"></i>Ραντεβού
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% if customers %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Πελάτης</th>
+                        <th>Επικοινωνία</th>
+                        <th>Ραντεβού</th>
+                        <th>Τελευταίο</th>
+                        <th>Σημειώσεις / προτιμήσεις</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td style="min-width: 180px;">
+                            <div class="fw-semibold">{{ customer.display_name }}</div>
+                            <div class="small text-muted">
+                                {% if customer.user %}
+                                <span class="badge bg-success">Λογαριασμός</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Επισκέπτης</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td style="min-width: 220px;">
+                            <div>{{ customer.phone|default:'—' }}</div>
+                            <div class="text-muted small">{{ customer.email|default:'—' }}</div>
+                        </td>
+                        <td>{{ customer.booking_count }}</td>
+                        <td>
+                            {% if customer.last_booking_at %}
+                            {{ customer.last_booking_at|date:"d/m/Y H:i" }}
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td style="min-width: 360px;">
+                            <form method="post" class="d-grid gap-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                                <div class="border rounded-3 p-3 bg-light">
+                                    {% if customer.notes %}
+                                    <div class="small text-muted mb-2">Σημειώσεις πελάτη</div>
+                                    <div class="customer-notes-preview" style="white-space: pre-wrap;">{{ customer.notes|truncatechars:180 }}</div>
+                                    <div class="mt-2 d-flex flex-wrap gap-2 align-items-center justify-content-between">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm js-view-customer-notes"
+                                                data-customer-name="{{ customer.display_name|escape }}"
+                                                data-customer-notes="{{ customer.notes|escape }}">
+                                            <i class="fas fa-ellipsis-h me-1"></i>Προβολή όλων
+                                        </button>
+                                        <small class="text-muted">Αφορούν μόνο αυτόν τον πελάτη</small>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-muted small">Δεν υπάρχουν σημειώσεις για αυτόν τον πελάτη.</div>
+                                    {% endif %}
+                                </div>
+                                <textarea name="notes" class="form-control" rows="3" placeholder="Πχ. προτιμά πρωινά ραντεβού, χωρίς τηλεφωνήματα, αγαπά συγκεκριμένη υπηρεσία...">{{ customer.notes }}</textarea>
+                                <div class="d-flex justify-content-between align-items-center gap-2">
+                                    <small class="text-muted">Αποθηκευμένες προσωπικές σημειώσεις για την επιχείρηση</small>
+                                    <button type="submit" class="btn btn-primary btn-sm">Αποθήκευση</button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            Δεν υπάρχουν ακόμα πελάτες. Θα εμφανιστούν αυτόματα όταν γίνει το πρώτο ραντεβού με την επιχείρησή σας.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="modal fade" id="customerNotesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow-lg" style="border-radius: 1rem;">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user me-2"></i><span id="customerNotesModalTitle">Σημειώσεις πελάτη</span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Κλείσιμο"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-muted small mb-2">Πλήρεις σημειώσεις για αυτόν τον πελάτη</div>
+                <div id="customerNotesModalBody" class="border rounded-3 p-3 bg-light" style="white-space: pre-wrap; min-height: 120px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modalEl = document.getElementById('customerNotesModal');
+    if (!modalEl || typeof bootstrap === 'undefined') return;
+
+    const modal = new bootstrap.Modal(modalEl);
+    const titleEl = document.getElementById('customerNotesModalTitle');
+    const bodyEl = document.getElementById('customerNotesModalBody');
+
+    document.querySelectorAll('.js-view-customer-notes').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const customerName = this.dataset.customerName || 'Πελάτης';
+            const notes = this.dataset.customerNotes || '';
+            titleEl.textContent = 'Σημειώσεις: ' + customerName;
+            bodyEl.textContent = notes || 'Δεν υπάρχουν σημειώσεις για αυτόν τον πελάτη.';
+            modal.show();
+        });
+    });
+});
+</script>
+{% endblock %}

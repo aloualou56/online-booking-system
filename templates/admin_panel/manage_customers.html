@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Διαχείριση Πελατών{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="fas fa-user-shield me-2"></i>Διαχείριση Πελατών</h3>
+
+<div class="table-responsive">
+    <table class="table table-hover bg-white shadow-sm align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Όνομα</th>
+                <th>Όνομα Χρήστη</th>
+                <th>Email</th>
+                <th>Επαλήθευση Email</th>
+                <th>Κατάσταση</th>
+                <th>Εγγραφή</th>
+                <th>Ενέργειες</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+            <tr class="{% if not customer.is_active %}opacity-50{% endif %}">
+                <td><strong>{{ customer.get_full_name|default:customer.username }}</strong></td>
+                <td>{{ customer.username }}</td>
+                <td>{{ customer.email|default:"-" }}</td>
+                <td>
+                    {% if customer.is_email_verified %}
+                    <span class="badge bg-success">Επαληθευμένο</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">Μη επαληθευμένο</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if customer.is_active %}
+                    <span class="badge bg-success">Ενεργός</span>
+                    {% else %}
+                    <span class="badge bg-danger">Αποκλεισμένος</span>
+                    {% endif %}
+                </td>
+                <td>{{ customer.date_joined|date:"d/m/Y" }}</td>
+                <td>
+                    <form method="post" action="{% url 'superadmin:toggle_customer' customer.id %}" class="d-inline">
+                        {% csrf_token %}
+                        {% if customer.is_active %}
+                        <button class="btn btn-sm btn-outline-warning" title="Ban" onclick="return confirm('Θέλετε να κάνετε ban αυτόν τον πελάτη;')">
+                            <i class="fas fa-ban"></i>
+                        </button>
+                        {% else %}
+                        <button class="btn btn-sm btn-outline-success" title="Unban" onclick="return confirm('Θέλετε να άρετε το ban αυτού του πελάτη;')">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        {% endif %}
+                    </form>
+
+                    <a href="{% url 'superadmin:delete_customer' customer.id %}" class="btn btn-sm btn-outline-danger" title="Διαγραφή">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center text-muted py-4">Δεν υπάρχουν πελάτες.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

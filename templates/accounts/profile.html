@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+{% block title %}Προφίλ — Reserva{% endblock %}
+
+{% block extra_css %}
+<style>
+.email-item {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.email-item.primary {
+    background: #e7f3ff;
+    border-color: #0066cc;
+}
+.email-badge {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.badge-primary {
+    background-color: #0066cc;
+    color: white;
+}
+.badge-verified {
+    background-color: #28a745;
+    color: white;
+}
+.badge-unverified {
+    background-color: #6c757d;
+    color: white;
+}
+.add-email-form {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+    border: 2px dashed #dee2e6;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Το Προφίλ μου</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Όνομα Χρήστη</label>
+                                <input type="text" class="form-control" value="{{ request.user.username }}" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Όνομα</label>
+                                <input type="text" name="first_name" class="form-control" value="{{ request.user.first_name }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Επώνυμο</label>
+                                <input type="text" name="last_name" class="form-control" value="{{ request.user.last_name }}">
+                            </div>
+                        </div>
+
+                        <!-- Email Management Section -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Διευθύνσεις Email
+                                {% if request.user.can_have_multiple_emails %}
+                                    <small class="text-muted">(Μπορείτε να έχετε πολλαπλές διευθύνσεις email)</small>
+                                {% endif %}
+                            </label>
+
+                            <!-- Primary Email (always shown) -->
+                            <div class="email-item primary">
+                                <div>
+                                    <strong>{{ request.user.email }}</strong>
+                                    <span class="email-badge badge-primary ms-2">Κύρια</span>
+                                </div>
+                            </div>
+
+                            <!-- Additional Emails (only for super_admin and professional) -->
+                            {% if request.user.can_have_multiple_emails %}
+                                {% for email_obj in request.user.user_emails.all %}
+                                    <div class="email-item {% if email_obj.is_primary %}primary{% endif %}">
+                                        <div>
+                                            {{ email_obj.email_address }}
+                                            {% if email_obj.is_primary %}
+                                                <span class="email-badge badge-primary ms-2">Κύρια</span>
+                                            {% endif %}
+                                            {% if email_obj.is_verified %}
+                                                <span class="email-badge badge-verified ms-1">Επαληθευμένο</span>
+                                            {% else %}
+                                                <span class="email-badge badge-unverified ms-1">Μη Επαληθευμένο</span>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeEmail('{{ email_obj.id }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            {% if not email_obj.is_primary %}
+                                                <button type="button" class="btn btn-sm btn-outline-primary ms-1" onclick="setPrimary('{{ email_obj.id }}')">
+                                                    Ορισμός ως Κύρια
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
+                                <!-- Add New Email Form -->
+                                <div class="add-email-form" id="addEmailForm" style="display: none;">
+                                    <h6>Προσθήκη Νέας Διεύθυνσης Email</h6>
+                                    <div class="input-group">
+                                        <input type="email" id="newEmailInput" class="form-control" placeholder="Εισάγετε νέα διεύθυνση email">
+                                        <button type="button" class="btn btn-primary" onclick="addEmail()">
+                                            <i class="fas fa-plus"></i> Προσθήκη
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" onclick="cancelAddEmail()">
+                                            Ακύρωση
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="showAddEmailForm()" id="addEmailBtn">
+                                    <i class="fas fa-plus me-1"></i> Προσθήκη Διεύθυνσης Email
+                                </button>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Τηλέφωνο</label>
+                            <input type="tel" name="phone" class="form-control" value="{{ request.user.phone }}" pattern="[0-9]{10}" title="Το τηλέφωνο πρέπει να είναι 10 ψηφία">
+                        </div>
+
+                        <!-- Role field is now hidden as requested -->
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save me-2"></i>Αποθήκευση
+                        </button>
+                    </form>
+
+                    <hr class="my-4">
+                    <div class="alert alert-info" role="alert">
+                        <h6 class="mb-2"><i class="fas fa-key me-2"></i>Αλλαγή Κωδικού</h6>
+                        <p class="mb-3">Για ασφάλεια, η αλλαγή κωδικού γίνεται μέσω email επαλήθευσης.</p>
+                        <form method="post" action="{% url 'accounts:send_password_change_email' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="fas fa-envelope me-2"></i>Στείλε Email Αλλαγής Κωδικού
+                            </button>
+                        </form>
+                    </div>
+
+                    {% if request.user.is_professional %}
+                    <hr class="my-4">
+                    <div class="alert alert-warning" role="alert">
+                        <h6 class="mb-2"><i class="fas fa-store-slash me-2"></i>Διαγραφή Επιχείρησης</h6>
+                        <p class="mb-3">Μπορείτε να ζητήσετε διαγραφή επιχείρησης. Το αίτημα θα εξεταστεί από τον Super Admin.</p>
+                        <a href="{% url 'accounts:request_business_deletion' %}" class="btn btn-outline-danger">
+                            <i class="fas fa-paper-plane me-2"></i>Αίτημα Διαγραφής Επιχείρησης
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if request.user.is_customer or request.user.is_employee %}
+                    <hr class="my-4">
+                    <div class="alert alert-danger mb-0" role="alert">
+                        <h6 class="mb-2"><i class="fas fa-exclamation-triangle me-2"></i>Επικίνδυνη Ενέργεια</h6>
+                        <p class="mb-3">Αν θέλετε, μπορείτε να διαγράψετε οριστικά τον λογαριασμό σας.</p>
+                        <a href="{% url 'accounts:delete_account' %}" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Διαγραφή Λογαριασμού
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showAddEmailForm() {
+    document.getElementById('addEmailForm').style.display = 'block';
+    document.getElementById('addEmailBtn').style.display = 'none';
+    document.getElementById('newEmailInput').focus();
+}
+
+function cancelAddEmail() {
+    document.getElementById('addEmailForm').style.display = 'none';
+    document.getElementById('addEmailBtn').style.display = 'block';
+    document.getElementById('newEmailInput').value = '';
+}
+
+function addEmail() {
+    const email = document.getElementById('newEmailInput').value;
+    if (!email) {
+        alert('Please enter an email address');
+        return;
+    }
+
+    fetch('/accounts/add-email/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({email: email})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Refresh to show new email
+        } else {
+            alert(data.error || 'Error adding email');
+        }
+    })
+    .catch(error => {
+        alert('Error adding email');
+        console.error(error);
+    });
+}
+
+function removeEmail(emailId) {
+    if (!confirm('Are you sure you want to remove this email address?')) {
+        return;
+    }
+
+    fetch('/accounts/remove-email/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({email_id: emailId})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Refresh to remove email from display
+        } else {
+            alert(data.error || 'Error removing email');
+        }
+    })
+    .catch(error => {
+        alert('Error removing email');
+        console.error(error);
+    });
+}
+
+function setPrimary(emailId) {
+    if (!confirm('Make this email the primary email address?')) {
+        return;
+    }
+
+    fetch('/accounts/set-primary-email/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({email_id: emailId})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Refresh to show updated primary status
+        } else {
+            alert(data.error || 'Error setting primary email');
+        }
+    })
+    .catch(error => {
+        alert('Error setting primary email');
+        console.error(error);
+    });
+}
+</script>
+{% endblock %}

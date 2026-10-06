@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Διαγραφή Λογαριασμού - Reserva</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #dc3545;">
+        <h2 style="color: #dc3545; margin-top: 0;">Διαγραφή Λογαριασμού Reserva</h2>
+        <p>Γεια σας {{ customer_name }},</p>
+        <p>Ο λογαριασμός σας στην πλατφόρμα Reserva διαγράφηκε από τη διαχείριση.</p>
+
+        <div style="background: #fff; border: 1px solid #e3e3e3; border-radius: 6px; padding: 12px; margin: 16px 0;">
+            <strong>Λόγος διαγραφής:</strong>
+            <p style="margin: 8px 0 0 0; white-space: pre-wrap;">{{ reason }}</p>
+        </div>
+
+        <p>Αν πιστεύετε ότι πρόκειται για λάθος ή θέλετε διευκρινίσεις, επικοινωνήστε στο {{ support_email }}.</p>
+        <p style="margin-bottom: 0;">Με εκτίμηση,<br>Η ομάδα Reserva</p>
+    </div>
+</body>
+</html>

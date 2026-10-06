@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Επιβεβαίωση Αλλαγής Λογαριασμού — Reserva{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 600px;">
+    <div class="text-center mb-4">
+        <i class="fas fa-user-circle text-primary" style="font-size: 4rem;"></i>
+        <h3 class="mt-3">Επιβεβαίωση Αλλαγής Λογαριασμού</h3>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body p-4">
+            <div class="text-center mb-4">
+                <p class="lead">
+                    Θέλετε να μεταβείτε στον παρακάτω λογαριασμό;
+                </p>
+            </div>
+
+            <!-- Target Account Info -->
+            <div class="alert alert-light border text-center">
+                <div class="mb-2">
+                    {% if target_user.role == 'professional' %}
+                        <i class="fas fa-briefcase text-primary" style="font-size: 2rem;"></i>
+                    {% elif target_user.role == 'customer' %}
+                        <i class="fas fa-user text-success" style="font-size: 2rem;"></i>
+                    {% elif target_user.role == 'employee' %}
+                        <i class="fas fa-id-badge text-info" style="font-size: 2rem;"></i>
+                    {% elif target_user.role == 'super_admin' %}
+                        <i class="fas fa-crown text-warning" style="font-size: 2rem;"></i>
+                    {% endif %}
+                </div>
+                <h5 class="mb-1">{{ target_user.get_full_name|default:target_user.username }}</h5>
+                <span class="badge bg-{% if target_user.role == 'professional' %}primary{% elif target_user.role == 'customer' %}success{% elif target_user.role == 'employee' %}info{% elif target_user.role == 'super_admin' %}warning{% endif %} fs-6">
+                    {{ target_user.get_role_display }}
+                </span>
+                {% if target_user.email %}
+                <div class="mt-2 text-muted">
+                    <small><i class="fas fa-envelope me-1"></i>{{ target_user.email }}</small>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Action Buttons -->
+            <form method="post" class="text-center">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-sign-in-alt me-2"></i>Ναι, Μετάβαση
+                </button>
+                <a href="{% url 'accounts:switch_account' %}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-times me-2"></i>Ακύρωση
+                </a>
+            </form>
+
+            <!-- Warning -->
+            <div class="alert alert-warning mt-4">
+                <small>
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Σημείωση:</strong> Η αλλαγή λογαριασμού θα σας αποσυνδέσει από τον τρέχοντα λογαριασμό και θα σας συνδέσει στον επιλεγμένο.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

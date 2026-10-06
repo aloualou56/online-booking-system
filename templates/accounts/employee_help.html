@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Βοήθεια Υπαλλήλου — {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="fas fa-question-circle me-2"></i>Βοήθεια Υπαλλήλου</h3>
+    <span class="badge bg-primary fs-6">{{ business.name }}</span>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <h5 class="mb-3">Τι μπορείτε να κάνετε</h5>
+        <ul class="mb-0">
+            <li>Να βλέπετε τα ραντεβού σας σε λίστα ή ημερολόγιο.</li>
+            <li>Να επιβεβαιώνετε, να απορρίπτετε, να σημειώνετε No-Show και να ολοκληρώνετε ραντεβού (αν το επιτρέπει η επιχείρηση).</li>
+            <li>Να υποβάλλετε αιτήματα άδειας και να επικοινωνείτε με τον εργοδότη μέσα από τη συνομιλία.</li>
+            <li>Να αλλάζετε θέση εργασίας από το αριστερό μενού, αν εργάζεστε σε πάνω από μία επιχειρήσεις.</li>
+        </ul>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <h5 class="mb-3">Συχνές Ερωτήσεις</h5>
+        <p class="mb-2"><strong>Δεν βλέπω ραντεβού.</strong> Ελέγξτε αν βρίσκεστε στη σωστή θέση εργασίας από το αριστερό μενού.</p>
+        <p class="mb-2"><strong>Δεν μπορώ να κάνω ενέργειες σε ραντεβού.</strong> Η επιχείρηση μπορεί να έχει απενεργοποιήσει τις ενέργειες υπαλλήλων.</p>
+        <p class="mb-0"><strong>Δεν λαμβάνω email για νέα ραντεβού.</strong> Ζητήστε από την επιχείρηση να ελέγξει το email που έχει δηλωθεί στο προφίλ υπαλλήλου.</p>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body d-flex gap-2 flex-wrap">
+        <a href="{% url 'accounts:employee_dashboard' %}" class="btn btn-primary">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+        </a>
+        <a href="{% url 'accounts:employee_bookings' %}" class="btn btn-outline-primary">
+            <i class="fas fa-calendar-alt me-2"></i>Ραντεβού
+        </a>
+    </div>
+</div>
+{% endblock %}

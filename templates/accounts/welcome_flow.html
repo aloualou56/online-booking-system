@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Οδηγός Καλωσορίσματος{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 960px;">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4 p-md-5">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+                <div>
+                    <h2 class="mb-2"><i class="fas fa-hand-sparkles me-2 text-warning"></i>Καλωσήρθες στο Reserva</h2>
+                    <p class="text-muted mb-0">
+                        Προαιρετικός οδηγός βήμα-βήμα για τις βασικές δυνατότητες του λογαριασμού σου.
+                    </p>
+                </div>
+                {% if has_seen_welcome_flow %}
+                <span class="badge bg-light text-dark border">Προβολή ξανά</span>
+                {% else %}
+                <span class="badge bg-warning text-dark">Πρώτη Είσοδος</span>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2 small text-muted">
+                    <span>Βήμα {{ current_step }} από {{ total_steps }}</span>
+                    <span>{{ progress_percent }}%</span>
+                </div>
+                <div class="progress" role="progressbar" aria-label="Πρόοδος οδηγού" aria-valuemin="0" aria-valuemax="{{ total_steps }}" aria-valuenow="{{ current_step }}" style="height: 8px;">
+                    <div id="welcomeProgressBar" class="progress-bar" data-progress="{{ progress_percent }}"></div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-lg-7">
+                    <div class="p-3 rounded border bg-light h-100">
+                        <h5 class="mb-2"><i class="fas fa-star me-2 text-warning"></i>{{ step_data.title }}</h5>
+                        <p class="text-muted mb-3">{{ step_data.description }}</p>
+                        <ul class="mb-0">
+                            {% for item in step_data.items %}
+                            <li class="mb-2">{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-5">
+                    <div class="p-3 rounded border h-100">
+                        <h6 class="mb-2"><i class="fas fa-lightbulb me-2 text-primary"></i>Γρήγορες συμβουλές</h6>
+                        <p class="small text-muted mb-2">Το κουμπί Συνέχεια σε πάει στο επόμενο βήμα του οδηγού.</p>
+                        <p class="small text-muted mb-2">Το κουμπί Παράλειψη κλείνει τον οδηγό και σε μεταφέρει κατευθείαν στην εφαρμογή.</p>
+                        <p class="small text-muted mb-0">Μπορείς να ανοίξεις ξανά τον οδηγό από το μενού λογαριασμού.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                {% if has_previous_step %}
+                <a href="{% url 'accounts:welcome_flow' %}?step={{ previous_step }}&next={{ next_url|urlencode }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Προηγούμενο
+                </a>
+                {% endif %}
+
+                {% if is_last_step %}
+                <form method="post" action="{% url 'accounts:complete_welcome_flow' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next_url }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-rocket me-2"></i>Ολοκλήρωση
+                    </button>
+                </form>
+                {% else %}
+                <a href="{% url 'accounts:welcome_flow' %}?step={{ next_step }}&next={{ next_url|urlencode }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-right me-2"></i>Συνέχεια
+                </a>
+                {% endif %}
+
+                <form method="post" action="{% url 'accounts:complete_welcome_flow' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next_url }}">
+                    <button type="submit" class="btn btn-outline-secondary">
+                        <i class="fas fa-forward me-2"></i>Παράλειψη Οδηγού
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var progressBar = document.getElementById('welcomeProgressBar');
+    if (!progressBar) return;
+    var percent = parseInt(progressBar.getAttribute('data-progress') || '0', 10);
+    progressBar.style.width = Math.max(0, Math.min(100, percent)) + '%';
+});
+</script>
+{% endblock %}

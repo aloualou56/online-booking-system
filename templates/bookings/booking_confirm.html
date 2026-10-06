@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Επιβεβαίωση Κράτησης{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:600px">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white text-center">
+            <h4 class="mb-0"><i class="fas fa-check-circle me-2"></i>Επιβεβαίωση Κράτησης</h4>
+        </div>
+        <div class="card-body p-4">
+            <table class="table table-borderless">
+                <tr><td class="text-muted">Επιχείρηση</td><td><strong>{{ booking.business.name }}</strong></td></tr>
+                <tr><td class="text-muted">Υπηρεσία</td><td>{{ booking.service.name }}</td></tr>
+                <tr><td class="text-muted">Υπάλληλος</td><td>{{ booking.employee_display_name }}</td></tr>
+                <tr><td class="text-muted">Ημ/νία</td><td>{{ booking.date|date:"d/m/Y" }}</td></tr>
+                <tr><td class="text-muted">Ώρα</td><td>{{ booking.start_time|time:"H:i" }} - {{ booking.end_time|time:"H:i" }}</td></tr>
+                <tr><td class="text-muted">Τιμή υπηρεσίας</td><td>{% if booking.service.price > 0 %}{{ booking.service.price }}€{% else %}Δωρεάν{% endif %}</td></tr>
+                {% if deposit_amount > 0 %}
+                <tr><td class="text-muted">Προκαταβολή</td><td class="text-danger fw-bold">{% if deposit_amount > 0 %}{{ deposit_amount }}€{% else %}Δωρεάν{% endif %}</td></tr>
+                {% endif %}
+            </table>
+
+            {% if deposit_amount > 0 %}
+            <div class="alert alert-warning">
+                <i class="fas fa-info-circle me-2"></i>
+                Απαιτείται προκαταβολή <strong>{{ deposit_amount }}€</strong> ({{ booking.business.deposit_percentage }}% της τιμής).
+                Θα μεταφερθείτε στο Stripe.
+            </div>
+            <form method="post" action="{% url 'payments:create_checkout' %}">
+                {% csrf_token %}
+                <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                <button type="submit" class="btn btn-warning btn-lg w-100">
+                    <i class="fas fa-credit-card me-2"></i>Πληρωμή & Κράτηση
+                </button>
+            </form>
+            {% else %}
+            <div class="alert alert-success">
+                <i class="fas fa-check me-2"></i>
+                {% if booking.status == 'confirmed' %}Η κράτησή σας επιβεβαιώθηκε αυτόματα!{% else %}Η κράτησή σας αναμένει έγκριση.{% endif %}
+            </div>
+            <a href="{% url 'accounts:my_bookings' %}" class="btn btn-primary btn-lg w-100">
+                <i class="fas fa-list me-2"></i>Τα ραντεβού μου
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

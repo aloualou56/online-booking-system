@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}OTP Επαλήθευση Επαγγελματία - Reserva{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="card-title text-center mb-4">OTP Επαλήθευση</h2>
+
+                    <p class="text-muted text-center mb-2">
+                        Στείλαμε OTP στο email:<br>
+                        <strong>{{ user_email }}</strong>
+                    </p>
+                    {% if requires_phone_otp %}
+                    <p class="text-muted text-center mb-4">
+                        Στείλαμε OTP και στο κινητό:<br>
+                        <strong>{{ user_phone }}</strong>
+                    </p>
+                    {% else %}
+                    <p class="text-muted text-center mb-4">
+                        Δεν απαιτείται OTP τηλεφώνου για σταθερό αριθμό.
+                    </p>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="email_otp" class="form-label">Email OTP (6 ψηφία)</label>
+                            <input
+                                type="text"
+                                class="form-control form-control-lg text-center"
+                                id="email_otp"
+                                name="email_otp"
+                                placeholder="000000"
+                                maxlength="6"
+                                inputmode="numeric"
+                                pattern="[0-9]{6}"
+                                required
+                            >
+                        </div>
+
+                        {% if requires_phone_otp %}
+                        <div class="mb-3">
+                            <label for="phone_otp" class="form-label">Phone OTP (6 ψηφία)</label>
+                            <input
+                                type="text"
+                                class="form-control form-control-lg text-center"
+                                id="phone_otp"
+                                name="phone_otp"
+                                placeholder="000000"
+                                maxlength="6"
+                                inputmode="numeric"
+                                pattern="[0-9]{6}"
+                                required
+                            >
+                        </div>
+                        {% endif %}
+
+                        <small class="text-muted d-block mt-2 mb-3">Οι κωδικοί ισχύουν για 10 λεπτά.</small>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                            Επαλήθευση
+                        </button>
+                    </form>
+
+                    <div class="text-center">
+                        <p class="text-muted mb-2">Δεν λάβατε τον κωδικό;</p>
+                        <button
+                            type="button"
+                            class="btn btn-link btn-sm"
+                            id="resend-btn"
+                            onclick="resendProfessionalOTP()"
+                        >
+                            Αποστολή ξανά
+                        </button>
+                        <span id="resend-timer" class="text-muted ms-2" style="display: none;"></span>
+                    </div>
+
+                    {% if messages %}
+                        <div class="mt-4">
+                            {% for message in messages %}
+                                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p class="text-muted">
+                    <a href="{% url 'accounts:register_professional' %}">Επιστροφή στην εγγραφή</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let resendTimeout = 0;
+
+function resendProfessionalOTP() {
+    const btn = document.getElementById('resend-btn');
+    const timer = document.getElementById('resend-timer');
+
+    btn.disabled = true;
+    resendTimeout = 60;
+    timer.style.display = 'inline';
+
+    fetch('{% url "accounts:resend_professional_otp" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+        } else {
+            alert('Σφάλμα: ' + data.message);
+            btn.disabled = false;
+            timer.style.display = 'none';
+        }
+    })
+    .catch(() => {
+        alert('Προέκυψε σφάλμα. Δοκιμάστε ξανά.');
+        btn.disabled = false;
+        timer.style.display = 'none';
+    });
+
+    startTimer();
+}
+
+function startTimer() {
+    const timer = document.getElementById('resend-timer');
+    const btn = document.getElementById('resend-btn');
+
+    const interval = setInterval(() => {
+        resendTimeout--;
+        timer.textContent = `(${resendTimeout}s)`;
+
+        if (resendTimeout <= 0) {
+            clearInterval(interval);
+            btn.disabled = false;
+            timer.style.display = 'none';
+        }
+    }, 1000);
+}
+</script>
+
+<style>
+.form-control-lg {
+    font-size: 24px;
+    letter-spacing: 8px;
+    font-weight: bold;
+}
+
+#email_otp::placeholder,
+#phone_otp::placeholder {
+    letter-spacing: 8px;
+}
+</style>
+{% endblock %}

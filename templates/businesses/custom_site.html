@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+{% block title %}{{ business.name }}{% if business.custom_site_title %} · {{ business.custom_site_title }}{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .custom-site-shell {
+        --site-bg: #f7f2e8;
+        --site-surface: #ffffff;
+        --site-surface-soft: #fff9ef;
+        --site-text: #1f1a17;
+        --site-muted: #74685b;
+        --site-accent: #c9a227;
+        --site-accent-strong: #8d6b11;
+        background:
+            radial-gradient(circle at top left, rgba(201, 162, 39, 0.16), transparent 30%),
+            radial-gradient(circle at right center, rgba(61, 44, 18, 0.08), transparent 28%),
+            linear-gradient(180deg, #fffdf8 0%, var(--site-bg) 100%);
+        color: var(--site-text);
+    }
+    .site-wrap {
+        max-width: 1240px;
+    }
+    .custom-hero {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(201, 162, 39, 0.15);
+        box-shadow: 0 24px 80px rgba(35, 22, 5, 0.10);
+        background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255, 249, 239, 0.98));
+    }
+    .custom-hero::after {
+        content: "";
+        position: absolute;
+        inset: auto -30% -60% auto;
+        width: 280px;
+        height: 280px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(201,162,39,.22), transparent 65%);
+        pointer-events: none;
+    }
+    .custom-logo {
+        width: 88px;
+        height: 88px;
+        object-fit: cover;
+        border-radius: 22px;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(0,0,0,.10);
+    }
+    .pill-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        border-radius: 999px;
+        padding: .55rem .9rem;
+        background: rgba(201, 162, 39, 0.10);
+        color: var(--site-accent-strong);
+        font-weight: 700;
+        letter-spacing: .02em;
+    }
+    .glass-card {
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(201, 162, 39, 0.14);
+        box-shadow: 0 14px 45px rgba(0, 0, 0, 0.08);
+    }
+    .soft-card {
+        background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,250,242,.96));
+        border: 1px solid rgba(201, 162, 39, 0.12);
+        box-shadow: 0 18px 50px rgba(35, 22, 5, 0.08);
+    }
+    .section-title {
+        font-weight: 800;
+        letter-spacing: -0.03em;
+    }
+    .section-kicker {
+        letter-spacing: .16em;
+        font-size: .78rem;
+        color: var(--site-accent-strong);
+        text-transform: uppercase;
+        font-weight: 800;
+    }
+    .hero-actions .btn {
+        padding-inline: 1.1rem;
+    }
+    .info-chip {
+        border-radius: 18px;
+        padding: .85rem 1rem;
+        background: rgba(255,255,255,.75);
+        border: 1px solid rgba(201, 162, 39, .14);
+    }
+    .service-grid {
+        display: grid;
+        gap: .95rem;
+    }
+    .service-card {
+        position: relative;
+        padding: 1rem 1rem 1rem 1.05rem;
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(252,247,238,.94));
+        border: 1px solid rgba(201, 162, 39, .12);
+        box-shadow: 0 12px 30px rgba(35, 22, 5, .06);
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        overflow: hidden;
+    }
+    .service-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 5px;
+        background: linear-gradient(180deg, var(--site-accent), var(--site-accent-strong));
+    }
+    .service-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 38px rgba(35, 22, 5, .10);
+        border-color: rgba(201, 162, 39, .22);
+    }
+    .service-name {
+        font-size: 1.02rem;
+        line-height: 1.2;
+        margin: 0;
+    }
+    .service-price {
+        padding: .35rem .65rem;
+        border-radius: 999px;
+        background: rgba(201, 162, 39, .12);
+        color: var(--site-accent-strong);
+        font-weight: 800;
+        white-space: nowrap;
+    }
+    .service-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .55rem;
+        margin-top: .75rem;
+    }
+    .service-meta .meta-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        padding: .42rem .7rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,.78);
+        border: 1px solid rgba(201, 162, 39, .12);
+        color: var(--site-muted);
+        font-size: .9rem;
+    }
+    .service-summary {
+        border-radius: 20px;
+        padding: 1rem 1rem;
+        background: linear-gradient(135deg, rgba(201,162,39,.10), rgba(255,255,255,.90));
+        border: 1px solid rgba(201, 162, 39, .14);
+    }
+    .gallery-img {
+        width: 100%;
+        aspect-ratio: 4 / 5;
+        object-fit: cover;
+        border-radius: 22px;
+        box-shadow: 0 14px 35px rgba(0,0,0,.10);
+        background: #f5efe4;
+    }
+    .gallery-frame {
+        position: relative;
+        overflow: hidden;
+        border-radius: 22px;
+        background: linear-gradient(180deg, #ffffff, #f7f1e4);
+        border: 1px solid rgba(201, 162, 39, .12);
+        box-shadow: 0 16px 36px rgba(0,0,0,.08);
+    }
+    .gallery-caption {
+        position: absolute;
+        left: 14px;
+        bottom: 14px;
+        right: 14px;
+        padding: .6rem .8rem;
+        border-radius: 16px;
+        background: rgba(31, 26, 23, .72);
+        color: #fff;
+        font-size: .92rem;
+        line-height: 1.35;
+        backdrop-filter: blur(8px);
+    }
+    .widget-frame {
+        min-height: 960px;
+        width: 100%;
+        border: 0;
+        display: block;
+        background: #fff;
+    }
+    .floating-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(8px);
+        opacity: .75;
+        pointer-events: none;
+    }
+    .orb-one { top: 24px; right: 28px; width: 84px; height: 84px; background: rgba(201, 162, 39, .18); }
+    .orb-two { bottom: 28px; left: 22px; width: 58px; height: 58px; background: rgba(61, 44, 18, .12); }
+    .gallery-scroll {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+    }
+    @media (max-width: 768px) {
+        .site-wrap { max-width: 100%; }
+        .custom-hero { border-radius: 28px !important; }
+        .custom-hero::after { inset: auto -42% -78% auto; width: 220px; height: 220px; }
+        .custom-logo { width: 72px; height: 72px; border-radius: 18px; }
+        .gallery-scroll {
+            display: flex;
+            gap: .85rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding-bottom: .25rem;
+        }
+        .gallery-scroll > div {
+            flex: 0 0 84%;
+            scroll-snap-align: start;
+        }
+        .gallery-img {
+            aspect-ratio: 4 / 5;
+            object-fit: contain;
+        }
+        .gallery-caption {
+            font-size: .88rem;
+        }
+        .widget-frame { min-height: 1100px; }
+        .hero-actions .btn { width: 100%; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="custom-site-shell py-4 py-lg-5">
+    <div class="container site-wrap">
+        <section class="custom-hero rounded-5 p-4 p-lg-5 position-relative mb-4 mb-lg-5">
+            <span class="floating-orb orb-one"></span>
+            <span class="floating-orb orb-two"></span>
+            <div class="row align-items-center g-4 position-relative">
+                <div class="col-lg-7">
+                    <div class="pill-badge mb-3 shadow-sm">
+                        <i class="fas fa-sparkles"></i>
+                        {% if business.custom_site_title %}{{ business.custom_site_title }}{% else %}{{ business.name }}{% endif %}
+                    </div>
+                    <h1 class="display-5 fw-bold mb-3 section-title" style="text-wrap:balance;">
+                        {% if business.custom_site_title %}{{ business.custom_site_title }}{% else %}Καλώς ήρθατε στη {{ business.name }}{% endif %}
+                    </h1>
+                    {% if business.custom_site_subtitle %}
+                    <p class="lead text-secondary mb-4" style="max-width: 42rem;">{{ business.custom_site_subtitle }}</p>
+                    {% else %}
+                    <p class="lead text-secondary mb-4" style="max-width: 42rem;">Ανακαλύψτε τις υπηρεσίες μας, δείτε τη δουλειά μας και κλείστε ραντεβού άμεσα μέσα από τη δημόσια σελίδα μας.</p>
+                    {% endif %}
+                    <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 hero-actions">
+                        <a href="#booking" class="btn btn-warning btn-lg fw-semibold">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            {% if business.custom_site_cta_text %}{{ business.custom_site_cta_text }}{% else %}Κλείστε Ραντεβού{% endif %}
+                        </a>
+                        <a href="{{ booking_url }}" class="btn btn-outline-dark btn-lg">
+                            <i class="fas fa-arrow-right me-2"></i>Ανοιχτό booking page
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="glass-card rounded-5 p-4 p-lg-4 h-100">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            {% if business.logo %}
+                            <img src="{{ business.logo.url }}" alt="{{ business.name }}" class="custom-logo">
+                            {% else %}
+                            <div class="custom-logo d-flex align-items-center justify-content-center fw-bold text-warning">{{ business.name|slice:":1" }}</div>
+                            {% endif %}
+                            <div>
+                                <div class="text-uppercase small text-muted fw-semibold">Δημόσια Σελίδα</div>
+                                <h2 class="h4 mb-0 fw-bold">{{ business.name }}</h2>
+                            </div>
+                        </div>
+                        <div class="row g-2 text-muted">
+                            <div class="col-12">
+                                <div class="info-chip"><strong>Διεύθυνση</strong><br>{{ business.address|default:"Δεν έχει οριστεί" }}</div>
+                            </div>
+                            <div class="col-md-6 col-lg-12">
+                                <div class="info-chip h-100"><strong>Τηλέφωνο</strong><br>{{ business.phone|default:"Δεν έχει οριστεί" }}</div>
+                            </div>
+                            <div class="col-md-6 col-lg-12">
+                                <div class="info-chip h-100"><strong>Email</strong><br>{{ business.email|default:"Δεν έχει οριστεί" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="row g-4 mb-4 mb-lg-5">
+            <div class="col-lg-7">
+                <section class="glass-card rounded-5 p-4 p-lg-5 h-100">
+                    <p class="section-kicker mb-2">Σχετικά</p>
+                    <h2 class="section-title h1 mb-3">{{ business.custom_site_about_title|default:"Γιατί να μας επιλέξετε" }}</h2>
+                    <p class="text-secondary mb-0" style="white-space:pre-line; line-height:1.8;">{{ business.custom_site_about_text|default:"Περιγράψτε εδώ την επιχείρησή σας, τις υπηρεσίες σας και τι κάνει την εμπειρία σας ξεχωριστή." }}</p>
+                </section>
+            </div>
+            <div class="col-lg-5">
+                <section class="glass-card rounded-5 p-4 p-lg-5 h-100">
+                    <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                        <div>
+                            <p class="section-kicker mb-2">Υπηρεσίες</p>
+                            <h3 class="section-title h2 mb-2">Ό,τι χρειάζεστε σε ένα μέρος</h3>
+                        </div>
+                        <div class="service-summary text-end d-none d-sm-block">
+                            <div class="small text-muted mb-1">Διαθέσιμες υπηρεσίες</div>
+                            <div class="h3 mb-0 fw-bold">{{ services|length }}</div>
+                        </div>
+                    </div>
+                    <div class="service-grid">
+                        {% for service in services|slice:":6" %}
+                        <article class="service-card">
+                            <div class="d-flex align-items-start justify-content-between gap-3">
+                                <div class="flex-grow-1">
+                                    <h4 class="service-name fw-bold">{{ service.name }}</h4>
+                                    {% if service.description %}
+                                    <p class="text-secondary mb-0 mt-2" style="line-height:1.6;">{{ service.description }}</p>
+                                    {% else %}
+                                    <p class="text-secondary mb-0 mt-2">Άμεση, καθαρή υπηρεσία με εύκολο online booking.</p>
+                                    {% endif %}
+                                </div>
+                                <div class="service-price">{% if service.price > 0 %}€{{ service.price|floatformat:2 }}{% else %}Δωρεάν{% endif %}</div>
+                            </div>
+                            <div class="service-meta">
+                                <span class="meta-pill"><i class="fas fa-clock"></i>{{ service.duration_minutes }} λεπτά</span>
+                                {% if service.price %}
+                                <span class="meta-pill"><i class="fas fa-euro-sign"></i>{{ service.price|floatformat:2 }} τελική τιμή</span>
+                                {% else %}
+                                <span class="meta-pill"><i class="fas fa-bolt"></i>Γρήγορη κράτηση</span>
+                                {% endif %}
+                            </div>
+                        </article>
+                        {% empty %}
+                        <div class="service-summary">
+                            <div class="h5 fw-bold mb-2">Οι υπηρεσίες σας θα εμφανιστούν εδώ μόλις προστεθούν.</div>
+                            <div class="text-secondary">Προσθέστε υπηρεσίες από τις ρυθμίσεις για να γεμίσει αυτό το panel με κάρτες, τιμές και διάρκεια.</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        {% if business.custom_site_gallery_title or business.custom_site_image_1 or business.custom_site_image_2 or business.custom_site_image_3 %}
+        <section class="mb-4 mb-lg-5">
+            <div class="d-flex align-items-end justify-content-between gap-3 mb-3">
+                <div>
+                    <p class="section-kicker mb-1">Gallery</p>
+                    <h2 class="section-title h1 mb-0">{{ business.custom_site_gallery_title|default:"Φωτογραφίες από τη δουλειά μας" }}</h2>
+                </div>
+            </div>
+            <div class="gallery-scroll">
+                {% if business.custom_site_image_1 %}
+                <div>
+                    <div class="gallery-frame">
+                        <img src="{{ business.custom_site_image_1.url }}" alt="{{ business.name }} gallery 1" class="gallery-img">
+                        <div class="gallery-caption">{{ business.custom_site_about_title|default:business.name }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if business.custom_site_image_2 %}
+                <div>
+                    <div class="gallery-frame">
+                        <img src="{{ business.custom_site_image_2.url }}" alt="{{ business.name }} gallery 2" class="gallery-img">
+                        <div class="gallery-caption">{{ business.custom_site_gallery_title|default:"Η δουλειά μας" }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if business.custom_site_image_3 %}
+                <div>
+                    <div class="gallery-frame">
+                        <img src="{{ business.custom_site_image_3.url }}" alt="{{ business.name }} gallery 3" class="gallery-img">
+                        <div class="gallery-caption">{{ business.custom_site_cta_text|default:"Κλείστε ραντεβού" }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if not business.custom_site_image_1 and not business.custom_site_image_2 and not business.custom_site_image_3 %}
+                <div class="col-12">
+                    <div class="alert alert-light border">Ανεβάστε φωτογραφίες από τις ρυθμίσεις για να εμφανιστεί το gallery.</div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+        {% endif %}
+
+        <section id="booking" class="glass-card rounded-5 p-3 p-lg-4 mb-4 mb-lg-5">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 px-1">
+                <div>
+                    <p class="section-kicker mb-1">Booking</p>
+                    <h2 class="section-title h1 mb-0">Κλείστε ραντεβού τώρα</h2>
+                </div>
+                <a href="{{ booking_url }}" class="btn btn-outline-dark">Άνοιγμα πλήρους booking page</a>
+            </div>
+            <iframe src="{{ widget_url }}" class="widget-frame rounded-4" title="{{ business.name }} booking widget"></iframe>
+        </section>
+    </div>
+</div>
+{% endblock %}

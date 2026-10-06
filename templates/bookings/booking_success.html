@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Επιτυχής Κράτηση — {{ booking.business.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #4f46e5;
+            --success: #059669;
+            --success-bg: #ecfdf5;
+            --surface: #ffffff;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .success-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        .success-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 24px rgba(0,0,0,.08);
+            max-width: 480px;
+            width: 100%;
+            overflow: hidden;
+            animation: fadeUp .5s ease-out;
+        }
+        .success-header {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            padding: 40px 28px 32px;
+            text-align: center;
+            color: #fff;
+        }
+        .check-ring {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            animation: popIn .5s ease-out .2s both;
+        }
+        .check-ring i { font-size: 2rem; }
+        .success-header h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+        .success-header p { font-size: .85rem; opacity: .85; margin: 0; }
+        .success-body { padding: 28px; }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: .9rem;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-row .lbl { color: var(--text-muted); }
+        .detail-row .val { font-weight: 600; text-align: right; }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: .75rem;
+            font-weight: 600;
+        }
+        .status-confirmed { background: var(--success-bg); color: var(--success); }
+        .status-pending { background: #fffbeb; color: #b45309; }
+        .success-actions { padding: 0 28px 28px; display: flex; gap: 10px; }
+        .btn-main {
+            flex: 1;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: .9rem;
+            text-decoration: none;
+            text-align: center;
+            transition: all .2s;
+        }
+        .btn-main:hover { background: #4338ca; color: #fff; transform: translateY(-1px); }
+        .btn-outline {
+            flex: 1;
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: .9rem;
+            text-decoration: none;
+            text-align: center;
+            transition: all .2s;
+        }
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+        .page-footer {
+            text-align: center;
+            padding: 24px 0;
+            font-size: .8rem;
+            color: var(--text-muted);
+        }
+        .page-footer a { color: var(--accent); text-decoration: none; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes popIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-wrapper">
+        <div class="success-card">
+            <div class="success-header">
+                <div class="check-ring">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2>Η κράτησή σας καταχωρήθηκε!</h2>
+                <p>
+                    {% if booking.status == 'confirmed' %}
+                    Επιβεβαιώθηκε αυτόματα
+                    {% else %}
+                    Αναμένει έγκριση από την επιχείρηση
+                    {% endif %}
+                </p>
+            </div>
+            <div class="success-body">
+                <div class="detail-row">
+                    <span class="lbl">Επιχείρηση</span>
+                    <span class="val">{{ booking.business.name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="lbl">Υπηρεσία</span>
+                    <span class="val">{{ booking.service.name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="lbl">Ημερομηνία</span>
+                    <span class="val">{{ booking.date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="lbl">Ώρα</span>
+                    <span class="val">{{ booking.start_time|time:"H:i" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="lbl">Κατάσταση</span>
+                    <span class="val">
+                        {% if booking.status == 'confirmed' %}
+                        <span class="status-badge status-confirmed"><i class="fas fa-check-circle"></i> Confirmed</span>
+                        {% else %}
+                        <span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="success-actions">
+                {% if user.is_authenticated %}
+                <a href="{% url 'accounts:my_bookings' %}" class="btn-main">
+                    <i class="fas fa-list me-2"></i>Τα ραντεβού μου
+                </a>
+                <a href="/b/{{ booking.business.slug }}/" class="btn-outline">
+                    <i class="fas fa-plus me-2"></i>Νέα κράτηση
+                </a>
+                {% else %}
+                <a href="/" class="btn-main">
+                    <i class="fas fa-home me-2"></i>Αρχική Σελίδα
+                </a>
+                <a href="/b/{{ booking.business.slug }}/" class="btn-outline">
+                    <i class="fas fa-plus me-2"></i>Νέα κράτηση
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="page-footer">Powered by <a href="/">Reserva</a></div>
+</body>
+</html>

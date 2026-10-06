@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Κέντρο Ειδοποιήσεων{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h3 class="mb-1"><i class="fas fa-bell me-2"></i>Κέντρο Ειδοποιήσεων</h3>
+        <p class="text-muted mb-0">Όλα τα σημαντικά συμβάντα της επιχείρησης σε ένα σημείο.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'businesses:booking_list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-calendar-alt me-1"></i>Ραντεβού
+        </a>
+        <a href="{% url 'notifications:sms_log' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-sms me-1"></i>SMS Log
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Εκκρεμή ραντεβού</div>
+                <div class="display-6 mb-0">{{ pending_bookings }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Καθυστερημένα / overdue</div>
+                <div class="display-6 mb-0">{{ overdue_bookings }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Ενημερώσεις επιχείρησης</div>
+                <div class="display-6 mb-0">{{ latest_news|length }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Πρόσφατη δραστηριότητα</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_activity %}
+                <div class="list-group list-group-flush">
+                    {% for item in recent_activity %}
+                    <div class="list-group-item px-0">
+                        <div class="d-flex justify-content-between gap-3">
+                            <div>
+                                <div class="fw-semibold">#{{ item.booking.id }} · {{ item.booking.service.name }}</div>
+                                <div class="text-muted small">
+                                    {{ item.booking.date|date:"d/m/Y" }} {{ item.booking.start_time|time:"H:i" }} ·
+                                    {{ item.old_status }} → {{ item.new_status }}
+                                </div>
+                                <div class="small text-muted">
+                                    {% if item.booking.customer %}{{ item.booking.customer.get_full_name }}{% else %}{{ item.booking.guest_name }}{% endif %}
+                                </div>
+                            </div>
+                            <small class="text-muted text-nowrap">{{ item.created_at|date:"d/m H:i" }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Δεν υπάρχει πρόσφατη δραστηριότητα.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                <h5 class="mb-0"><i class="fas fa-sms me-2"></i>Τελευταία SMS</h5>
+            </div>
+            <div class="card-body">
+                {% if sms_notifications %}
+                <div class="list-group list-group-flush">
+                    {% for sms in sms_notifications %}
+                    <div class="list-group-item px-0">
+                        <div class="d-flex justify-content-between gap-3">
+                            <div>
+                                <div class="fw-semibold">{{ sms.recipient_phone }}</div>
+                                <div class="text-muted small">{{ sms.get_sms_type_display }}</div>
+                                <div class="small text-muted">{{ sms.message|truncatechars:120 }}</div>
+                            </div>
+                            <span class="badge bg-{% if sms.status == 'sent' %}success{% elif sms.status == 'failed' %}danger{% else %}secondary{% endif %} h-100">
+                                {{ sms.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Δεν υπάρχουν SMS ακόμη.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                <h5 class="mb-0"><i class="fas fa-newspaper me-2"></i>Ανακοινώσεις</h5>
+            </div>
+            <div class="card-body">
+                {% if latest_news %}
+                <div class="row g-3">
+                    {% for news in latest_news %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="border rounded-4 p-3 h-100 bg-light">
+                            <div class="small text-muted mb-1">{{ news.published_at|date:"d/m/Y" }}</div>
+                            <h6 class="mb-2">{{ news.get_title }}</h6>
+                            <p class="small text-muted mb-0">{{ news.get_description|truncatewords:22 }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Δεν υπάρχουν δημοσιευμένες ανακοινώσεις.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

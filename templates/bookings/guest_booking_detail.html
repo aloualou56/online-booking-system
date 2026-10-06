@@ -1,0 +1,369 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Το Ραντεβού σας — {{ business.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #4f46e5;
+            --accent-light: #818cf8;
+            --accent-bg: #eef2ff;
+            --success: #059669;
+            --success-bg: #ecfdf5;
+            --surface: #ffffff;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+            --shadow-lg: 0 4px 24px rgba(0,0,0,.08);
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .top-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            background: rgba(255,255,255,.85);
+        }
+        .top-bar .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+        .top-bar .brand-icon {
+            width: 34px; height: 34px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: .9rem;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+            padding: 48px 0 80px;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0; right: 0;
+            height: 40px;
+            background: var(--bg);
+            border-radius: 40px 40px 0 0;
+        }
+        .hero-section h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .hero-meta {
+            opacity: .85;
+            font-size: .9rem;
+            font-weight: 400;
+        }
+
+        .booking-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 0;
+            overflow: hidden;
+            margin-bottom: 24px;
+            animation: fadeUp .4s ease-out;
+        }
+        .booking-card-body { padding: 28px; }
+        .booking-card-title {
+            font-size: .8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: var(--text-muted); font-size: .9rem; }
+        .detail-value { font-weight: 600; font-size: .95rem; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: .75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .status-confirmed {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .status-completed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .alert-box {
+            background: var(--accent-bg);
+            border-left: 4px solid var(--accent);
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: .9rem;
+        }
+
+        .info-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .page-footer {
+            text-align: center;
+            padding: 32px 0;
+            font-size: .8rem;
+            color: var(--text-muted);
+        }
+        .page-footer a { color: var(--accent); text-decoration: none; }
+
+        @media (max-width: 576px) {
+            .hero-section { padding: 36px 0 64px; }
+            .hero-section h1 { font-size: 1.4rem; }
+            .booking-card-body { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="container" style="max-width:660px">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="/" class="brand">
+                <span class="brand-icon"><i class="fas fa-calendar-check"></i></span>
+                Reserva
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="hero-section">
+    <div class="container">
+        {% if business.logo %}
+        <img src="{{ business.logo.url }}" alt="{{ business.name }}" style="width:60px; height:60px; border-radius:16px; object-fit:cover; margin-bottom:12px; border:3px solid rgba(255,255,255,.3);">
+        {% endif %}
+        <h1><i class="fas fa-check-circle me-2"></i>Το Ραντεβού σας</h1>
+        <div class="hero-meta">{{ business.name }}</div>
+    </div>
+</div>
+
+<div class="container" style="max-width:660px; padding-bottom: 40px; margin-top: -40px; position: relative; z-index: 10;">
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert-box"{% if message.tags == 'error' %} style="background:#fee2e2; border-left-color:#991b1b;"{% endif %}>
+        <i class="fas fa-info-circle me-2"></i>{{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if booking.status == 'confirmed' %}
+    <div class="alert-box">
+        <i class="fas fa-check-circle me-2"></i>
+        <strong>Το ραντεβού σας είναι επιβεβαιωμένο!</strong> Σας περιμένουμε στην ώρα που έχει προγραμματιστεί.
+    </div>
+    {% elif booking.status == 'pending' %}
+    <div class="alert-box">
+        <i class="fas fa-clock me-2"></i>
+        <strong>Το ραντεβού σας αναμένει έγκριση.</strong> Θα ενημερωθείτε σύντομα.
+    </div>
+    {% elif booking.status == 'cancelled' %}
+    <div class="alert-box" style="background: #fee2e2; border-left-color: #991b1b;">
+        <i class="fas fa-times-circle me-2"></i>
+        <strong>Το ραντεβού σας έχει ακυρωθεί.</strong>
+    </div>
+    {% endif %}
+
+    <div class="booking-card">
+        <div class="booking-card-body">
+            <div class="booking-card-title"><i class="fas fa-receipt me-2"></i>Λεπτομέρειες Κράτησης</div>
+
+            <div class="detail-row">
+                <span class="detail-label">Κατάσταση</span>
+                <span class="detail-value">
+                    {% if booking.status == 'confirmed' %}
+                    <span class="status-badge status-confirmed">Επιβεβαιωμένο</span>
+                    {% elif booking.status == 'pending' %}
+                    <span class="status-badge status-pending">Αναμονή Έγκρισης</span>
+                    {% elif booking.status == 'cancelled' %}
+                    <span class="status-badge status-cancelled">Ακυρώθηκε</span>
+                    {% elif booking.status == 'completed' %}
+                    <span class="status-badge status-completed">Ολοκληρώθηκε</span>
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Υπηρεσία</span>
+                <span class="detail-value">{{ booking.service.name }}</span>
+            </div>
+
+            {% if booking.employee %}
+            <div class="detail-row">
+                <span class="detail-label">Επαγγελματίας</span>
+                <span class="detail-value">{{ booking.employee_display_name }}</span>
+            </div>
+            {% endif %}
+
+            <div class="detail-row">
+                <span class="detail-label">Ημερομηνία</span>
+                <span class="detail-value">{{ booking.date|date:"d/m/Y" }}</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Ώρα</span>
+                <span class="detail-value">{{ booking.start_time|time:"H:i" }} - {{ booking.end_time|time:"H:i" }}</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Τιμή</span>
+                <span class="detail-value" style="color: var(--accent);">{% if booking.price_at_booking > 0 %}{{ booking.price_at_booking }}€{% else %}Δωρεάν{% endif %}</span>
+            </div>
+
+            {% if booking.deposit_amount > 0 %}
+            <div class="detail-row">
+                <span class="detail-label">Προκαταβολή</span>
+                <span class="detail-value">{{ booking.deposit_amount }}€</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Κατάσταση Πληρωμής</span>
+                <span class="detail-value">
+                    {% if booking.payment_status == 'paid' %}
+                    <span class="status-badge status-confirmed">Πληρώθηκε</span>
+                    {% elif booking.payment_status == 'pending' %}
+                    <span class="status-badge status-pending">Εκκρεμεί</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% endif %}
+
+            {% if booking.notes %}
+            <div class="detail-row">
+                <span class="detail-label">Σημειώσεις</span>
+                <span class="detail-value">{{ booking.notes }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="info-card">
+        <h6 style="font-weight: 600; font-size: .9rem; margin-bottom: 12px;">
+            <i class="fas fa-info-circle me-2" style="color: var(--accent);"></i>Πληροφορίες Επιχείρησης
+        </h6>
+        <div style="font-size: .9rem; color: var(--text-muted);">
+            {% if business.address %}
+            <p><i class="fas fa-map-marker-alt me-2" style="width: 20px;"></i>{{ business.address }}</p>
+            {% endif %}
+            {% if business.phone %}
+            <p><i class="fas fa-phone me-2" style="width: 20px;"></i>{{ business.phone }}</p>
+            {% endif %}
+            {% if business.email %}
+            <p><i class="fas fa-envelope me-2" style="width: 20px;"></i>{{ business.email }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="info-card" style="background: #fef3c7; border: 1px solid #fbbf24;">
+        <div style="font-size: .85rem; color: #92400e;">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Σημαντικό:</strong> Κρατήστε αυτόν τον σύνδεσμο για να δείτε τις λεπτομέρειες του ραντεβού σας ανά πάσα στιγμή. Για οποιαδήποτε αλλαγή ή ακύρωση, επικοινωνήστε απευθείας με την επιχείρηση.
+        </div>
+    </div>
+
+    {% if booking.is_cancellable and booking.status != 'cancelled' and booking.status != 'completed' and booking.status != 'no_show' %}
+    <div class="booking-card">
+        <div class="booking-card-body" style="text-align:center;">
+            <div class="booking-card-title"><i class="fas fa-ban me-2"></i>Ακύρωση Ραντεβού</div>
+            <form method="post" action="{% url 'public_booking:guest_cancel_booking' business.slug booking.guest_access_token %}" onsubmit="return confirm('Είστε σίγουροι ότι θέλετε να ακυρώσετε το ραντεβού;');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" style="border-radius:999px; padding:10px 20px; font-weight:600;">
+                    <i class="fas fa-times-circle me-2"></i>Ακύρωση τώρα
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if booking.status == 'completed' and not booking.review %}
+    <div class="booking-card">
+        <div class="booking-card-body">
+            <div class="booking-card-title"><i class="fas fa-star me-2"></i>Αξιολόγηση Υπηρεσίας</div>
+            <p style="color: var(--text-muted); margin-bottom: 16px; font-size: .9rem;">
+                Σας ευχαριστούμε που χρησιμοποιήσατε τις υπηρεσίες μας. Η γνώμη σας είναι πολύτιμη για να βελτιώσουμε τις υπηρεσίες μας!
+            </p>
+            <div style="text-align:center;">
+                <a href="{% url 'reviews:submit_review_guest' booking.id booking.guest_access_token %}" class="btn btn-primary" style="border-radius:999px; padding:10px 20px; font-weight:600;">
+                    <i class="fas fa-comment-dots me-2"></i>Αφήστε μια αξιολόγηση
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="page-footer">
+    Powered by <a href="/">Reserva</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

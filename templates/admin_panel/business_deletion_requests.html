@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Αιτήματα Διαγραφής Επιχειρήσεων - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Αιτήματα Διαγραφής Επιχειρήσεων</h4>
+        <span class="badge bg-light text-dark">{{ deletion_requests.count }}</span>
+    </div>
+    <div class="card-body">
+        <!-- Status Filter -->
+        <div class="mb-4 row g-2">
+            {% for status_value, status_label, status_count in statuses_with_counts %}
+                <div class="col-auto">
+                    <a href="?status={{ status_value }}" 
+                       class="btn btn-sm {% if active_status == status_value or status_value == 'pending' and not active_status %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        {{ status_label }}
+                        <span class="badge bg-secondary ms-2">{{ status_count }}</span>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Deletion Requests Table -->
+        {% if deletion_requests %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Επιχείρηση</th>
+                            <th>Ιδιοκτήτης</th>
+                            <th>Ημερομηνία Αιτήματος</th>
+                            <th>Κατάσταση</th>
+                            <th>Ενέργειες</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in deletion_requests %}
+                            <tr>
+                                <td>
+                                    <strong>{{ req.business.name }}</strong><br>
+                                    <small class="text-muted">{{ req.business.category_label }}</small>
+                                </td>
+                                <td>
+                                    {{ req.owner.get_full_name }}<br>
+                                    <small class="text-muted">{{ req.owner.email }}</small>
+                                </td>
+                                <td>
+                                    <small>{{ req.requested_at|date:"d/m/Y H:i" }}</small>
+                                </td>
+                                <td>
+                                    {% if req.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark">Σε Αναμονή</span>
+                                    {% elif req.status == 'approved' %}
+                                        <span class="badge bg-success">Εγκρίθηκε</span>
+                                    {% elif req.status == 'rejected' %}
+                                        <span class="badge bg-danger">Απορρίφθηκε</span>
+                                    {% elif req.status == 'cancelled' %}
+                                        <span class="badge bg-secondary">Ακυρώθηκε</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="#" 
+                                           class="btn btn-outline-primary" 
+                                           data-bs-toggle="modal" 
+                                           data-bs-target="#detailsModal{{ req.id }}"
+                                           title="Λεπτομέρειες">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        {% if req.status == 'pending' %}
+                                            <a href="{% url 'superadmin:approve_business_deletion' req.id %}" 
+                                               class="btn btn-outline-success"
+                                               title="Έγκριση">
+                                                <i class="bi bi-check-lg"></i>
+                                            </a>
+                                            <a href="{% url 'superadmin:reject_business_deletion' req.id %}" 
+                                               class="btn btn-outline-danger"
+                                               title="Απόρριψη">
+                                                <i class="bi bi-x-lg"></i>
+                                            </a>
+                                        {% endif %}
+                                        <form method="post" action="{% url 'superadmin:delete_business_deletion_request' req.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-outline-dark" title="Διαγραφή Εγγραφής" onclick="return confirm('Διαγραφή αυτού του αιτήματος από το σύστημα;')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Details Modal -->
+                            <div class="modal fade" id="detailsModal{{ req.id }}" tabindex="-1">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Λεπτομέρειες Αιτήματος</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">Επιχείρηση</label>
+                                                    <p>{{ req.business.name }}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">Κατηγορία</label>
+                                                    <p>{{ req.business.category_label }}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">Ιδιοκτήτης</label>
+                                                    <p>
+                                                        {{ req.owner.get_full_name }}<br>
+                                                        <small class="text-muted">{{ req.owner.email }}</small>
+                                                    </p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">Αποστολή</label>
+                                                    <p>{{ req.requested_at|date:"d/m/Y H:i" }}</p>
+                                                </div>
+                                            </div>
+
+                                            {% if req.reason %}
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Λόγος Διαγραφής</label>
+                                                    <p>{{ req.reason }}</p>
+                                                </div>
+                                            {% endif %}
+
+                                            {% if req.admin_notes %}
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Σημειώσεις Διαχειριστή</label>
+                                                    <p>{{ req.admin_notes }}</p>
+                                                </div>
+                                            {% endif %}
+
+                                            {% if req.reviewed_by %}
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Αναγνώρισε</label>
+                                                        <p>{{ req.reviewed_by.get_full_name }}</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Ημερομηνία Αναγνώρισης</label>
+                                                        <p>{{ req.reviewed_at|date:"d/m/Y H:i" }}</p>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i> Δεν υπάρχουν αιτήματα διαγραφής.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.table-hover tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.btn-group-sm .btn {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+</style>
+{% endblock %}

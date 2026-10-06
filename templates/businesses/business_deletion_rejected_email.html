@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Αίτημα Διαγραφής Απορρίφθηκε</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;background-color: #f5f5f5;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5;">
+        <tr>
+            <td align="center" style="padding: 20px;">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color: #dc3545; padding: 30px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Αίτημα Απορρίφθηκε</h1>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px 30px;">
+                            <p>Γεια σας {{ user.first_name }},</p>
+                            
+                            <p>Το αίτημα διαγραφής για την επιχείρηση <strong>{{ business.name }}</strong> έχει απορριφθεί.</p>
+                            
+                            <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; margin: 30px 0; border-left: 4px solid #ffc107;">
+                                <p style="margin: 0; color: #856404;"><strong>Η επιχείρησή σας θα συνεχίσει να λειτουργεί κανονικά.</strong></p>
+                            </div>
+                            
+                            {% if admin_notes %}
+                                <h4 style="margin: 30px 0 10px 0;">Λόγος Απόρριψης:</h4>
+                                <p style="background-color: #f0f0f0; padding: 15px; border-radius: 5px; margin: 0;">{{ admin_notes }}</p>
+                            {% endif %}
+                            
+                            <p style="margin: 30px 0;">
+                                Εάν έχετε οποιεσδήποτε ερωτήσεις ή θέλετε να υποβάλετε ένα νέο αίτημα, παρακαλώ <a href="https://reserva.gr/contact/" style="color: #0066cc; text-decoration: none;">επικοινωνήστε με ημάς</a>.
+                            </p>
+                            
+                            <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+                            
+                            <p style="font-size: 14px; color: #666;">
+                                Ευχαριστούμε που χρησιμοποιήσατε το Reserva.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #ddd;">
+                            <p style="margin: 0;">© 2024 Reserva. Όλα τα δικαιώματα διατηρούνται.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

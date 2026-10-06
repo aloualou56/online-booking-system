@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Η Επιχείρησή σας Εγκρίθηκε!</title>
+</head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background-color:#f3f4f6;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;padding:40px 20px;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.1);overflow:hidden;">
+
+                    <!-- Header with gradient -->
+                    <tr>
+                        <td style="background:linear-gradient(135deg, #c9a227 0%, #f0c04a 100%);padding:40px 30px;text-align:center;">
+                            <h1 style="margin:0;color:#1a1a2e;font-size:28px;font-weight:900;letter-spacing:-0.5px;">
+                                🎉 Συγχαρητήρια!
+                            </h1>
+                            <p style="margin:8px 0 0;color:#1a1a2e;opacity:0.8;font-size:14px;">
+                                Η επιχείρησή σας εγκρίθηκε
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding:40px 30px;">
+                            <h2 style="margin:0 0 20px;color:#1f2937;font-size:24px;font-weight:700;">
+                                Καλώς ήρθατε στο Reserva!
+                            </h2>
+
+                            <p style="margin:0 0 20px;color:#4b5563;font-size:16px;line-height:1.6;">
+                                Γεια σας <strong>{{ user.get_full_name }}</strong>,
+                            </p>
+
+                            <p style="margin:0 0 20px;color:#4b5563;font-size:16px;line-height:1.6;">
+                                Χαρούμενα νέα! Η επιχείρησή σας <strong>{{ business.name }}</strong> εγκρίθηκε από την ομάδα μας και είναι τώρα ενεργή στην πλατφόρμα Reserva!
+                            </p>
+
+                            <!-- Success Badge -->
+                            <div style="background:linear-gradient(135deg, #10b981 0%, #34d399 100%);border-radius:12px;padding:24px;margin:30px 0;text-align:center;">
+                                <div style="font-size:48px;margin-bottom:10px;">✓</div>
+                                <p style="margin:0;color:#ffffff;font-size:18px;font-weight:700;">
+                                    Η Επιχείρησή σας είναι πλέον Ενεργή!
+                                </p>
+                            </div>
+
+                            <h3 style="margin:30px 0 15px;color:#1f2937;font-size:18px;font-weight:600;">
+                                Τι μπορείτε να κάνετε τώρα:
+                            </h3>
+
+                            <ul style="margin:0 0 25px;padding-left:20px;color:#4b5563;font-size:15px;line-height:1.8;">
+                                <li><strong>Προσθέστε υπηρεσίες</strong> - Ορίστε τις υπηρεσίες που προσφέρετε με τιμές και διάρκεια</li>
+                                <li><strong>Διαχειριστείτε το ωράριο σας</strong> - Ορίστε τις ώρες λειτουργίας της επιχείρησής σας</li>
+                                <li><strong>Προσθέστε εργαζομένους</strong> - Δημιουργήστε προφίλ για την ομάδα σας</li>
+                                <li><strong>Δέχεστε κρατήσεις</strong> - Οι πελάτες μπορούν πλέον να κλείνουν ραντεβού online!</li>
+                            </ul>
+
+                            <!-- Login Button -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin:30px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="{{ login_url }}"
+                                           style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg, #c9a227 0%, #f0c04a 100%);color:#1a1a2e;text-decoration:none;border-radius:8px;font-weight:700;font-size:16px;box-shadow:0 4px 12px rgba(201,162,39,0.3);">
+                                            Σύνδεση στο Dashboard
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <div style="background-color:#dbeafe;border-left:4px solid #3b82f6;padding:16px;margin:20px 0;border-radius:4px;">
+                                <p style="margin:0;color:#1e40af;font-size:14px;line-height:1.6;">
+                                    <strong>💡 Συμβουλή:</strong> Συμπληρώστε πρώτα τις υπηρεσίες και το ωράριό σας για να ξεκινήσετε να δέχεστε κρατήσεις!
+                                </p>
+                            </div>
+
+                            {% if business.slug %}
+                            <p style="margin:20px 0 10px;color:#4b5563;font-size:14px;line-height:1.6;">
+                                Η δημόσια σελίδα της επιχείρησής σας:
+                            </p>
+                            <p style="margin:0 0 20px;padding:12px;background-color:#f9fafb;border-radius:6px;word-break:break-all;font-size:13px;color:#6b7280;">
+                                {{ public_url }}
+                            </p>
+                            {% endif %}
+
+                            <p style="margin:30px 0 0;color:#6b7280;font-size:14px;line-height:1.6;">
+                                Αν έχετε οποιαδήποτε ερώτηση, μη διστάσετε να επικοινωνήσετε μαζί μας.<br><br>
+                                Με εκτίμηση,<br>
+                                <strong>Η Ομάδα του Reserva</strong>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color:#f9fafb;padding:30px;text-align:center;border-top:1px solid #e5e7eb;">
+                            <p style="margin:0 0 10px;color:#9ca3af;font-size:12px;">
+                                © 2026 Reserva. All rights reserved.
+                            </p>
+                            <p style="margin:0;color:#9ca3af;font-size:12px;">
+                                <a href="{{ privacy_url }}" style="color:#c9a227;text-decoration:none;margin:0 8px;">Πολιτική Απορρήτου</a>
+                                <a href="{{ terms_url }}" style="color:#c9a227;text-decoration:none;margin:0 8px;">Όροι Χρήσης</a>
+                                <a href="{{ contact_url }}" style="color:#c9a227;text-decoration:none;margin:0 8px;">Επικοινωνία</a>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

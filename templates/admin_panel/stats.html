@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Στατιστικά Πλατφόρμας{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="fas fa-chart-bar me-2"></i>Στατιστικά Πλατφόρμας</h3>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">Χρήστες</h6><h2>{{ stats.total_users }}</h2></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">Πελάτες</h6><h2>{{ stats.total_customers }}</h2></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">Ενεργοί Pro</h6><h2>{{ stats.active_pros }}</h2></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">MRR (25€ × Pro)</h6><h2>{{ stats.mrr }}€</h2></div></div></div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">Σύνολο Ραντεβού</h6><h2>{{ stats.total_bookings }}</h2></div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">Ραντεβού (μήνας)</h6><h2>{{ stats.month_bookings }}</h2></div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">Ακυρωμένα (μήνας)</h6><h2>{{ stats.month_cancelled }}</h2></div></div></div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">Σύνολο SMS</h6><h2>{{ stats.total_sms }}</h2></div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">Κριτικές</h6><h2>{{ stats.total_reviews }}</h2></div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">Μέσος Όρος Βαθμολογίας</h6><h2>{{ stats.avg_rating|default:"—" }}</h2></div></div></div>
+</div>
+
+<div class="row g-3 mt-1">
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">Προτίμηση Email</h6><h2>{{ stats.contact_pref_email }}</h2></div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">Προτίμηση SMS</h6><h2>{{ stats.contact_pref_phone }}</h2></div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-body text-center"><h6 class="text-muted">Προτίμηση Και τα δύο</h6><h2>{{ stats.contact_pref_both }}</h2></div></div></div>
+</div>
+{% endblock %}

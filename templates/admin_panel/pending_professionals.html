@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Εκκρεμείς Αιτήσεις{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="fas fa-clock me-2"></i>Εκκρεμείς Αιτήσεις Επαγγελματιών</h3>
+
+{% if pending_with_biz %}
+<div class="table-responsive">
+    <table class="table table-hover bg-white shadow-sm">
+        <thead class="table-light">
+            <tr><th>Όνομα</th><th>Email</th><th>Τηλέφωνο</th><th>Εγγραφή</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for item in pending_with_biz %}
+            <tr>
+                <td><strong>{{ item.user.get_full_name }}</strong></td>
+                <td>{{ item.user.email }}</td>
+                <td>{{ item.user.phone }}</td>
+                <td>{{ item.user.date_joined|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <form method="post" action="{% url 'superadmin:approve_professional' item.user.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-success"><i class="fas fa-check me-1"></i>Έγκριση</button>
+                    </form>
+                    <form method="post" action="{% url 'superadmin:reject_professional' item.user.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-danger"><i class="fas fa-times me-1"></i>Απόρριψη</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-success"><i class="fas fa-check me-2"></i>Δεν υπάρχουν εκκρεμείς αιτήσεις.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,54 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Django
+db.sqlite3
+*.log
+staticfiles/
+media/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Android / Gradle cache
+android/.gradle/
+
+
+# Local/secret configuration - never commit
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+local.properties
+google-services.json
+*.sqlite3
+*.sqlite
+*.db
+*.sql
+*.dump
+*.bak
+backups/
+
+# Local-only deploy script (copy deploy.sh.example to deploy.sh)
+deploy.sh

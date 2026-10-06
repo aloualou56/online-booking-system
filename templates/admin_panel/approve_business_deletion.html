@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Έγκριση Διαγραφής Επιχείρησης - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-success">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">Έγκριση Αιτήματος Διαγραφής</h4>
+    </div>
+    <div class="card-body p-5">
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle"></i> Η έγκριση θα απενεργοποιήσει την επιχείρηση και θα ειδοποιήσει τον ιδιοκτήτη.
+        </div>
+
+        <!-- Request Details -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Επιχείρηση</label>
+                    <p class="fs-5">{{ deletion_request.business.name }}</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Κατηγορία</label>
+                    <p>{{ deletion_request.business.category_label }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Ιδιοκτήτης</label>
+                    <p>
+                        {{ deletion_request.owner.get_full_name }}<br>
+                        <small class="text-muted">{{ deletion_request.owner.email }}</small>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Ημερομηνία Αιτήματος</label>
+                    <p>{{ deletion_request.requested_at|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+
+        {% if deletion_request.reason %}
+            <div class="mb-4">
+                <label class="form-label fw-bold">Λόγος Διαγραφής</label>
+                <p class="border p-3 bg-light">{{ deletion_request.reason }}</p>
+            </div>
+        {% endif %}
+
+        <hr>
+
+        <!-- Approval Form -->
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label for="admin_notes" class="form-label fw-bold">Σημειώσεις Διαχειριστή (Προαιρετικό)</label>
+                <textarea 
+                    class="form-control" 
+                    id="admin_notes" 
+                    name="admin_notes"
+                    rows="4"
+                    placeholder="Προαιρετικές σημειώσεις που θα ληφθούν υπόψη..."
+                ></textarea>
+                <small class="text-muted d-block mt-2">Αυτές οι σημειώσεις θα αποσταλούν στον ιδιοκτήτη.</small>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'superadmin:business_deletion_requests' %}" class="btn btn-secondary">
+                    Ακύρωση
+                </a>
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="bi bi-check-lg"></i> Έγκριση Διαγραφής
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

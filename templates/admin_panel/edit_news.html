@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Επεξεργασία Ειδήσεων — Super Admin{% endblock %}
+
+{% block content %}
+<h3 class="mb-4">
+    <a href="{% url 'superadmin:manage_news' %}" style="text-decoration: none; color: inherit;">
+        <i class="fas fa-arrow-left me-2"></i>
+    </a>
+    <i class="fas fa-newspaper me-2"></i>Επεξεργασία Ειδήσεων
+</h3>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-file-edit me-2"></i>{{ news.title_gr }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Ελληνικά Section -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3"><i class="fas fa-flag-greece me-1"></i>Ελληνικά</h6>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Τίτλος (Ελληνικά) *</label>
+                            <input type="text" name="title_gr" class="form-control" placeholder="π.χ. Νέα Δυνατότητα Ημερολογίου" 
+                                   value="{{ news.title_gr }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Περιγραφή (Ελληνικά) *</label>
+                            <textarea name="description_gr" class="form-control" rows="3" 
+                                      placeholder="Σύντομη περιγραφή που εμφανίζεται στη λίστα..." required>{{ news.description_gr }}</textarea>
+                            <small class="text-muted">Θα εμφανιστεί περιληπτικά στις σελίδες ειδήσεων</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Πλήρες Περιεχόμενο (Ελληνικά)</label>
+                            <textarea name="content_gr" class="form-control" rows="6" 
+                                      placeholder="Λεπτομερής περιγραφή (προαιρετικό)...">{{ news.content_gr }}</textarea>
+                            <small class="text-muted">Προαιρετικό - εμφανίζεται σε πλήρη προβολή</small>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- English Section -->
+                    <div class="mb-4">
+                        <h6 class="text-info mb-3"><i class="fas fa-flag-usa me-1"></i>Αγγλικά</h6>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Τίτλος (Αγγλικά) *</label>
+                            <input type="text" name="title_en" class="form-control" placeholder="e.g. New Calendar Feature" 
+                                   value="{{ news.title_en }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Περιγραφή (Αγγλικά) *</label>
+                            <textarea name="description_en" class="form-control" rows="3" 
+                                      placeholder="Brief description shown in lists..." required>{{ news.description_en }}</textarea>
+                            <small class="text-muted">Εμφανίζεται ως preview στις λίστες ειδήσεων</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Πλήρες Περιεχόμενο (Αγγλικά)</label>
+                            <textarea name="content_en" class="form-control" rows="6" 
+                                      placeholder="Detailed description (optional)...">{{ news.content_en }}</textarea>
+                            <small class="text-muted">Προαιρετικό - εμφανίζεται στην πλήρη προβολή</small>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Image & Status -->
+                    <div class="mb-4">
+                        <h6 class="mb-3"><i class="fas fa-image me-2"></i>Εικόνα & Κατάσταση</h6>
+
+                        {% if news.image %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Τρέχουσα Εικόνα</label>
+                            <div class="mb-2">
+                                <img src="{{ news.image.url }}" alt="{{ news.title_gr }}" style="max-width: 200px; border-radius: 4px;">
+                            </div>
+                            <small class="text-muted d-block">{{ news.image.name }}</small>
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Αλλαγή Εικόνας</label>
+                            <input type="file" name="image" class="form-control" accept="image/*">
+                            <small class="text-muted">JPG, PNG (αφήστε κενό για να κρατηθεί η τρέχουσα)</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Κατάσταση *</label>
+                            <select name="status" class="form-select">
+                                <option value="draft" {% if news.status == 'draft' %}selected{% endif %}>Σχέδιο (δεν θα εμφανιστεί)</option>
+                                <option value="published" {% if news.status == 'published' %}selected{% endif %}>Δημοσιευμένη (εμφανίζεται αμέσως)</option>
+                            </select>
+                            <small class="text-muted">Ως δημοσιευμένη θα φαίνεται αμέσως σε όλους</small>
+                        </div>
+
+                        {% if news.published_at %}
+                        <div class="alert alert-info small">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Δημοσιεύθηκε: {{ news.published_at|date:"d/m/Y H:i" }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Αποθήκευση Αλλαγών
+                        </button>
+                        <a href="{% url 'superadmin:manage_news' %}" class="btn btn-outline-secondary">Ακύρωση</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm" style="position: sticky; top: 20px;">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Πληροφορίες</h6>
+            </div>
+            <div class="card-body small">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <strong>Δημιουργός:</strong>
+                        <br>Reserva.gr Team
+                    </li>
+                    <li class="mb-2">
+                        <strong>Δημιουργήθηκε:</strong>
+                        <br>{{ news.created_at|date:"d/m/Y H:i" }}
+                    </li>
+                    <li class="mb-2">
+                        <strong>Ενημερώθηκε:</strong>
+                        <br>{{ news.updated_at|date:"d/m/Y H:i" }}
+                    </li>
+                    <li class="mb-3">
+                        <strong>Κατάσταση:</strong>
+                        <br>
+                        {% if news.status == 'published' %}
+                        <span class="badge bg-success">Δημοσιευμένη</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">Σχέδιο</span>
+                        {% endif %}
+                    </li>
+                    <hr>
+                    <li>
+                        <a href="{% url 'superadmin:delete_news' news.id %}" class="text-danger">
+                            <i class="fas fa-trash me-1"></i>Διαγραφή ειδήσεων
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

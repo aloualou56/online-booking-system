@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Διαγραφή Ειδήσεων — Super Admin{% endblock %}
+
+{% block content %}
+<h3 class="mb-4">
+    <i class="fas fa-trash me-2"></i>Διαγραφή Ειδήσεων
+</h3>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Προσοχή!</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-4">
+                    Είστε σίγουρος ότι θέλετε να διαγράψετε αυτή την ειδήσεων;
+                </p>
+
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <h6 class="mb-2">{{ news.title_gr }}</h6>
+                        <p class="text-muted small mb-2">{{ news.description_gr }}</p>
+                        
+                        <div class="row text-center mt-3 pt-3 border-top">
+                            <div class="col-4">
+                                <small class="text-muted">Κατάσταση</small>
+                                <br>
+                                {% if news.status == 'published' %}
+                                <span class="badge bg-success">Δημοσιευμένη</span>
+                                {% else %}
+                                <span class="badge bg-warning text-dark">Σχέδιο</span>
+                                {% endif %}
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Δημιουργός</small>
+                                <br>
+                                <strong>Reserva.gr Team</strong>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Δημοσιεύθηκε</small>
+                                <br>
+                                {% if news.published_at %}
+                                {{ news.published_at|date:"d/m/Y" }}
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Σημαντικό:</strong> Αυτή η ενέργεια δεν μπορεί να αναιρεθεί. Η ειδήσεων θα αφαιρεθεί από όλες τις σελίδες.
+                </div>
+
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Ναι, Διάγραφε την Ειδήσεων
+                        </button>
+                        <a href="{% url 'superadmin:manage_news' %}" class="btn btn-outline-secondary">
+                            Ακύρωση
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

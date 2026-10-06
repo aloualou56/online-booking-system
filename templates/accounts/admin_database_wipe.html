@@ -1,0 +1,330 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Management - Reserva</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at 50% 0%, #1e1600 0%, #070600 55%, #000 100%) !important;
+            min-height: 100vh !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #333;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #f39c12, #e74c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .warning-box h3 {
+            margin-bottom: 10px;
+            font-size: 1.4em;
+        }
+
+        .warning-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .warning-list li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .warning-list li:before {
+            content: "⚠️";
+            position: absolute;
+            left: 0;
+        }
+
+        .confirmation-section {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #f39c12;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #f39c12;
+            box-shadow: 0 0 10px rgba(243, 156, 18, 0.2);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+            box-shadow: 0 5px 15px rgba(149, 165, 166, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
+            transform: translateY(-2px);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .credentials-box {
+            background: rgba(52, 152, 219, 0.1);
+            border: 2px solid #3498db;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .credentials-box h4 {
+            color: #2980b9;
+            margin-bottom: 15px;
+        }
+
+        .credential-item {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-family: monospace;
+            border-left: 4px solid #3498db;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body style="background: radial-gradient(ellipse at 50% 0%, #1e1600 0%, #070600 55%, #000 100%) !important; margin:0 !important;">
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-database"></i> Database Management</h1>
+            <p class="subtitle">Super Admin Control Panel</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="success-box">
+                        <pre>{{ message }}</pre>
+                    </div>
+                {% else %}
+                    <div class="warning-box">
+                        <h3><i class="fas fa-exclamation-triangle"></i> {{ message }}</h3>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {% if not confirmed %}
+            <div class="warning-box">
+                <h3><i class="fas fa-skull-crossbones"></i> DANGER ZONE</h3>
+                <p><strong>This action will COMPLETELY DESTROY the database!</strong></p>
+
+                <ul class="warning-list">
+                    <li>All user accounts will be deleted</li>
+                    <li>All businesses and bookings will be lost</li>
+                    <li>All reviews and data will be wiped</li>
+                    <li>This action CANNOT be undone</li>
+                    <li>You will be logged out after reset</li>
+                </ul>
+            </div>
+
+            <div class="confirmation-section">
+                <h4><i class="fas fa-keyboard"></i> Safety Confirmation Required</h4>
+                <p>To proceed with the database reset, type <strong>RESET</strong> in the box below:</p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="confirm_wipe">
+
+                    <div class="form-group">
+                        <label for="confirmation_text">Type "RESET" to confirm:</label>
+                        <input type="text"
+                               id="confirmation_text"
+                               name="confirmation_text"
+                               class="form-control"
+                               placeholder="Type RESET here..."
+                               required>
+                    </div>
+
+                    <div class="btn-group">
+                        <a href="{% url 'superadmin:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-exclamation-triangle"></i> I Understand the Risk
+                        </button>
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <div class="warning-box">
+                <h3><i class="fas fa-bomb"></i> FINAL WARNING</h3>
+                <p>You are about to <strong>PERMANENTLY DELETE</strong> the entire database!</p>
+            </div>
+
+            <div class="credentials-box">
+                <h4><i class="fas fa-user-crown"></i> New Super Admin Details</h4>
+                <p>After the reset, a new default super admin account will be created with the credentials configured in the management command.</p>
+                <p><strong>Note:</strong> Change the admin password immediately after the reset.</p>
+            </div>
+
+            <div class="confirmation-section">
+                <h4><i class="fas fa-fire"></i> This is your last chance to cancel</h4>
+                <p>Click "WIPE DATABASE NOW" to proceed or "Cancel" to abort.</p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="perform_wipe">
+
+                    <div class="btn-group">
+                        <a href="{% url 'superadmin:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-shield-alt"></i> Cancel (Recommended)
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-nuclear"></i> WIPE DATABASE NOW
+                        </button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+
+        <a href="{% url 'superadmin:dashboard' %}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Super Admin Dashboard
+        </a>
+    </div>
+
+    <script>
+        // Add some dramatic effect for the final confirmation
+        {% if confirmed %}
+        document.querySelector('.btn-danger').addEventListener('click', function(e) {
+            const confirmed = confirm('🚨 ABSOLUTE FINAL WARNING 🚨\n\nThis will DESTROY everything!\n\nClick OK to proceed or Cancel to abort.');
+            if (!confirmed) {
+                e.preventDefault();
+            }
+        });
+        {% endif %}
+
+        // Auto-focus on confirmation input
+        const confirmInput = document.getElementById('confirmation_text');
+        if (confirmInput) {
+            confirmInput.focus();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Αίτημα Άδειας</title>
+</head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background-color:#f3f4f6;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;padding:40px 20px;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.1);overflow:hidden;">
+
+                    <!-- Header with gradient -->
+                    <tr>
+                        <td style="background:linear-gradient(135deg, #c9a227 0%, #f0c04a 100%);padding:40px 30px;text-align:center;">
+                            <img src="https://reserva.gr/static/img/logo.png?v=2026" alt="Reserva" style="height:60px;width:auto;margin-bottom:10px;border-radius:8px;">
+                            <h1 style="margin:0;color:#1a1a2e;font-size:28px;font-weight:900;letter-spacing:-0.5px;">
+                                Reserva
+                            </h1>
+                            <p style="margin:8px 0 0;color:#1a1a2e;opacity:0.8;font-size:14px;">
+                                Το ραντεβού σου, online
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding:40px 30px;">
+                            <h2 style="margin:0 0 20px;color:#1f2937;font-size:24px;font-weight:700;">
+                                <i class="fas fa-calendar-minus" style="color:#f59e0b;margin-right:8px;"></i>
+                                Αίτημα Άδειας
+                            </h2>
+
+                            <p style="margin:0 0 20px;color:#4b5563;font-size:16px;line-height:1.6;">
+                                Ο/η υπάλληλός σας <strong>{{ employee.name }}</strong> υπέβαλε αίτημα για άδεια.
+                            </p>
+
+                            <!-- Request Details Card -->
+                            <div style="background-color:#f9fafb;border-radius:8px;padding:20px;margin:20px 0;border-left:4px solid #f59e0b;">
+                                <table width="100%" style="font-size:14px;line-height:1.6;">
+                                    <tr>
+                                        <td style="color:#374151;font-weight:600;padding:4px 0;width:120px;">Υπάλληλος:</td>
+                                        <td style="color:#111827;padding:4px 0;">{{ employee.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#374151;font-weight:600;padding:4px 0;">Ημερομηνία:</td>
+                                        <td style="color:#111827;padding:4px 0;">{{ absence_request.date|date:"d/m/Y" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#374151;font-weight:600;padding:4px 0;">Λόγος:</td>
+                                        <td style="color:#111827;padding:4px 0;">{{ absence_request.reason }}</td>
+                                    </tr>
+                                    {% if absence_request.request_notes %}
+                                    <tr>
+                                        <td style="color:#374151;font-weight:600;padding:4px 0;vertical-align:top;">Σημειώσεις:</td>
+                                        <td style="color:#111827;padding:4px 0;">{{ absence_request.request_notes }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <td style="color:#374151;font-weight:600;padding:4px 0;">Αιτήθηκε:</td>
+                                        <td style="color:#111827;padding:4px 0;">{{ absence_request.requested_at|date:"d/m/Y H:i" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin:30px 0;">
+                                <tr>
+                                    <td align="center" style="padding-right:10px;">
+                                        <a href="{{ approve_url }}"
+                                           style="display:inline-block;padding:12px 24px;background:#10b981;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:700;font-size:14px;">
+                                            ✓ Έγκριση
+                                        </a>
+                                    </td>
+                                    <td align="center" style="padding-left:10px;">
+                                        <a href="{{ reject_url }}"
+                                           style="display:inline-block;padding:12px 24px;background:#ef4444;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:700;font-size:14px;">
+                                            ✗ Απόρριψη
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin:20px 0 10px;color:#4b5563;font-size:14px;line-height:1.6;">
+                                Για να διαχειριστείτε όλα τα αιτήματα:
+                            </p>
+
+                            <p style="margin:0 0 20px;padding:12px;background-color:#f9fafb;border-radius:6px;text-align:center;">
+                                <a href="{{ requests_url }}" style="color:#c9a227;text-decoration:none;font-weight:600;">
+                                    Διαχείριση Αιτημάτων Άδειας
+                                </a>
+                            </p>
+
+                            <p style="margin:20px 0 0;color:#6b7280;font-size:14px;line-height:1.6;">
+                                Με εκτίμηση,<br>
+                                <strong>Η Ομάδα του Reserva</strong>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color:#f9fafb;padding:30px;text-align:center;border-top:1px solid #e5e7eb;">
+                            <p style="margin:0;color:#9ca3af;font-size:12px;">
+                                © 2026 Reserva. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

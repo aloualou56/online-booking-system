@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{% if service %}Επεξεργασία{% else %}Νέα{% endif %} Υπηρεσία{% endblock %}
+
+{% block content %}
+<h3 class="mb-4">{% if service %}<span>Επεξεργασία:</span> {{ service.name }}{% else %}Νέα Υπηρεσία{% endif %}</h3>
+<div class="card shadow-sm">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Όνομα *</label>
+                <input type="text" name="name" class="form-control" value="{% if service %}{{ service.name }}{% endif %}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Περιγραφή</label>
+                <textarea name="description" class="form-control" rows="2">{% if service %}{{ service.description }}{% endif %}</textarea>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Διάρκεια (λεπτά) *</label>
+                    <input type="number" name="duration_minutes" class="form-control" value="{% if service %}{{ service.duration_minutes }}{% else %}30{% endif %}" min="5" step="1" required>
+                    <div class="form-text text-muted">Ελάχιστη διάρκεια: 5 λεπτά</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Τιμή (€) *</label>
+                    <input type="number" name="price" class="form-control" value="{% if service %}{{ service.price }}{% else %}0{% endif %}" min="0" step="any" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Προθεσμία Ακύρωσης/Επαναπρογραμματισμού (ώρες πριν) *</label>
+                <input type="number" name="cancellation_deadline_hours" class="form-control" value="{% if service %}{{ service.cancellation_deadline_hours }}{% else %}24{% endif %}" min="0" max="720" step="1" required>
+                <div class="form-text text-muted">0 = επιτρέπεται μέχρι την ώρα έναρξης, 24 = έως 24 ώρες πριν.</div>
+            </div>
+            {% if service %}
+            <div class="mb-3">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="is_active" {% if service.is_active %}checked{% endif %}>
+                    <label class="form-check-label">Ενεργή</label>
+                </div>
+            </div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Αποθήκευση</button>
+            <a href="{% url 'businesses:service_list' %}" class="btn btn-outline-secondary ms-2">Ακύρωση</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

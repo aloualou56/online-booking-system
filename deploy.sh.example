@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# NOTE: Copy this file to deploy.sh. deploy.sh is LOCAL-ONLY and ignored by Git (.gitignore).
+# It will NOT be downloaded or overwritten by git pull.
+# Maintain your custom deployment steps here.
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+# --- CONFIGURATION ---
+# The absolute path to your project directory on your server
+PROJECT_DIR="/path/to/Project_online"
+# The user that the web server runs as (e.g., www-data, nginx, or your own user)
+# This is important for file permissions. We'll use the current user for simplicity.
+WEB_USER=$(whoami) 
+# --- END CONFIGURATION ---
+
+echo "Starting deployment..."
+
+# Navigate to the project directory
+cd "$PROJECT_DIR"
+
+# Activate the virtual environment
+# Note: The path to 'activate' might differ if you named your .venv differently
+source "$PROJECT_DIR/.venv/bin/activate"
+echo "Virtual environment activated."
+
+
+# Pull the latest changes from the git repository, but EXCLUDE deploy.sh
+# We use git checkout with -- . to update all files except deploy.sh
+git fetch origin main
+git checkout origin/main -- .
+git restore --staged deploy.sh || true
+git restore deploy.sh || true
+echo "Latest code pulled from git (deploy.sh excluded)."
+
+# Install/update Python dependencies
+pip install -r requirements.txt
+echo "Python dependencies installed."
+
+
+# Run database migrations
+python manage.py migrate
+echo "Database migrations applied."
+
+# Ensure deploy.sh always has execute permission
+sudo chmod u+x "$PROJECT_DIR/deploy.sh"
+echo "deploy.sh execute permission ensured."
+
+# Collect static files (important for production)
+python manage.py collectstatic --noinput
+echo "Static files collected."
+
+# Set correct file permissions
+# This is crucial if your web server runs as a different user
+# chown -R "$WEB_USER":"$WEB_USER" "$PROJECT_DIR"
+# echo "File permissions updated."
+
+# Restart the application server
+#
+# --- IMPORTANT ---
+# The following lines are examples. You MUST adapt them to how you run your server.
+#
+# If you are using the Django development server (for testing only):
+# You will need to find and kill the old process to restart it.
+# This is NOT recommended for a real application.
+#
+# pkill -f "manage.py runserver" || echo "Server was not running."
+# python manage.py runserver 0.0.0.0:8000 &
+#
+# If you are using a service manager like 'systemd' (RECOMMENDED):
+# You would simply restart the service. The service would manage Gunicorn/Daphne.
+# This is the standard, most reliable method.
+#
+# Example for a 'systemd' service named 'erantevou':
+#
+# systemctl restart erantevou
+# systemctl restart webhook_listener
+#
+echo "Restarting application server (manual step or systemd required)..."
+
+
+echo "Deployment finished successfully."

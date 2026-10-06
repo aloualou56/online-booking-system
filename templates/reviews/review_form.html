@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Αξιολόγηση — {{ booking.business.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:600px">
+    <div class="card shadow-sm">
+        <div class="card-header bg-white text-center">
+            <h4><i class="fas fa-star text-warning me-2"></i>Αξιολόγηση</h4>
+            <p class="text-muted mb-0">{{ booking.business.name }} — {{ booking.service.name }}</p>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" id="reviewForm">
+                {% csrf_token %}
+                <div class="mb-4 text-center">
+                    <label class="form-label d-block">Βαθμολογία <span style="color:red;">*</span></label>
+                    <div class="star-rating" id="starRating">
+                        {% for i in "12345" %}
+                        <i class="far fa-star fa-2x text-warning star-icon" data-value="{{ i }}" style="cursor:pointer" title="{{i}} αστέρι"></i>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="rating" id="ratingInput">
+                    <div id="ratingError" style="color: red; font-size: 0.9rem; display:none; margin-top:8px;">
+                        Παρακαλώ επιλέξτε βαθμολογία
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Σχόλιο</label>
+                    <textarea name="comment" class="form-control" rows="4" placeholder="Γράψτε την εμπειρία σας..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-paper-plane me-2"></i>Υποβολή
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const starIcons = document.querySelectorAll('.star-icon');
+const ratingInput = document.getElementById('ratingInput');
+const ratingError = document.getElementById('ratingError');
+const reviewForm = document.getElementById('reviewForm');
+
+starIcons.forEach(star => {
+    star.addEventListener('click', function() {
+        const val = this.dataset.value;
+        ratingInput.value = val;
+        ratingError.style.display = 'none';
+        
+        starIcons.forEach((s, i) => {
+            s.classList.toggle('fas', i < val);
+            s.classList.toggle('far', i >= val);
+        });
+    });
+});
+
+reviewForm.addEventListener('submit', function(e) {
+    const rating = ratingInput.value.trim();
+    if (!rating) {
+        e.preventDefault();
+        ratingError.style.display = 'block';
+        return false;
+    }
+    return true;
+});
+</script>
+{% endblock %}

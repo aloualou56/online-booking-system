@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Διαγραφή Πελάτη{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border-danger shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-times me-2"></i>Οριστική Διαγραφή Πελάτη</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        Αυτή η ενέργεια είναι μόνιμη και δεν αναιρείται.
+                    </div>
+
+                    <p class="mb-2"><strong>Πελάτης:</strong> {{ customer.get_full_name|default:customer.username }}</p>
+                    <p class="mb-3"><strong>Email:</strong> {{ customer.email|default:"-" }}</p>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="reason" class="form-label"><strong>Λόγος διαγραφής (θα σταλεί με email):</strong></label>
+                            <textarea id="reason" name="reason" class="form-control" rows="5" required placeholder="Γράψτε τον λόγο διαγραφής για τον πελάτη..."></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Οριστική Διαγραφή
+                            </button>
+                            <a href="{% url 'superadmin:manage_customers' %}" class="btn btn-outline-secondary">Ακύρωση</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

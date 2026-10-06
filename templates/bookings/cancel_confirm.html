@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Ακύρωση Ραντεβού{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:600px">
+    <div class="card shadow border-danger">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Ακύρωση Ραντεβού</h4>
+        </div>
+        <div class="card-body p-4">
+            <div class="bg-light rounded p-3 mb-3">
+                <p class="mb-1"><strong>{{ booking.business.name }}</strong></p>
+                <p class="mb-1">{{ booking.service.name }} με {{ booking.employee_display_name }}</p>
+                <p class="mb-0">{{ booking.date|date:"d/m/Y" }} — {{ booking.start_time|time:"H:i" }}</p>
+            </div>
+
+            {% if booking.deposit_amount > 0 %}
+            <div class="alert alert-{% if refund_percentage == 100 %}success{% elif refund_percentage >= 50 %}warning{% else %}danger{% endif %}">
+                <h6>Πολιτική Ακύρωσης</h6>
+                <p class="mb-0">
+                    {% if booking.business.charge_cancellation_fee %}
+                    <i class="fas fa-info-circle me-1"></i>Χρέωση ακύρωσης <strong>{{ booking.business.cancellation_fee_percentage }}%</strong> — Θα επιστραφεί <strong>{{ refund_percentage }}%</strong> του ποσού
+                    {% else %}
+                        {% if refund_percentage == 100 %}
+                        <i class="fas fa-check-circle me-1"></i>Πλήρης επιστροφή <strong>{{ booking.deposit_amount }}€</strong> (ακύρωση > 48 ώρες πριν)
+                        {% elif refund_percentage == 50 %}
+                        <i class="fas fa-exclamation-circle me-1"></i>Μερική επιστροφή <strong>50%</strong> του ποσού (ακύρωση 24-48 ώρες πριν)
+                        {% else %}
+                        <i class="fas fa-times-circle me-1"></i>Δεν επιστρέφεται η προκαταβολή (ακύρωση < 24 ώρες πριν)
+                        {% endif %}
+                    {% endif %}
+                </p>
+            </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <p class="text-danger">Είστε σίγουροι ότι θέλετε να ακυρώσετε αυτό το ραντεβού;</p>
+                <button type="submit" class="btn btn-danger w-100">
+                    <i class="fas fa-times me-2"></i>Ακύρωση Ραντεβού
+                </button>
+            </form>
+            <a href="{% url 'accounts:my_bookings' %}" class="btn btn-outline-secondary w-100 mt-2">Πίσω</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

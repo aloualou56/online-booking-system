@@ -1,0 +1,222 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Εγγραφή Πελάτη — Reserva</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <style>
+        :root { --gold:#c9a227; --gold-light:#f0c04a; }
+        html,body { margin:0 !important; font-family:'Inter',sans-serif !important;
+            background: radial-gradient(ellipse at 50% 0%, #1e1600 0%, #070600 55%, #000 100%) !important;
+            background-attachment:fixed !important;
+            scrollbar-width:none; -ms-overflow-style:none; }
+        body::-webkit-scrollbar { display:none; }
+        .auth-page { min-height:100vh; display:flex; flex-direction:column;
+            align-items:center; justify-content:center; padding:40px 16px 60px; }
+        .auth-brand { text-align:center; margin-bottom:24px; }
+        .auth-brand img { width:66px; height:66px; object-fit:contain;
+            clip-path:inset(18% round 28px); display:block; margin:0 auto 8px; }
+        .auth-brand .brand-name { font-size:1.55rem; font-weight:900;
+            color:var(--gold-light); letter-spacing:-0.5px; }
+        .auth-brand .brand-sub { font-size:.82rem; color:rgba(255,255,255,.35); }
+        .auth-card { width:100%; max-width:520px;
+            background:rgba(255,255,255,.04); border:1px solid rgba(201,162,39,.2);
+            border-radius:20px; padding:38px 34px;
+            backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+            box-shadow:0 24px 60px rgba(0,0,0,.5); }
+        .auth-card-title { color:#fff; font-weight:800; font-size:1.4rem; margin-bottom:4px; }
+        .auth-card-sub { color:rgba(255,255,255,.38); font-size:.85rem; margin-bottom:26px; }
+        .auth-label { font-size:.76rem; font-weight:700; color:rgba(255,255,255,.52);
+            letter-spacing:.65px; text-transform:uppercase; margin-bottom:5px; display:block; }
+        .auth-field { position:relative; margin-bottom:4px; }
+        .auth-field .fi { position:absolute; left:13px; top:50%; transform:translateY(-50%);
+            color:var(--gold); font-size:.82rem; pointer-events:none; }
+        .auth-field input { width:100%; background:rgba(255,255,255,.06);
+            border:1px solid rgba(255,255,255,.11); border-radius:10px; color:#fff;
+            padding:11px 13px 11px 38px; font-size:.92rem;
+            transition:border-color .2s, box-shadow .2s; outline:none; font-family:'Inter',sans-serif; }
+        .auth-field input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,162,39,.17);
+            background:rgba(255,255,255,.09); }
+        .auth-field input::placeholder { color:rgba(255,255,255,.2); }
+        .mb-field { margin-bottom:14px; }
+        .btn-auth { width:100%;
+            background:linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color:#0e0d08; font-weight:800; font-size:.97rem; border:none;
+            border-radius:12px; padding:14px; cursor:pointer; margin-top:8px;
+            transition:opacity .2s, transform .15s, box-shadow .2s;
+            box-shadow:0 4px 20px rgba(201,162,39,.35); letter-spacing:.3px; }
+        .btn-auth:hover { opacity:.91; transform:translateY(-1px); box-shadow:0 8px 28px rgba(201,162,39,.45); }
+        .btn-auth:active { transform:translateY(0); }
+        .auth-divider { display:flex; align-items:center; gap:10px; margin:22px 0; }
+        .auth-divider::before,.auth-divider::after { content:''; flex:1; height:1px; background:rgba(255,255,255,.09); }
+        .auth-divider span { color:rgba(255,255,255,.28); font-size:.76rem; }
+        .auth-footer { text-align:center; }
+        .auth-footer p { color:rgba(255,255,255,.38); font-size:.84rem; margin-bottom:0; }
+        .auth-footer a { color:var(--gold-light); text-decoration:none; font-weight:600; }
+        .auth-footer a:hover { text-decoration:underline; }
+        .auth-back { text-align:center; margin-top:20px; }
+        .auth-back a { color:rgba(255,255,255,.28); font-size:.8rem; text-decoration:none; transition:color .2s; }
+        .auth-back a:hover { color:var(--gold-light); }
+        .lang-float { position:fixed; top:16px; right:16px; z-index:999; }
+        .lang-float button { background:rgba(201,162,39,.15); border:1px solid rgba(201,162,39,.4);
+            color:var(--gold-light); font-size:.78rem; font-weight:700; padding:5px 12px;
+            border-radius:20px; cursor:pointer; transition:background .2s; font-family:'Inter',sans-serif; }
+        .lang-float button:hover { background:rgba(201,162,39,.3); color:#fff; }
+        .auth-alert-error { background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3);
+            color:#fca5a5; border-radius:10px; padding:12px 15px; font-size:.87rem;
+            display:flex; gap:10px; align-items:flex-start; margin-bottom:18px; }
+        .eye-toggle { position:absolute; right:12px; top:50%; transform:translateY(-50%);
+            background:none; border:none; color:rgba(255,255,255,.3); cursor:pointer;
+            padding:0; font-size:.85rem; transition:color .2s; line-height:1; }
+        .eye-toggle:hover { color:var(--gold-light); }
+        .auth-field input[type=password],.auth-field input[type=text] { padding-right:40px; }
+    </style>
+</head>
+<body style="background: radial-gradient(ellipse at 50% 0%, #1e1600 0%, #070600 55%, #000 100%) !important; margin:0 !important; font-family:'Inter',sans-serif !important;">
+<div class="lang-float">
+    <button onclick="toggleLanguage()"><i class="fas fa-globe me-1"></i><span id="langLabel">EN</span></button>
+</div>
+<div class="auth-page">
+
+    <div class="auth-brand">
+        <img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva" onerror="this.style.display='none'">
+        <div class="brand-name">Reserva</div>
+        <div class="brand-sub" data-i18n="brand_sub">Εγγραφή Πελάτη</div>
+    </div>
+
+    <div class="auth-card">
+        <div class="auth-card-title"><i class="fas fa-user-plus me-2" style="color:var(--gold-light)"></i><span data-i18n="card_title">Δημιουργία Λογαριασμού</span></div>
+        <p class="auth-card-sub" data-i18n="card_sub">Κλείστε ραντεβού εύκολα και γρήγορα με τους καλύτερους επαγγελματίες.</p>
+
+        {% if messages %}
+        {% for msg in messages %}
+        <div class="auth-alert-error"><i class="fas fa-exclamation-circle mt-1"></i><span>{{ msg }}</span></div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="row g-3 mb-field">
+                <div class="col-6">
+                    <label class="auth-label" data-i18n="lbl_fname">Όνομα</label>
+                    <div class="auth-field">
+                        <i class="fas fa-id-card fi"></i>
+                        <input type="text" name="first_name" placeholder="Όνομα" required value="{{ form_data.first_name|default:'' }}">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label class="auth-label" data-i18n="lbl_lname">Επώνυμο</label>
+                    <div class="auth-field">
+                        <i class="fas fa-id-card fi"></i>
+                        <input type="text" name="last_name" placeholder="Επώνυμο" required value="{{ form_data.last_name|default:'' }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-field">
+                <label class="auth-label">Όνομα Χρήστη</label>
+                <div class="auth-field">
+                    <i class="fas fa-at fi"></i>
+                    <input type="text" name="username" placeholder="username" required value="{{ form_data.username|default:'' }}">
+                </div>
+            </div>
+
+            <div class="mb-field">
+                <label class="auth-label">Email</label>
+                <div class="auth-field">
+                    <i class="fas fa-envelope fi"></i>
+                    <input type="email" name="email" placeholder="email@example.com" required value="{{ form_data.email|default:'' }}">
+                </div>
+            </div>
+
+            <div class="mb-field">
+                <label class="auth-label" data-i18n="lbl_phone">Τηλέφωνο</label>
+                <div class="auth-field">
+                    <i class="fas fa-phone fi"></i>
+                    <input type="tel" name="phone" placeholder="69XXXXXXXX" required
+                           pattern="[0-9]{10}" title="10 ψηφία" value="{{ form_data.phone|default:'' }}">
+                </div>
+            </div>
+
+            <div class="row g-3 mb-field">
+                <div class="col-md-6">
+                    <label class="auth-label" data-i18n="lbl_pass">Κωδικός</label>
+                    <div class="auth-field">
+                        <i class="fas fa-lock fi"></i>
+                        <input type="password" name="password"
+                               placeholder="Τουλάχιστον 8 χαρ." required minlength="8">
+                        <button type="button" class="eye-toggle" onclick="togglePass(this)" tabindex="-1"><i class="fas fa-eye-slash"></i></button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="auth-label" data-i18n="lbl_pass2">Επιβεβαίωση</label>
+                    <div class="auth-field">
+                        <i class="fas fa-lock fi"></i>
+                        <input type="password" name="password2"
+                               placeholder="Επανάληψη" required minlength="8">
+                        <button type="button" class="eye-toggle" onclick="togglePass(this)" tabindex="-1"><i class="fas fa-eye-slash"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-auth">
+                <i class="fas fa-check me-2"></i><span data-i18n="btn_register">Εγγραφή</span>
+            </button>
+        </form>
+
+        <div class="auth-divider"><span data-i18n="or">ή</span></div>
+
+        <div class="auth-footer">
+            <p data-i18n="have_account">Έχετε ήδη λογαριασμό;
+                <a href="{% url 'accounts:login' %}" data-i18n="login_link">Σύνδεση</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="auth-back">
+        <a href="{% url 'landing' %}"><i class="fas fa-arrow-left me-1"></i><span data-i18n="back_home">Επιστροφή στην αρχική</span></a>
+    </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const loginUrl = "{% url 'accounts:login' %}";
+const t = {
+  gr:{ brand_sub:'Εγγραφή Πελάτη', card_title:'Δημιουργία Λογαριασμού',
+     card_sub:'Κλείστε ραντεβού εύκολα και γρήγορα με τους καλύτερους επαγγελματίες.',
+     lbl_fname:'Όνομα', lbl_lname:'Επώνυμο', lbl_phone:'Τηλέφωνο',
+     lbl_pass:'Κωδικός', lbl_pass2:'Επιβεβαίωση',
+     btn_register:'Εγγραφή', or:'ή',
+     have_account:'Έχετε ήδη λογαριασμό; <a href="'+loginUrl+'" style="color:var(--gold-light);font-weight:600;text-decoration:none">Σύνδεση</a>',
+     back_home:'Επιστροφή στην αρχική' },
+  en:{ brand_sub:'Customer Sign Up', card_title:'Create Account',
+     card_sub:'Book appointments easily and quickly with the best professionals.',
+     lbl_fname:'First Name', lbl_lname:'Last Name', lbl_phone:'Phone',
+     lbl_pass:'Password', lbl_pass2:'Confirm Password',
+     btn_register:'Register', or:'or',
+     have_account:'Already have an account? <a href="'+loginUrl+'" style="color:var(--gold-light);font-weight:600;text-decoration:none">Sign in</a>',
+     back_home:'Back to home' }
+};
+let lang = localStorage.getItem('lang')||'gr';
+function applyLang(l){
+  const d=t[l]; document.querySelectorAll('[data-i18n]').forEach(el=>{ if(d[el.dataset.i18n]!==undefined)el.innerHTML=d[el.dataset.i18n]; });
+  document.getElementById('langLabel').textContent=l==='gr'?'EN':'ΕΛ';
+  document.documentElement.lang=l==='gr'?'el':'en'; lang=l; localStorage.setItem('lang',l);
+}
+function toggleLanguage(){ applyLang(lang==='gr'?'en':'gr'); }
+function togglePass(btn){
+  const inp=btn.previousElementSibling;
+  const show=inp.type==='password';
+  inp.type=show?'text':'password';
+  btn.querySelector('i').className=show?'fas fa-eye':'fas fa-eye-slash';
+}
+document.addEventListener('DOMContentLoaded',()=>applyLang(lang));
+</script>
+</body>
+</html>

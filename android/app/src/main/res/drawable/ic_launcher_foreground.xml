@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Adaptive icon foreground: white calendar-check icon.
+    Canvas is 108x108dp. Safe zone (always visible) is the
+    inner 72x72dp (18dp inset each side). Icon is centered within it.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Scale a 24x24 Material icon up to ~56dp and center in 108x108 canvas -->
+    <group
+        android:translateX="26"
+        android:translateY="26"
+        android:scaleX="2.333"
+        android:scaleY="2.333">
+
+        <!-- Calendar body -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M20,3L18,3L18,1L16,1L16,3L8,3L8,1L6,1L6,3L4,3C2.9,3 2,3.9 2,5L2,21C2,22.1 2.9,23 4,23L20,23C21.1,23 22,22.1 22,21L22,5C22,3.9 21.1,3 20,3ZM20,21L4,21L4,9L20,9L20,21Z"/>
+
+        <!-- Checkmark inside calendar -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M11,16.17L7.83,13l-1.42,1.41L11,19l9,-9l-1.41,-1.41z"/>
+
+    </group>
+</vector>

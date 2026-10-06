@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}SMS Log{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="fas fa-sms me-2"></i>Ιστορικό SMS</h3>
+
+<style>
+.sms-log-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 0.9rem;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+
+.sms-log-card .sms-message {
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #1f2937;
+    line-height: 1.45;
+}
+
+.sms-log-meta-label {
+    font-size: 0.78rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+@media (max-width: 767.98px) {
+    .sms-log-mobile-wrap {
+        display: grid;
+        gap: 0.75rem;
+    }
+}
+</style>
+
+<div class="table-responsive d-none d-md-block">
+    <table class="table table-hover bg-white shadow-sm align-middle">
+        <thead class="table-light">
+            <tr><th>Ημ/νία</th><th>Τύπος</th><th>Παραλήπτης</th><th>Μήνυμα</th><th>Κατάσταση</th></tr>
+        </thead>
+        <tbody>
+            {% for sms in notifications %}
+            <tr>
+                <td>{{ sms.created_at|date:"d/m/Y H:i" }}</td>
+                <td><span class="badge bg-info">{{ sms.get_sms_type_display }}</span></td>
+                <td>{{ sms.recipient_phone }}</td>
+                <td style="min-width: 320px;"><small>{{ sms.message|truncatechars:140 }}</small></td>
+                <td>
+                    <span class="badge bg-{% if sms.status == 'sent' %}success{% elif sms.status == 'failed' %}danger{% else %}secondary{% endif %}">
+                        {{ sms.get_status_display }}
+                    </span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-muted py-4">Δεν υπάρχουν SMS.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="d-md-none sms-log-mobile-wrap">
+    {% for sms in notifications %}
+    <article class="sms-log-card p-3">
+        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+            <div>
+                <div class="sms-log-meta-label mb-1">Ημ/νία</div>
+                <div class="fw-semibold">{{ sms.created_at|date:"d/m/Y H:i" }}</div>
+            </div>
+            <span class="badge bg-{% if sms.status == 'sent' %}success{% elif sms.status == 'failed' %}danger{% else %}secondary{% endif %}">
+                {{ sms.get_status_display }}
+            </span>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-2">
+            <span class="badge bg-info">{{ sms.get_sms_type_display }}</span>
+            <span class="badge bg-light text-dark border">{{ sms.recipient_phone }}</span>
+        </div>
+
+        <div class="sms-log-meta-label mb-1">Μήνυμα</div>
+        <div class="sms-message small">{{ sms.message }}</div>
+    </article>
+    {% empty %}
+    <div class="alert alert-light border text-muted mb-0">Δεν υπάρχουν SMS.</div>
+    {% endfor %}
+</div>
+{% endblock %}

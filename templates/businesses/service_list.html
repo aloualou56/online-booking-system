@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% block title %}Υπηρεσίες — {{ business.name }}{% endblock %}
+
+{% block content %}
+<section class="services-redesign-shell">
+    <header class="services-head">
+        <h3 class="services-title"><i class="fas fa-concierge-bell me-2"></i>Υπηρεσίες</h3>
+        <a href="{% url 'businesses:add_service' %}" class="btn services-add-btn">
+            <i class="fas fa-plus me-2"></i>Νέα Υπηρεσία
+        </a>
+    </header>
+
+    <div class="services-table-wrap d-none d-lg-block">
+        <table class="table services-table mb-0">
+            <thead>
+                <tr>
+                    <th>ΥΠΗΡΕΣΙΑ</th>
+                    <th>ΔΙΑΡΚΕΙΑ</th>
+                    <th>ΤΙΜΗ</th>
+                    <th>ΚΑΤΑΣΤΑΣΗ</th>
+                    <th class="text-end"> </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for svc in services %}
+                <tr class="{% if not svc.is_active %}service-row-inactive{% endif %}">
+                    <td>
+                        <div class="service-name">{{ svc.name }}</div>
+                        {% if svc.description %}
+                        <div class="service-desc">{{ svc.description|truncatechars:60 }}</div>
+                        {% endif %}
+                    </td>
+                    <td>{{ svc.duration_minutes }} λεπτά</td>
+                    <td>{% if svc.price > 0 %}{{ svc.price }}€{% else %}Δωρεάν{% endif %}</td>
+                    <td>
+                        <span class="service-status-pill {% if svc.is_active %}is-active{% else %}is-inactive{% endif %}">
+                            {% if svc.is_active %}Ενεργή{% else %}Ανενεργή{% endif %}
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <div class="service-actions">
+                            <a href="{% url 'businesses:edit_service' svc.id %}" class="btn service-action-btn edit" aria-label="Επεξεργασία">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" action="{% url 'businesses:delete_service' svc.id %}" class="d-inline" onsubmit="event.preventDefault(); customConfirm('Σίγουρα θέλετε να διαγράψετε αυτή την υπηρεσία;', 'Διαγραφή Υπηρεσίας').then(confirmed => { if (confirmed) this.submit(); }); return false;">
+                                {% csrf_token %}
+                                <button class="btn service-action-btn delete" aria-label="Διαγραφή"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="services-empty">Δεν υπάρχουν υπηρεσίες.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-lg-none services-mobile-list">
+        {% for svc in services %}
+        <article class="service-mobile-card {% if not svc.is_active %}is-inactive{% endif %}">
+            <div class="service-mobile-icon">
+                <i class="fas {% cycle 'fa-scissors' 'fa-paint-brush' 'fa-spa' 'fa-hand-sparkles' 'fa-cut' %}"></i>
+            </div>
+            <div class="service-mobile-main">
+                <h5>{{ svc.name }}</h5>
+                <p>{{ svc.duration_minutes }} λεπτά · {% if svc.price > 0 %}{{ svc.price }}€{% else %}Δωρεάν{% endif %}</p>
+            </div>
+            <div class="service-mobile-right">
+                <span class="service-status-pill {% if svc.is_active %}is-active{% else %}is-inactive{% endif %}">
+                    {% if svc.is_active %}Ενεργή{% else %}Ανενεργή{% endif %}
+                </span>
+                <div class="service-actions">
+                    <a href="{% url 'businesses:edit_service' svc.id %}" class="btn service-action-btn edit" aria-label="Επεξεργασία">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form method="post" action="{% url 'businesses:delete_service' svc.id %}" class="d-inline" onsubmit="event.preventDefault(); customConfirm('Σίγουρα θέλετε να διαγράψετε αυτή την υπηρεσία;', 'Διαγραφή Υπηρεσίας').then(confirmed => { if (confirmed) this.submit(); }); return false;">
+                        {% csrf_token %}
+                        <button class="btn service-action-btn delete" aria-label="Διαγραφή"><i class="fas fa-trash"></i></button>
+                    </form>
+                </div>
+            </div>
+        </article>
+        {% empty %}
+        <div class="services-empty-card">Δεν υπάρχουν υπηρεσίες.</div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.services-redesign-shell {
+    max-width: 100%;
+}
+
+.services-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.services-title {
+    margin: 0;
+    font-size: 1.9rem;
+    font-weight: 900;
+    color: #17130d;
+}
+
+.services-title i {
+    color: #9f7600;
+}
+
+.services-add-btn {
+    border: 0;
+    border-radius: 1rem;
+    background: #c9a227;
+    color: #15120b;
+    font-weight: 900;
+    padding: 0.78rem 1.4rem;
+}
+
+.services-add-btn:hover {
+    background: #d8b54b;
+    color: #15120b;
+}
+
+.services-table-wrap {
+    background: #fff;
+    border: 1px solid #e2ded2;
+    border-radius: 1.1rem;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(18, 17, 15, 0.08);
+}
+
+.services-table thead th {
+    background: #fbfaf7;
+    color: #8f949c;
+    letter-spacing: 0.04em;
+    font-size: 0.83rem;
+    font-weight: 900;
+    padding: 0.95rem 1.25rem;
+    border-bottom: 1px solid #e2ded2;
+}
+
+.services-table tbody td {
+    padding: 0.68rem 1rem;
+    border-bottom: 1px solid #ece8de;
+    vertical-align: middle;
+    font-size: 1rem;
+    color: #202a3a;
+}
+
+.services-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.service-name {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #101b2b;
+    line-height: 1.1;
+}
+
+.service-desc {
+    font-size: 0.88rem;
+    color: #8f94a0;
+}
+
+.service-row-inactive .service-name,
+.service-row-inactive td {
+    color: #8a8d93;
+}
+
+.service-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0.14rem 0.64rem;
+    font-weight: 900;
+    font-size: 0.86rem;
+}
+
+.service-status-pill.is-active {
+    background: #cef0da;
+    color: #0f6f38;
+}
+
+.service-status-pill.is-inactive {
+    background: #ececf0;
+    color: #9ca0ab;
+}
+
+.service-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.service-action-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 0.75rem;
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.92rem;
+}
+
+.service-action-btn.edit {
+    background: #e6ebff;
+    color: #2f66e9;
+}
+
+.service-action-btn.delete {
+    background: #fbecef;
+    color: #e5262a;
+}
+
+.services-empty {
+    text-align: center;
+    color: #858992;
+    padding: 2rem 1rem;
+}
+
+.services-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.service-mobile-card {
+    background: #fff;
+    border: 1px solid #e3dfd5;
+    border-radius: 1.15rem;
+    box-shadow: 0 8px 20px rgba(18, 17, 15, 0.08);
+    padding: 0.72rem;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.service-mobile-card.is-inactive {
+    opacity: 0.65;
+}
+
+.service-mobile-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.9rem;
+    background: #f6f3e9;
+    color: #c39a1e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.service-mobile-main h5 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #101b2b;
+}
+
+.service-mobile-main p {
+    margin: 0.15rem 0 0;
+    color: #7f8692;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.service-mobile-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.55rem;
+}
+
+.services-empty-card {
+    background: #fff;
+    border: 1px dashed #d3d7df;
+    border-radius: 0.9rem;
+    padding: 1.25rem;
+    text-align: center;
+    color: #858992;
+}
+
+@media (max-width: 1199.98px) {
+    .services-table tbody td,
+    .service-name {
+        font-size: 0.95rem;
+    }
+
+    .service-desc,
+    .service-status-pill {
+        font-size: 0.82rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .services-title {
+        font-size: 1.8rem;
+    }
+
+    .services-head {
+        margin-bottom: 0.9rem;
+    }
+
+    .services-add-btn {
+        padding: 0.65rem 1rem;
+        font-size: 1rem;
+    }
+
+    .service-mobile-card {
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-areas:
+            'icon main'
+            'icon right';
+        align-items: start;
+    }
+
+    .service-mobile-icon { grid-area: icon; }
+    .service-mobile-main { grid-area: main; }
+    .service-mobile-right {
+        grid-area: right;
+        align-items: flex-start;
+        margin-left: 0;
+    }
+
+    .service-mobile-main h5 {
+        font-size: 1.08rem;
+    }
+
+    .service-mobile-main p {
+        font-size: 0.84rem;
+    }
+}
+</style>
+{% endblock %}

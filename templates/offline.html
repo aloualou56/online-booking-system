@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline | Reserva</title>
+    <style>
+        :root {
+            --brand: #c9a227;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --bg: #f8fafc;
+            --card: #ffffff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at 10% 0%, #fff8e5 0%, var(--bg) 45%);
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 16px;
+        }
+
+        .offline-card {
+            width: min(520px, 100%);
+            background: var(--card);
+            border: 1px solid rgba(201, 162, 39, 0.25);
+            border-radius: 16px;
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+            padding: 24px;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(201, 162, 39, 0.15);
+            color: #7a5b00;
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            margin: 6px 0 10px;
+            font-size: 1.5rem;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .actions {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: 1px solid rgba(31, 41, 55, 0.16);
+            background: #fff;
+            color: var(--text);
+            border-radius: 10px;
+            padding: 10px 14px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .btn.primary {
+            border-color: var(--brand);
+            background: linear-gradient(135deg, #f0c04a, #c9a227);
+            color: #2b1f00;
+        }
+    </style>
+</head>
+<body>
+    <main class="offline-card">
+        <div class="badge">!</div>
+        <h1>Είσαι εκτός σύνδεσης</h1>
+        <p>Δεν υπάρχει σύνδεση στο internet αυτή τη στιγμή. Μπορείς να δοκιμάσεις ξανά ή να επιστρέψεις στην αρχική σελίδα μόλις επανέλθει το δίκτυο.</p>
+        <div class="actions">
+            <a class="btn primary" href="/" onclick="window.location.reload(); return false;">Δοκίμασε ξανά</a>
+            <a class="btn" href="/">Αρχική</a>
+        </div>
+    </main>
+</body>
+</html>

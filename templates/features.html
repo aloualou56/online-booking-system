@@ -1,0 +1,1056 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reserva — Features</title>
+<link rel="icon" href="/favicon.ico?v=20260404" sizes="any">
+<link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}?v=20260404">
+<link rel="apple-touch-icon" href="{% static 'img/logo.png' %}?v=2026">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<link href="{% static 'css/style.css' %}?v=20260426-1" rel="stylesheet">
+
+<style>
+:root {
+  --gold: #c9a227;
+  --gold-light: #f0c04a;
+  --gold-dark: #8a6500;
+  --gold-glow: rgba(201,162,39,.45);
+  --gold-text: #f5e6c0;
+  --dark: #0e0d08;
+  --dark2: #1a180e;
+  --dark-card: #1e1c10;
+  --dark-border: rgba(201,162,39,.18);
+  --off-white: #faf8f5;
+  --light-bg: #f4f1eb;
+}
+
+*,*::before,*::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #fff;
+  overflow-x: hidden;
+  color: #1a1a1a;
+}
+
+.features-hero {
+  background: radial-gradient(ellipse at 50% 0%, #1e1600 0%, #070600 55%, #000 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 130px 0 100px;
+  text-align: center;
+}
+.features-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(201,162,39,.16) 0%, transparent 55%),
+    radial-gradient(ellipse at 20% 80%, rgba(201,162,39,.06) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 80%, rgba(201,162,39,.05) 0%, transparent 40%);
+  pointer-events: none;
+}
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(201,162,39,.12);
+  border: 1px solid rgba(201,162,39,.3);
+  color: var(--gold-light);
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 50px;
+  margin-bottom: 1.5rem;
+}
+.features-hero h1 {
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  font-weight: 900;
+  letter-spacing: -2px;
+  background: linear-gradient(90deg, var(--gold-dark) 0%, var(--gold-light) 45%, #fff8d0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+  margin-bottom: 1.25rem;
+}
+.features-hero p {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: rgba(245,230,192,.75);
+  max-width: 560px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
+}
+.hero-wave {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  line-height: 0;
+}
+.hero-wave svg {
+  width: 100%;
+  height: 60px;
+}
+
+.section-label {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: .5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::before {
+  content: '';
+  width: 24px;
+  height: 2px;
+  background: var(--gold);
+  border-radius: 2px;
+}
+
+.feat-card {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid rgba(201,162,39,.12);
+  transition: transform .25s, box-shadow .25s, border-color .25s;
+  overflow: hidden;
+  height: 100%;
+}
+.feat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 48px rgba(201,162,39,.13);
+  border-color: rgba(201,162,39,.35);
+}
+.feat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(201,162,39,.12), rgba(240,192,74,.18));
+  border: 1px solid rgba(201,162,39,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+.feat-card-inner {
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+}
+.feat-card-inner h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  color: #111;
+}
+.feat-card-inner p {
+  font-size: .88rem;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+.feat-tag {
+  display: inline-block;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-top: auto;
+  background: rgba(201,162,39,.1);
+  color: var(--gold-dark);
+}
+
+.spotlight { padding: 96px 0; }
+.spotlight-dark { background: var(--dark); }
+.spotlight-light { background: var(--off-white); }
+
+.spotlight-visual {
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(201,162,39,.18);
+  background: var(--dark2);
+  aspect-ratio: 4/3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.spotlight-visual-light {
+  background: #fff;
+  border-color: rgba(201,162,39,.15);
+  box-shadow: 0 8px 40px rgba(0,0,0,.08);
+}
+
+.spotlight h2 {
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1.2;
+  margin-bottom: 1.25rem;
+}
+.spotlight-dark h2 { color: #fff; }
+.spotlight-light h2 { color: #111; }
+
+.spotlight-dark p { color: rgba(255,255,255,.6); font-size: 1rem; line-height: 1.7; }
+.spotlight-light p { color: #555; font-size: 1rem; line-height: 1.7; }
+
+.feat-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+.feat-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: .92rem;
+}
+.spotlight-dark .feat-list li { color: rgba(255,255,255,.75); }
+.spotlight-light .feat-list li { color: #444; }
+.feat-list-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .65rem;
+  color: #0e0d08;
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-weight: 900;
+}
+
+.mock-calendar { padding: 1.5rem; font-size: .78rem; color: #fff; width: 100%; }
+.mock-cal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: var(--gold-light);
+  font-weight: 700;
+  font-size: .9rem;
+}
+.mock-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.mock-cal-day {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .72rem;
+  color: rgba(255,255,255,.5);
+  cursor: default;
+}
+.mock-cal-day.has-apt { background: rgba(201,162,39,.2); color: var(--gold-light); font-weight: 700; }
+.mock-cal-day.today { background: linear-gradient(135deg, var(--gold-dark), var(--gold-light)); color: #0e0d08; font-weight: 900; }
+.mock-cal-day.empty { opacity: 0; }
+.mock-apt-row {
+  margin-top: 1rem;
+  background: rgba(255,255,255,.06);
+  border-radius: 10px;
+  padding: .6rem .8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-left: 3px solid var(--gold);
+}
+.mock-apt-row + .mock-apt-row { margin-top: 6px; }
+.apt-name { font-weight: 700; color: #fff; font-size: .82rem; }
+.apt-time { font-size: .75rem; color: rgba(255,255,255,.5); margin-top: 1px; }
+.apt-badge {
+  font-size: .65rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: rgba(72,187,120,.2);
+  color: #68d391;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+.apt-badge.pending { background: rgba(237,137,54,.2); color: #fbb774; }
+
+.mock-widget {
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+}
+.mock-widget-header {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mock-widget-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .9rem;
+  color: #fff;
+}
+.mock-widget-header-text .biz-name { font-weight: 800; color: #fff; font-size: .95rem; }
+.mock-widget-header-text .biz-sub { font-size: .75rem; color: rgba(255,255,255,.75); }
+.mock-widget-body { padding: 1rem 1.25rem; }
+.mock-svc-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .6rem .75rem;
+  border-radius: 10px;
+  cursor: default;
+  transition: background .15s;
+  margin-bottom: 4px;
+  border: 1.5px solid transparent;
+}
+.mock-svc-item.selected { background: rgba(201,162,39,.1); border-color: var(--gold); }
+.mock-svc-item:not(.selected) { background: #f8f5ee; }
+.mock-svc-name { font-weight: 600; font-size: .82rem; color: #222; }
+.mock-svc-meta { font-size: .75rem; color: #888; }
+.mock-svc-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .6rem;
+  flex-shrink: 0;
+}
+.mock-svc-item.selected .mock-svc-check { background: var(--gold); border-color: var(--gold); color: #fff; }
+.mock-time-label {
+  font-size: .72rem;
+  font-weight: 700;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin: .75rem 0 .5rem;
+}
+.mock-time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.mock-time-slot {
+  padding: 6px 0;
+  border-radius: 8px;
+  text-align: center;
+  font-size: .75rem;
+  font-weight: 600;
+  color: #555;
+  background: #f0ede6;
+  cursor: default;
+}
+.mock-time-slot.picked { background: var(--gold); color: #0e0d08; }
+.mock-time-slot.unavail { color: #ccc; background: #f8f8f8; }
+.mock-widget-footer { padding: .75rem 1.25rem 1.25rem; }
+.mock-book-btn {
+  width: 100%;
+  padding: 11px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold-light));
+  color: #0e0d08;
+  font-weight: 800;
+  font-size: .9rem;
+  cursor: default;
+}
+
+.mock-sms {
+  background: #f0f0f5;
+  border-radius: 20px;
+  padding: 1.5rem;
+  max-width: 320px;
+  margin: 0 auto;
+}
+.mock-sms-bubble {
+  background: #007aff;
+  color: #fff;
+  border-radius: 18px 18px 4px 18px;
+  padding: .75rem 1rem;
+  font-size: .82rem;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  max-width: 88%;
+  margin-left: auto;
+  box-shadow: 0 2px 8px rgba(0,122,255,.3);
+}
+.mock-sms-bubble.incoming {
+  background: #fff;
+  color: #222;
+  border-radius: 18px 18px 18px 4px;
+  margin-left: 0;
+  margin-right: auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.mock-sms-time { font-size: .7rem; color: #aaa; text-align: center; margin: 4px 0; }
+
+.mock-site {
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 6px 28px rgba(0,0,0,.14);
+  max-width: 360px;
+  margin: 0 auto;
+}
+.mock-site-bar {
+  background: #1e1e1e;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mock-site-dot { width: 10px; height: 10px; border-radius: 50%; }
+.mock-site-url {
+  flex: 1;
+  background: #333;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: .65rem;
+  color: #aaa;
+  margin-left: 8px;
+}
+.mock-site-hero-band {
+  background: linear-gradient(135deg, #0e0d08, #2a2000);
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(201,162,39,.2);
+}
+.mock-site-name { font-size: 1.1rem; font-weight: 900; color: var(--gold-light); }
+.mock-site-tag { font-size: .7rem; color: rgba(245,230,192,.6); margin-top: 2px; }
+.mock-site-body { background: #fff; padding: 1rem 1.25rem; }
+.mock-site-svc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .5rem 0;
+  border-bottom: 1px solid #f0ede4;
+  font-size: .8rem;
+}
+.mock-site-svc-row:last-child { border: none; }
+.mock-site-svc-row span { color: #888; font-size: .75rem; }
+.mock-site-cta {
+  width: 100%;
+  margin-top: .75rem;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
+  color: #0e0d08;
+  font-weight: 800;
+  font-size: .85rem;
+  cursor: default;
+}
+
+.mock-pay {
+  background: var(--dark2);
+  border-radius: 20px;
+  padding: 1.5rem;
+  max-width: 340px;
+  margin: 0 auto;
+  border: 1px solid var(--dark-border);
+}
+.mock-pay-title { color: var(--gold-light); font-weight: 700; font-size: .85rem; margin-bottom: 1rem; }
+.mock-pay-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .6rem 0;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  font-size: .82rem;
+}
+.mock-pay-row:last-of-type { border: none; }
+.mock-pay-label { color: rgba(255,255,255,.55); }
+.mock-pay-val { color: #fff; font-weight: 600; }
+.mock-pay-total { color: var(--gold-light); font-size: 1rem; font-weight: 900; }
+.mock-pay-btn {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold-light));
+  color: #0e0d08;
+  font-weight: 800;
+  font-size: .9rem;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.mock-review-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 3px 14px rgba(0,0,0,.07);
+  margin-bottom: 10px;
+  border: 1px solid rgba(201,162,39,.12);
+}
+.mock-review-stars { color: #f5a623; font-size: .85rem; margin-bottom: .4rem; }
+.mock-review-text { font-size: .8rem; color: #555; line-height: 1.5; margin-bottom: .5rem; }
+.mock-reviewer { font-size: .72rem; color: #aaa; font-weight: 600; }
+.mock-review-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(72,187,120,.1);
+  color: #48bb78;
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  margin-top: 4px;
+}
+
+.stats-bar {
+  background: var(--dark);
+  border-top: 1px solid var(--dark-border);
+  border-bottom: 1px solid var(--dark-border);
+  padding: 3.5rem 0;
+}
+.stat-item { text-align: center; }
+.stat-num {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -1px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.stat-label { font-size: .85rem; color: rgba(255,255,255,.5); margin-top: .25rem; }
+
+.pricing-card {
+  background: var(--dark);
+  border-radius: 24px;
+  padding: 2.5rem;
+  border: 1px solid var(--dark-border);
+  position: relative;
+  overflow: hidden;
+}
+.pricing-card::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,162,39,.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.price-pill {
+  display: inline-block;
+  background: rgba(201,162,39,.12);
+  border: 1px solid rgba(201,162,39,.3);
+  color: var(--gold-light);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+}
+.price-num { font-size: 3rem; font-weight: 900; color: #fff; letter-spacing: -2px; }
+.price-num sup { font-size: 1.2rem; color: var(--gold); vertical-align: super; }
+.price-num sub { font-size: .9rem; color: rgba(255,255,255,.4); font-weight: 400; }
+.price-feat-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+.price-feat-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .88rem;
+  color: rgba(255,255,255,.7);
+}
+.price-feat-list li i { color: var(--gold); font-size: .8rem; width: 16px; }
+
+.cta-section {
+  background: radial-gradient(ellipse at 50% 50%, #1e1600 0%, #070600 60%, #000 100%);
+  padding: 100px 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, rgba(201,162,39,.14) 0%, transparent 60%);
+  pointer-events: none;
+}
+.cta-section h2 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+.cta-section h2 span {
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.cta-section p {
+  color: rgba(255,255,255,.6);
+  font-size: 1.05rem;
+  max-width: 480px;
+  margin: 0 auto 2.5rem;
+}
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 50%, var(--gold-light) 100%);
+  border: none;
+  color: #0e0d08;
+  font-weight: 800;
+  border-radius: 50px;
+  padding: 14px 36px;
+  font-size: 1rem;
+  letter-spacing: .2px;
+  transition: transform .2s, box-shadow .2s;
+  box-shadow: 0 6px 28px var(--gold-glow);
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-gold:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(201,162,39,.65); color: #0e0d08; }
+.btn-ghost {
+  background: transparent;
+  border: 1.5px solid rgba(255,255,255,.3);
+  color: #fff;
+  border-radius: 50px;
+  padding: 13px 28px;
+  font-size: .95rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: border-color .2s, background .2s;
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,.7); background: rgba(255,255,255,.06); color: #fff; }
+
+.site-footer {
+  background: #0e0d08;
+  color: rgba(255,255,255,.5);
+  padding: 2rem 0;
+  font-size: .85rem;
+  border-top: 1px solid var(--dark-border);
+}
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+  margin-bottom: .25rem;
+}
+.footer-brand img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  border-radius: 6px;
+  clip-path: inset(18% round 6px);
+}
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+.footer-links a { color: rgba(255,255,255,.45); text-decoration: none; transition: color .2s; }
+.footer-links a:hover { color: var(--gold-light); }
+
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .55s ease, transform .55s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: .1s; }
+.reveal-delay-2 { transition-delay: .2s; }
+.reveal-delay-3 { transition-delay: .3s; }
+
+@media (max-width: 767px) {
+  .spotlight { padding: 64px 0; }
+  .features-hero { padding: 110px 0 80px; }
+  .mock-widget, .mock-site, .mock-sms, .mock-pay { transform: scale(.92); transform-origin: center; }
+  .navbar-collapse { background: rgba(10,9,4,.97); border-radius: 14px; border: 1px solid rgba(201,162,39,.2); margin-top: 10px; padding: .75rem; }
+}
+</style>
+</head>
+<body class="landing-body">
+
+<nav class="navbar navbar-expand-lg navbar-dark landing-navbar fixed-top">
+  <div class="container">
+    <a class="navbar-brand landing-logo-brand" href="{% url 'landing' %}">
+      <img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block'">
+      <i class="fas fa-calendar-check" style="display:none"></i>
+      Reserva
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav" aria-controls="landingNav" aria-expanded="false" aria-label="Toggle menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="landingNav">
+      <ul class="navbar-nav ms-auto align-items-center gap-2">
+        <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'landing' %}" data-el="nav_home">Αρχική</a></li>
+        <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'landing' %}#businesses" data-el="nav_partners">Partners</a></li>
+        <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'business_browser' %}" data-el="nav_businesses">Businesses</a></li>
+        <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'features' %}" data-el="nav_features">Features</a></li>
+        {% if request.user.is_authenticated %}
+        <li class="nav-item ms-2"><button id="langToggle" class="btn btn-sm lang-toggle-btn" onclick="toggleLang()" title="Switch language"><i class="fas fa-globe me-1"></i><span id="langLabel">EN</span></button></li>
+        <li class="nav-item"><a class="btn btn-outline-light btn-sm px-3" href="{% url 'accounts:redirect_after_login' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></li>
+        {% else %}
+        <li class="nav-item"><a class="btn btn-gold-outline btn-sm px-3" href="{% url 'accounts:register_professional' %}"><i class="fas fa-briefcase me-1"></i><span data-el="nav_pro_cta">Είστε επαγγελματίας;</span></a></li>
+        <li class="nav-item ms-2"><button id="langToggle" class="btn btn-sm lang-toggle-btn" onclick="toggleLang()" title="Switch language"><i class="fas fa-globe me-1"></i><span id="langLabel">EN</span></button></li>
+        <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'accounts:login' %}" data-el="nav_login">Σύνδεση</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="features-hero">
+  <div class="container position-relative" style="z-index:1">
+    <div class="hero-pill"><i class="fas fa-sparkles"></i><span data-el="hero_pill">Δυνατότητες πλατφόρμας</span></div>
+    <h1 data-el="hero_h1">Όλα σε ένα.<br>Μηδέν κόπος.</h1>
+    <p data-el="hero_sub">Κρατήσεις, website, widget, ημερολόγιο και SMS —<br class="d-none d-md-block"> σχεδιασμένα για επαγγελματίες που θέλουν να εστιάζουν στη δουλειά τους.</p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="#booking" class="btn-gold"><i class="fas fa-bolt me-2"></i><span data-el="hero_cta1_txt">Δες πώς λειτουργεί</span></a>
+      <a href="{% url 'accounts:register_professional' %}" class="btn-ghost"><i class="fas fa-briefcase me-2"></i><span data-el="hero_cta2_txt">Ξεκίνησε δωρεάν</span></a>
+    </div>
+  </div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,30 C400,60 1040,0 1440,30 L1440,60 L0,60 Z" fill="#f4f1eb"/>
+    </svg>
+  </div>
+</section>
+
+<section class="py-5" style="background:#f4f1eb">
+  <div class="container py-3">
+    <div class="text-center mb-5 reveal">
+      <div class="section-label justify-content-center" style="justify-content:center"><span data-el="grid_label">Δυνατότητες</span></div>
+      <h2 class="fw-bold" style="font-size:clamp(1.5rem,3.5vw,2.2rem);letter-spacing:-.5px" data-el="grid_h">Ό,τι χρειάζεται η επιχείρησή σου</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-sm-6 col-lg-4 reveal reveal-delay-1"><div class="feat-card"><div class="feat-card-inner"><div class="feat-icon"><i class="fas fa-bolt"></i></div><h4 data-el="fc1_h">Instant Booking</h4><p data-el="fc1_p">Κλείσιμο ραντεβού σε 30 δευτερόλεπτα. Real-time διαθεσιμότητα, χωρίς τηλεφώνημα, χωρίς αναμονή.</p><span class="feat-tag" data-el="fc1_t">Πελάτες & Επαγγελματίες</span></div></div></div>
+      <div class="col-sm-6 col-lg-4 reveal reveal-delay-2"><div class="feat-card"><div class="feat-card-inner"><div class="feat-icon"><i class="fas fa-calendar-days"></i></div><h4 data-el="fc2_h">Smart Calendar</h4><p data-el="fc2_p">Προβολή ημερολογίου ή λίστας, overdue reminders, και πλήρεις actions πάνω σε κάθε ραντεβού.</p><span class="feat-tag" data-el="fc2_t">Business Panel</span></div></div></div>
+      <div class="col-sm-6 col-lg-4 reveal reveal-delay-3"><div class="feat-card"><div class="feat-card-inner"><div class="feat-icon"><i class="fas fa-globe"></i></div><h4 data-el="fc3_h">Branded Website</h4><p data-el="fc3_p">Έτοιμη δημόσια σελίδα με λογότυπο, κείμενα, φωτογραφίες και ενσωματωμένο widget κρατήσεων.</p><span class="feat-tag" data-el="fc3_t">Online Παρουσία</span></div></div></div>
+      <div class="col-sm-6 col-lg-4 reveal reveal-delay-1"><div class="feat-card"><div class="feat-card-inner"><div class="feat-icon"><i class="fas fa-code"></i></div><h4 data-el="fc4_h">Widget Embed</h4><p data-el="fc4_p">Ένα snippet κώδικα για να ενσωματώσεις το booking widget σε οποιαδήποτε υπάρχουσα ιστοσελίδα.</p><span class="feat-tag" data-el="fc4_t">Ενσωμάτωση</span></div></div></div>
+      <div class="col-sm-6 col-lg-4 reveal reveal-delay-2"><div class="feat-card"><div class="feat-card-inner"><div class="feat-icon"><i class="fas fa-sms"></i></div><h4 data-el="fc5_h">SMS & Reminders</h4><p data-el="fc5_p">Αυτόματες επιβεβαιώσεις και υπενθυμίσεις 24 ώρες πριν — μηδέν no-shows, μηδέν manual δουλειά.</p><span class="feat-tag" data-el="fc5_t">Αυτοματισμός</span></div></div></div>
+      <div class="col-sm-6 col-lg-4 reveal reveal-delay-1"><div class="feat-card"><div class="feat-card-inner"><div class="feat-icon"><i class="fas fa-check-to-slot"></i></div><h4 data-el="fc7_h">Approval Flow</h4><p data-el="fc7_p">Επέλεξε αν τα ραντεβού επιβεβαιώνονται αυτόματα ή χρειάζονται έγκρισή σου πρώτα.</p><span class="feat-tag" data-el="fc7_t">Ευελιξία</span></div></div></div>
+      <div class="col-sm-6 col-lg-4 reveal reveal-delay-2"><div class="feat-card"><div class="feat-card-inner"><div class="feat-icon"><i class="fas fa-palette"></i></div><h4 data-el="fc8_h">Widget Themes</h4><p data-el="fc8_p">Classic Gold ή Site-Match. Το widget σου ταιριάζει απόλυτα με τα χρώματα της επιχείρησής σου.</p><span class="feat-tag" data-el="fc8_t">Branding</span></div></div></div>
+      <div class="col-sm-6 col-lg-4 reveal reveal-delay-3"><div class="feat-card"><div class="feat-card-inner"><div class="feat-icon"><i class="fas fa-mobile-screen-button"></i></div><h4 data-el="fc9_h">Mobile-First</h4><p data-el="fc9_p">Από τον πελάτη ως τον επαγγελματία — η εμπειρία είναι γρήγορη, καθαρή και φιλική σε κινητά.</p><span class="feat-tag" data-el="fc9_t">UX & Design</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-center gap-4 gap-md-5 flex-wrap">
+      <div class="stat-item reveal"><div class="stat-num">30"</div><div class="stat-label" data-el="stat1">Μέσος χρόνος κράτησης</div></div>
+      <div class="stat-item reveal reveal-delay-1"><div class="stat-num">0</div><div class="stat-label" data-el="stat2">Τηλεφωνήματα απαιτούνται</div></div>
+      <div class="stat-item reveal reveal-delay-2"><div class="stat-num">24/7</div><div class="stat-label" data-el="stat3">Online διαθεσιμότητα</div></div>
+      <div class="stat-item reveal reveal-delay-3"><div class="stat-num">100%</div><div class="stat-label" data-el="stat4">Mobile-friendly</div></div>
+    </div>
+  </div>
+</div>
+
+<section id="booking" class="spotlight spotlight-dark">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 reveal">
+        <div class="section-label" style="color:var(--gold)"><span data-el="s1_label">Κράτηση</span></div>
+        <h2 data-el="s1_h">Το widget που<br>κάνει πωλήσεις για σένα</h2>
+        <p data-el="s1_p">Ένα κουμπί κράτησης στο site σου ή στη σελίδα Reserva μετατρέπει επισκέπτες σε επιβεβαιωμένα ραντεβού — αυτόματα, σε κάθε ώρα.</p>
+        <ul class="feat-list">
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s1_f1">Real-time διαθεσιμότητα χωρίς ανανέωση</span></li>
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s1_f2">Επιλογή υπηρεσίας, ώρας και εργαζομένου</span></li>
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s1_f3">Embed με ένα snippet — λειτουργεί παντού</span></li>
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s1_f4">Classic Gold ή Site-Match theme</span></li>
+        </ul>
+      </div>
+      <div class="col-lg-6 reveal reveal-delay-2">
+        <div class="spotlight-visual" style="background:var(--dark2);padding:1.5rem">
+          <div class="mock-widget" style="width:100%">
+            <div class="mock-widget-header">
+              <div class="mock-widget-logo"><i class="fas fa-cut"></i></div>
+              <div class="mock-widget-header-text"><div class="biz-name">Glam Studio</div><div class="biz-sub">Κομμωτήριο · Θεσσαλονίκη</div></div>
+            </div>
+            <div class="mock-widget-body">
+              <div style="font-size:.72rem;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem" data-el="w_svc">Επιλογή υπηρεσίας</div>
+              <div class="mock-svc-item selected"><div><div class="mock-svc-name" data-el="w_s1">Κούρεμα & Styling</div><div class="mock-svc-meta">60 λεπτά · 25€</div></div><div class="mock-svc-check"><i class="fas fa-check"></i></div></div>
+              <div class="mock-svc-item"><div><div class="mock-svc-name" data-el="w_s2">Βαφή</div><div class="mock-svc-meta">90 λεπτά · 45€</div></div><div class="mock-svc-check"></div></div>
+              <div class="mock-time-label" data-el="w_time">Διαθέσιμες ώρες — Τρ. 29 Απρ</div>
+              <div class="mock-time-grid"><div class="mock-time-slot unavail">09:00</div><div class="mock-time-slot">10:00</div><div class="mock-time-slot picked">11:00</div><div class="mock-time-slot">12:00</div><div class="mock-time-slot">14:00</div><div class="mock-time-slot unavail">15:00</div><div class="mock-time-slot">16:00</div><div class="mock-time-slot">17:00</div></div>
+            </div>
+            <div class="mock-widget-footer"><button class="mock-book-btn"><i class="fas fa-calendar-check me-2"></i><span data-el="w_btn_txt">Επιβεβαίωση κράτησης</span></button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="spotlight spotlight-light">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 order-lg-2 reveal">
+        <div class="section-label"><span data-el="s2_label">Ημερολόγιο</span></div>
+        <h2 data-el="s2_h">Πλήρης εικόνα<br>της μέρας σου</h2>
+        <p data-el="s2_p">Calendar ή list view — δες, διαχειρίσου και ενέργησε πάνω σε κάθε ραντεβού από έναν ενιαίο πίνακα. Overdue reminders ώστε τίποτα να μην ξεχαστεί.</p>
+        <ul class="feat-list">
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s2_f1">Εναλλαγή calendar / λίστα με ένα κλικ</span></li>
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s2_f2">Άμεσες ενέργειες: επιβεβαίωση, ακύρωση, σημειώσεις</span></li>
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s2_f3">Overdue reminders για ανεκπλήρωτα ραντεβού</span></li>
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s2_f4">Multi-staff υποστήριξη</span></li>
+        </ul>
+      </div>
+      <div class="col-lg-6 order-lg-1 reveal reveal-delay-2">
+        <div class="spotlight-visual" style="background:#1a180e;padding:1.25rem">
+          <div class="mock-calendar" style="width:100%">
+            <div class="mock-cal-header"><span data-el="cal_month">Απρίλιος 2026</span><div style="display:flex;gap:6px"><div style="background:rgba(201,162,39,.15);border-radius:6px;padding:3px 10px;font-size:.7rem;color:var(--gold-light);cursor:default" data-el="cal_list">Λίστα</div><div style="background:rgba(201,162,39,.25);border-radius:6px;padding:3px 10px;font-size:.7rem;color:var(--gold-light);cursor:default;border:1px solid rgba(201,162,39,.4)" data-el="cal_cal">Ημερολόγιο</div></div></div>
+            <div class="mock-cal-grid">
+              <div class="mock-cal-day" style="color:rgba(255,255,255,.3);font-size:.65rem" data-el="cal_d">Δ</div><div class="mock-cal-day" style="color:rgba(255,255,255,.3);font-size:.65rem" data-el="cal_t">Τ</div><div class="mock-cal-day" style="color:rgba(255,255,255,.3);font-size:.65rem" data-el="cal_te">Τ</div><div class="mock-cal-day" style="color:rgba(255,255,255,.3);font-size:.65rem" data-el="cal_p">Π</div><div class="mock-cal-day" style="color:rgba(255,255,255,.3);font-size:.65rem" data-el="cal_pa">Π</div><div class="mock-cal-day" style="color:rgba(255,255,255,.3);font-size:.65rem" data-el="cal_s">Σ</div><div class="mock-cal-day" style="color:rgba(255,255,255,.3);font-size:.65rem" data-el="cal_k">Κ</div>
+              <div class="mock-cal-day empty"></div><div class="mock-cal-day">1</div><div class="mock-cal-day">2</div><div class="mock-cal-day has-apt">3</div><div class="mock-cal-day">4</div><div class="mock-cal-day has-apt">5</div><div class="mock-cal-day">6</div><div class="mock-cal-day has-apt">7</div><div class="mock-cal-day">8</div><div class="mock-cal-day has-apt">9</div><div class="mock-cal-day">10</div><div class="mock-cal-day has-apt">11</div><div class="mock-cal-day">12</div><div class="mock-cal-day">13</div><div class="mock-cal-day has-apt">14</div><div class="mock-cal-day">15</div><div class="mock-cal-day">16</div><div class="mock-cal-day has-apt">17</div><div class="mock-cal-day">18</div><div class="mock-cal-day has-apt">19</div><div class="mock-cal-day">20</div><div class="mock-cal-day">21</div><div class="mock-cal-day">22</div><div class="mock-cal-day has-apt">23</div><div class="mock-cal-day">24</div><div class="mock-cal-day">25</div><div class="mock-cal-day today">26</div><div class="mock-cal-day">27</div><div class="mock-cal-day has-apt">28</div><div class="mock-cal-day">29</div><div class="mock-cal-day">30</div>
+            </div>
+            <div class="mock-apt-row"><div><div class="apt-name" data-el="apt1_n">Μαρία Κ. — Κούρεμα</div><div class="apt-time">11:00 – 12:00</div></div><div class="apt-badge" data-el="apt1_s">Επιβεβαιωμένο</div></div>
+            <div class="mock-apt-row"><div><div class="apt-name" data-el="apt2_n">Νίκος Π. — Gel νύχια</div><div class="apt-time">14:30 – 15:45</div></div><div class="apt-badge pending" data-el="apt2_s">Αναμονή</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="spotlight spotlight-dark">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 reveal">
+        <div class="section-label" style="color:var(--gold)"><span data-el="s3_label">Online Παρουσία</span></div>
+        <h2 data-el="s3_h">Το site σου,<br>έτοιμο σε λεπτά</h2>
+        <p data-el="s3_p">Κάθε επαγγελματίας αποκτά δημόσια σελίδα με πλήρες branding — λογότυπο, χρώματα, περιγραφή, υπηρεσίες και widget κρατήσεων. Χωρίς developer, χωρίς hosting.</p>
+        <ul class="feat-list">
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s3_f1">Custom λογότυπο και εικόνες προφίλ</span></li>
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s3_f2">Λίστα υπηρεσιών με τιμές και διάρκεια</span></li>
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s3_f3">Booking widget ενσωματωμένο στη σελίδα</span></li>
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s3_f4">Εμφανίζεσαι στον κατάλογο Reserva</span></li>
+        </ul>
+      </div>
+      <div class="col-lg-6 reveal reveal-delay-2">
+        <div class="spotlight-visual" style="background:var(--dark2);padding:1.5rem;align-items:flex-start;height:auto">
+          <div class="mock-site" style="width:100%">
+            <div class="mock-site-bar"><div class="mock-site-dot" style="background:#ff5f57"></div><div class="mock-site-dot" style="background:#febc2e"></div><div class="mock-site-dot" style="background:#28c840"></div><div class="mock-site-url">reserva.gr/glam-studio</div></div>
+            <div class="mock-site-hero-band">
+              <div style="width:48px;height:48px;border-radius:14px;background:rgba(201,162,39,.2);border:2px solid rgba(201,162,39,.4);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:var(--gold-light);margin:0 auto .6rem"><i class="fas fa-cut"></i></div>
+              <div class="mock-site-name">Glam Studio</div>
+              <div class="mock-site-tag" data-el="site_cat">Κομμωτήριο · Θεσσαλονίκη</div>
+              <div style="display:flex;gap:4px;justify-content:center;margin-top:.5rem;color:#f5a623;font-size:.75rem"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><span style="color:rgba(255,255,255,.55);margin-left:4px">4.7 (23 κριτικές)</span></div>
+            </div>
+            <div class="mock-site-body">
+              <div style="font-size:.72rem;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem" data-el="site_svc_lbl">Υπηρεσίες</div>
+              <div class="mock-site-svc-row"><span data-el="site_s1">Κούρεμα & Styling</span><span>60λ · 25€</span></div>
+              <div class="mock-site-svc-row"><span data-el="site_s2">Gel νύχια</span><span>75λ · 35€</span></div>
+              <div class="mock-site-svc-row"><span data-el="site_s3">Βαφή</span><span>90λ · 45€</span></div>
+              <button class="mock-site-cta"><i class="fas fa-calendar-plus me-2"></i><span data-el="site_btn_txt">Κλείστε ραντεβού</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="spotlight spotlight-light">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 order-lg-2 reveal">
+        <div class="section-label"><span data-el="s4_label">Αυτοματισμός</span></div>
+        <h2 data-el="s4_h">SMS που δουλεύουν<br>όταν εσύ δεν μπορείς</h2>
+        <p data-el="s4_p">Αυτόματες επιβεβαιώσεις και υπενθυμίσεις 24 ώρες πριν στον πελάτη σου. Μηδέν no-shows, μηδέν χειροκίνητη επικοινωνία.</p>
+        <ul class="feat-list">
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s4_f1">Άμεση επιβεβαίωση μετά την κράτηση</span></li>
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s4_f2">Αυτόματη υπενθύμιση 24 ώρες πριν</span></li>
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s4_f3">SMS ακύρωσης αν χρειαστεί αλλαγή</span></li>
+          <li><div class="feat-list-icon"><i class="fas fa-check"></i></div><span data-el="s4_f4">Branded από το όνομα της επιχείρησής σου</span></li>
+        </ul>
+      </div>
+      <div class="col-lg-6 order-lg-1 reveal reveal-delay-2">
+        <div class="spotlight-visual spotlight-visual-light" style="padding:1.5rem">
+          <div class="mock-sms" style="width:100%;max-width:100%">
+            <div style="text-align:center;margin-bottom:1rem"><div style="display:inline-flex;align-items:center;gap:6px;background:#e8e8f0;border-radius:20px;padding:4px 12px;font-size:.72rem;color:#555;font-weight:600"><i class="fas fa-mobile-screen-button" style="color:#007aff"></i><span data-el="sms_header">Glam Studio</span></div></div>
+            <div class="mock-sms-time" data-el="sms_t1">Σήμερα, 11:32</div>
+            <div class="mock-sms-bubble incoming"><span data-el="sms1">✅ Επιβεβαίωση κράτησης — Κούρεμα & Styling, Τρ. 29 Απρ στις 11:00. Σας περιμένουμε! — Glam Studio</span></div>
+            <div class="mock-sms-time" data-el="sms_t2">Τρ. 28 Απρ, 11:00</div>
+            <div class="mock-sms-bubble incoming"><span data-el="sms2">⏰ Υπενθύμιση — Αύριο στις 11:00 έχετε ραντεβού στο Glam Studio. Τσιμισκή 55, Θεσσαλονίκη.</span></div>
+            <div class="mock-sms-bubble" style="background:#34c759"><span data-el="sms3">OK, ευχαριστώ! Θα είμαι εκεί 👍</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="cta-section">
+  <div class="container position-relative" style="z-index:1">
+    <div class="reveal">
+      <h2><span data-el="cta_h1">Έτοιμος να αναβαθμίσεις</span><br><span data-el="cta_h2">την επιχείρησή σου;</span></h2>
+      <p data-el="cta_sub">Εγγραφή σε λιγότερο από 2 λεπτά. Χωρίς πιστωτική κάρτα.</p>
+      <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <a href="{% url 'accounts:register_professional' %}" class="btn-gold"><i class="fas fa-rocket me-2"></i><span data-el="cta_btn1_txt">Ξεκίνα δωρεάν σήμερα</span></a>
+        <a href="{% url 'landing' %}" class="btn-ghost"><span data-el="cta_btn2_txt">Πίσω στην αρχική</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <a class="footer-brand" href="{% url 'landing' %}"><img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva" onerror="this.style.display='none'">Reserva</a>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.3)" data-el="footer_copy">© 2026 Reserva. All rights reserved.</div>
+      </div>
+      <ul class="footer-links">
+        <li><a href="{% url 'landing' %}" data-el="fl_home">Αρχική</a></li>
+        <li><a href="{% url 'features' %}" data-el="fl_feat">Features</a></li>
+        <li><a href="{% url 'business_browser' %}" data-el="fl_biz">Businesses</a></li>
+        <li><a href="{% url 'accounts:register_professional' %}" data-el="fl_pro">Για επαγγελματίες</a></li>
+        <li><a href="{% url 'privacy' %}" data-el="fl_priv">Απόρρητο</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const T = {
+  el: {
+    nav_home:'Αρχική', nav_partners:'Partners', nav_businesses:'Businesses', nav_features:'Features', nav_login:'Σύνδεση', nav_pro_cta:'Είστε επαγγελματίας;',
+    hero_pill:'Δυνατότητες πλατφόρμας', hero_h1:'Όλα σε ένα.<br>Μηδέν κόπος.', hero_sub:'Κρατήσεις, website, widget, ημερολόγιο και SMS —<br class="d-none d-md-block"> σχεδιασμένα για επαγγελματίες που θέλουν να εστιάζουν στη δουλειά τους.', hero_cta1_txt:'Δες πώς λειτουργεί', hero_cta2_txt:'Ξεκίνησε δωρεάν',
+    grid_label:'Δυνατότητες', grid_h:'Ό,τι χρειάζεται η επιχείρησή σου',
+    fc1_h:'Instant Booking', fc1_p:'Κλείσιμο ραντεβού σε 30 δευτερόλεπτα. Real-time διαθεσιμότητα, χωρίς τηλεφώνημα, χωρίς αναμονή.', fc1_t:'Πελάτες & Επαγγελματίες',
+    fc2_h:'Smart Calendar', fc2_p:'Προβολή ημερολογίου ή λίστας, overdue reminders, και πλήρεις actions πάνω σε κάθε ραντεβού.', fc2_t:'Business Panel',
+    fc3_h:'Branded Website', fc3_p:'Έτοιμη δημόσια σελίδα με λογότυπο, κείμενα, φωτογραφίες και ενσωματωμένο widget κρατήσεων.', fc3_t:'Online Παρουσία',
+    fc4_h:'Widget Embed', fc4_p:'Ένα snippet κώδικα για να ενσωματώσεις το booking widget σε οποιαδήποτε υπάρχουσα ιστοσελίδα.', fc4_t:'Ενσωμάτωση',
+    fc5_h:'SMS & Reminders', fc5_p:'Αυτόματες επιβεβαιώσεις και υπενθυμίσεις 24 ώρες πριν — μηδέν no-shows, μηδέν manual δουλειά.', fc5_t:'Αυτοματισμός',
+    fc6_h:'Ασφαλείς Πληρωμές', fc6_p:'Προκαταβολές και online πληρωμές με κρυπτογραφημένη σύνδεση. Τα χρήματά σου, ασφαλή.', fc6_t:'Πληρωμές',
+    fc7_h:'Approval Flow', fc7_p:'Επέλεξε αν τα ραντεβού επιβεβαιώνονται αυτόματα ή χρειάζονται έγκρισή σου πρώτα.', fc7_t:'Ευελιξία',
+    fc8_h:'Widget Themes', fc8_p:'Classic Gold ή Site-Match. Το widget σου ταιριάζει απόλυτα με τα χρώματα της επιχείρησής σου.', fc8_t:'Branding',
+    fc9_h:'Mobile-First', fc9_p:'Από τον πελάτη ως τον επαγγελματία — η εμπειρία είναι γρήγορη, καθαρή και φιλική σε κινητά.', fc9_t:'UX & Design',
+    stat1:'Μέσος χρόνος κράτησης', stat2:'Τηλεφωνήματα απαιτούνται', stat3:'Online διαθεσιμότητα', stat4:'Mobile-friendly',
+    s1_label:'Κράτηση', s1_h:'Το widget που<br>κάνει πωλήσεις για σένα', s1_p:'Ένα κουμπί κράτησης στο site σου ή στη σελίδα Reserva μετατρέπει επισκέπτες σε επιβεβαιωμένα ραντεβού — αυτόματα, σε κάθε ώρα.', s1_f1:'Real-time διαθεσιμότητα χωρίς ανανέωση', s1_f2:'Επιλογή υπηρεσίας, ώρας και εργαζομένου', s1_f3:'Embed με ένα snippet — λειτουργεί παντού', s1_f4:'Classic Gold ή Site-Match theme',
+    w_svc:'Επιλογή υπηρεσίας', w_s1:'Κούρεμα & Styling', w_s2:'Βαφή', w_time:'Διαθέσιμες ώρες — Τρ. 29 Απρ', w_btn_txt:'Επιβεβαίωση κράτησης',
+    s2_label:'Ημερολόγιο', s2_h:'Πλήρης εικόνα<br>της μέρας σου', s2_p:'Calendar ή list view — δες, διαχειρίσου και ενέργησε πάνω σε κάθε ραντεβού από έναν ενιαίο πίνακα. Overdue reminders ώστε τίποτα να μην ξεχαστεί.', s2_f1:'Εναλλαγή calendar / λίστα με ένα κλικ', s2_f2:'Άμεσες ενέργειες: επιβεβαίωση, ακύρωση, σημειώσεις', s2_f3:'Overdue reminders για ανεκπλήρωτα ραντεβού', s2_f4:'Multi-staff υποστήριξη',
+    cal_month:'Απρίλιος 2026', cal_list:'Λίστα', cal_cal:'Ημερολόγιο', cal_d:'Δ', cal_t:'Τ', cal_te:'Τ', cal_p:'Π', cal_pa:'Π', cal_s:'Σ', cal_k:'Κ', apt1_n:'Μαρία Κ. — Κούρεμα', apt1_s:'Επιβεβαιωμένο', apt2_n:'Νίκος Π. — Gel νύχια', apt2_s:'Αναμονή',
+    s3_label:'Online Παρουσία', s3_h:'Το site σου,<br>έτοιμο σε λεπτά', s3_p:'Κάθε επαγγελματίας αποκτά δημόσια σελίδα με πλήρες branding — λογότυπο, χρώματα, περιγραφή, υπηρεσίες και widget κρατήσεων. Χωρίς developer, χωρίς hosting.', s3_f1:'Custom λογότυπο και εικόνες προφίλ', s3_f2:'Λίστα υπηρεσιών με τιμές και διάρκεια', s3_f3:'Booking widget ενσωματωμένο στη σελίδα', s3_f4:'Εμφανίζεσαι στον κατάλογο Reserva', site_cat:'Κομμωτήριο · Θεσσαλονίκη', site_svc_lbl:'Υπηρεσίες', site_s1:'Κούρεμα & Styling', site_s2:'Gel νύχια', site_s3:'Βαφή', site_btn_txt:'Κλείστε ραντεβού',
+    s4_label:'Αυτοματισμός', s4_h:'SMS που δουλεύουν<br>όταν εσύ δεν μπορείς', s4_p:'Αυτόματες επιβεβαιώσεις και υπενθυμίσεις 24 ώρες πριν στον πελάτη σου. Μηδέν no-shows, μηδέν χειροκίνητη επικοινωνία.', s4_f1:'Άμεση επιβεβαίωση μετά την κράτηση', s4_f2:'Αυτόματη υπενθύμιση 24 ώρες πριν', s4_f3:'SMS ακύρωσης αν χρειαστεί αλλαγή', s4_f4:'Branded από το όνομα της επιχείρησής σου', sms_header:'Glam Studio', sms_t1:'Σήμερα, 11:32', sms1:'✅ Επιβεβαίωση κράτησης — Κούρεμα & Styling, Τρ. 29 Απρ στις 11:00. Σας περιμένουμε! — Glam Studio', sms_t2:'Τρ. 28 Απρ, 11:00', sms2:'⏰ Υπενθύμιση — Αύριο στις 11:00 έχετε ραντεβού στο Glam Studio. Τσιμισκή 55, Θεσσαλονίκη.', sms3:'OK, ευχαριστώ! Θα είμαι εκεί 👍',
+    s5_label:'Πληρωμές & Αξιολογήσεις', s5_h:'Πληρώσου ομαλά.<br>Χτίσε φήμη.', s5_p:'Ασφαλείς online πληρωμές με προκαταβολή και επαληθευμένες κριτικές πελατών που ενισχύουν την εμπιστοσύνη.', s5_f1:'Κρυπτογραφημένες συναλλαγές', s5_f2:'Επιλογή προκαταβολής ανά υπηρεσία', s5_f3:'Επαληθευμένες κριτικές — μόνο από πραγματικούς πελάτες', s5_f4:'Dashboard με ιστορικό πληρωμών', pay_title:'Ασφαλής πληρωμή', pay_svc:'Κούρεμα & Styling', pay_pre:'Προκαταβολή (30%)', pay_rem:'Υπόλοιπο επί τόπου', pay_tot:'Σύνολο σήμερα', pay_btn:'Πληρωμή με κάρτα', rev1:'"Εξαιρετική εξυπηρέτηση, το σύστημα κράτησης είναι πανεύκολο!"', rev1_n:'— Μαρία Κ.', rev1_b:'Επαληθευμένη', rev2:'"Τέλεια εμπειρία. Δεν ξαναπαίρνω τηλέφωνο!"', rev2_n:'— Νίκος Π.', rev2_b:'Επαληθευμένη',
+    price_label:'Τιμολόγηση', price_h:'Ξεκίνα δωρεάν.<br>Μεγάλωσε μαζί μας.', price_p:'Η πλατφόρμα Reserva είναι προσβάσιμη για κάθε επαγγελματία. Χωρίς κρυφές χρεώσεις, χωρίς δεσμεύσεις.', price_cta_txt:'Δες τα πλάνα', pp_label:'Pro Plan', pp_period:'/μήνα για έναρξη', pp_f1:'Δωρεάν branded σελίδα', pp_f2:'Booking widget embed', pp_f3:'SMS επιβεβαιώσεις & reminders', pp_f4:'Calendar & Business Panel', pp_f5:'Ασφαλείς πληρωμές', pp_cta_txt:'Εγγραφή τώρα — Δωρεάν',
+    cta_h1:'Έτοιμος να αναβαθμίσεις', cta_h2:'την επιχείρησή σου;', cta_sub:'Εγγραφή σε λιγότερο από 2 λεπτά. Χωρίς πιστωτική κάρτα.', cta_btn1_txt:'Ξεκίνα δωρεάν σήμερα', cta_btn2_txt:'Πίσω στην αρχική',
+    footer_copy:'© 2026 Reserva. All rights reserved.', fl_home:'Αρχική', fl_feat:'Features', fl_biz:'Businesses', fl_pro:'Για επαγγελματίες', fl_priv:'Απόρρητο'
+  },
+  en: {
+    nav_home:'Home', nav_partners:'Partners', nav_businesses:'Businesses', nav_features:'Features', nav_login:'Login', nav_pro_cta:'Are you a professional?',
+    hero_pill:'Platform Features', hero_h1:'All in one.<br>Zero friction.', hero_sub:'Bookings, website, widget, calendar and SMS —<br class="d-none d-md-block"> built for professionals who want to focus on their work.', hero_cta1_txt:'See how it works', hero_cta2_txt:'Start for free',
+    grid_label:'Features', grid_h:'Everything your business needs',
+    fc1_h:'Instant Booking', fc1_p:'Book an appointment in 30 seconds. Real-time availability, no phone calls, no waiting.', fc1_t:'Customers & Professionals',
+    fc2_h:'Smart Calendar', fc2_p:'Calendar or list view, overdue reminders, and full actions on every appointment.', fc2_t:'Business Panel',
+    fc3_h:'Branded Website', fc3_p:'A ready-made public page with logo, text, photos and an embedded booking widget.', fc3_t:'Online Presence',
+    fc4_h:'Widget Embed', fc4_p:'One code snippet to embed the booking widget on any existing website.', fc4_t:'Integration',
+    fc5_h:'SMS & Reminders', fc5_p:'Automatic confirmations and reminders 24 hours before — zero no-shows, zero manual work.', fc5_t:'Automation',
+    fc6_h:'Secure Payments', fc6_p:'Deposits and online payments with encrypted connection. Your money, safe.', fc6_t:'Payments',
+    fc7_h:'Approval Flow', fc7_p:'Choose whether appointments are confirmed automatically or require your approval first.', fc7_t:'Flexibility',
+    fc8_h:'Widget Themes', fc8_p:'Classic Gold or Site-Match. Your widget perfectly matches your business colors.', fc8_t:'Branding',
+    fc9_h:'Mobile-First', fc9_p:'From customer to professional — the experience is fast, clean and mobile-friendly.', fc9_t:'UX & Design',
+    stat1:'Avg. booking time', stat2:'Phone calls required', stat3:'Online availability', stat4:'Mobile-friendly',
+    s1_label:'Booking', s1_h:'The widget that<br>sells for you', s1_p:'A booking button on your site or Reserva page converts visitors into confirmed appointments — automatically, at any hour.', s1_f1:'Real-time availability with no refresh', s1_f2:'Choose service, time and staff member', s1_f3:'Embed with one snippet — works everywhere', s1_f4:'Classic Gold or Site-Match theme',
+    w_svc:'Select service', w_s1:'Haircut & Styling', w_s2:'Color', w_time:'Available times — Tue Apr 29', w_btn_txt:'Confirm Booking',
+    s2_label:'Calendar', s2_h:'Full picture<br>of your day', s2_p:'Calendar or list view — see, manage and act on every appointment from a single dashboard.', s2_f1:'Switch calendar / list with one click', s2_f2:'Instant actions: confirm, cancel, notes', s2_f3:'Overdue reminders for unfulfilled appointments', s2_f4:'Multi-staff support',
+    cal_month:'April 2026', cal_list:'List', cal_cal:'Calendar', cal_d:'M', cal_t:'T', cal_te:'W', cal_p:'T', cal_pa:'F', cal_s:'S', cal_k:'S', apt1_n:'Maria K. — Haircut', apt1_s:'Confirmed', apt2_n:'Nikos P. — Gel nails', apt2_s:'Pending',
+    s3_label:'Online Presence', s3_h:'Your site,<br>ready in minutes', s3_p:'Every professional gets a public page with full branding — logo, colors, description, services and booking widget. No developer, no hosting.', s3_f1:'Custom logo and profile images', s3_f2:'Service list with prices and duration', s3_f3:'Booking widget embedded in the page', s3_f4:'Listed in the Reserva directory', site_cat:'Hair Salon · Thessaloniki', site_svc_lbl:'Services', site_s1:'Haircut & Styling', site_s2:'Gel Nails', site_s3:'Color', site_btn_txt:'Book Appointment',
+    s4_label:'Automation', s4_h:'SMS that work<br>when you can\'t', s4_p:'Automatic confirmations and reminders 24 hours before your appointment. Zero no-shows, zero manual communication.', s4_f1:'Instant confirmation after booking', s4_f2:'Automatic reminder 24 hours before', s4_f3:'Cancellation SMS if a change is needed', s4_f4:'Branded with your business name', sms_header:'Glam Studio', sms_t1:'Today, 11:32', sms1:'✅ Booking confirmed — Haircut & Styling, Tue Apr 29 at 11:00. See you soon! — Glam Studio', sms_t2:'Mon Apr 28, 11:00', sms2:'⏰ Reminder — Tomorrow at 11:00 you have an appointment at Glam Studio. Tsimiski 55, Thessaloniki.', sms3:'OK, thanks! I\'ll be there 👍',
+    s5_label:'Payments & Reviews', s5_h:'Get paid smoothly.<br>Build reputation.', s5_p:'Secure online payments with deposits and verified customer reviews that build trust.', s5_f1:'Encrypted transactions', s5_f2:'Deposit option per service', s5_f3:'Verified reviews — only from real customers', s5_f4:'Dashboard with payment history', pay_title:'Secure payment', pay_svc:'Haircut & Styling', pay_pre:'Deposit (30%)', pay_rem:'Balance on site', pay_tot:'Total today', pay_btn:'Pay with card', rev1:'"Excellent service, the booking system is so easy!"', rev1_n:'— Maria K.', rev1_b:'Verified', rev2:'"Perfect experience. I\'ll never call again!"', rev2_n:'— Nikos P.', rev2_b:'Verified',
+    price_label:'Pricing', price_h:'Start free.<br>Grow with us.', price_p:'The Reserva platform is accessible to every professional. No hidden fees, no commitments.', price_cta_txt:'See plans', pp_label:'Pro Plan', pp_period:'/month to start', pp_f1:'Free branded page', pp_f2:'Booking widget embed', pp_f3:'SMS confirmations & reminders', pp_f4:'Calendar & Business Panel', pp_f5:'Secure payments', pp_cta_txt:'Sign up now — Free',
+    cta_h1:'Ready to upgrade', cta_h2:'your business?', cta_sub:'Sign up in less than 2 minutes. No credit card required.', cta_btn1_txt:'Start free today', cta_btn2_txt:'Back to homepage',
+    footer_copy:'© 2026 Reserva. All rights reserved.', fl_home:'Home', fl_feat:'Features', fl_biz:'Businesses', fl_pro:'For Professionals', fl_priv:'Privacy'
+  }
+};
+
+let lang = localStorage.getItem('lang') === 'en' ? 'en' : 'el';
+function toggleLang() {
+  lang = lang === 'el' ? 'en' : 'el';
+  localStorage.setItem('lang', lang);
+  applyLang();
+}
+function applyLang() {
+  const d = T[lang];
+  const lbl = document.getElementById('langLabel');
+  if (lbl) lbl.textContent = lang === 'el' ? 'EN' : 'ΕΛ';
+  document.documentElement.lang = lang === 'el' ? 'el' : 'en';
+  document.querySelectorAll('[data-el]').forEach(el => {
+    const k = el.getAttribute('data-el');
+    if (d[k] !== undefined && d[k] !== '') el.innerHTML = d[k];
+  });
+}
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('.landing-navbar');
+  if (!nav) return;
+  nav.style.background = window.scrollY > 60 ? 'rgba(0,0,0,.92)' : 'rgba(0,0,0,.78)';
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyLang();
+  document.querySelectorAll('#landingNav a').forEach(el => {
+    el.addEventListener('click', () => {
+      const collapse = bootstrap.Collapse.getInstance(document.getElementById('landingNav'));
+      if (collapse && window.innerWidth < 992) collapse.hide();
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Αίτημα Διαγραφής Επιχείρησης</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;background-color: #f5f5f5;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5;">
+        <tr>
+            <td align="center" style="padding: 20px;">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color: #dc3545; padding: 30px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Αίτημα Διαγραφής Επιχείρησης</h1>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px 30px;">
+                            <p>Καλώς ήρθατε διαχειριστή,</p>
+                            
+                            <p>Έχει υποβληθεί νέο αίτημα διαγραφής επιχείρησης και απαιτείται η έγκρισή σας.</p>
+                            
+                            <!-- Details Box -->
+                            <div style="background-color: #f0f0f0; padding: 20px; border-radius: 8px; margin: 30px 0;">
+                                <p style="margin: 0 0 15px 0;"><strong>Επιχείρηση:</strong> {{ business.name }}</p>
+                                <p style="margin: 0 0 15px 0;"><strong>Ιδιοκτήτης:</strong> {{ user.get_full_name }}</p>
+                                <p style="margin: 0 0 15px 0;"><strong>Email:</strong> {{ user.email }}</p>
+                                {% if reason %}
+                                    <p style="margin: 0;"><strong>Λόγος:</strong> {{ reason }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <p style="margin: 30px 0;">
+                                <a href="{{ admin_url }}" style="display: inline-block; background-color: #0066cc; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                                    Δείτε το Αίτημα
+                                </a>
+                            </p>
+                            
+                            <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+                            
+                            <p style="font-size: 14px; color: #666;">
+                                Κάντε κλικ στο παραπάνω κουμπί για να αναجριθείτε το αίτημα και να λάβετε ενέργεια.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #ddd;">
+                            <p style="margin: 0;">© 2024 Reserva. Όλα τα δικαιώματα διατηρούνται.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

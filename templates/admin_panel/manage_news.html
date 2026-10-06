@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}Διαχείριση Ειδήσεων — Super Admin{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="fas fa-newspaper me-2"></i>Διαχείριση Ειδήσεων</h3>
+
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card bg-info text-white shadow-sm">
+            <div class="card-body">
+                <h6><i class="fas fa-newspaper me-2"></i>Σύνολο</h6>
+                <h2>{{ stats.total }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white shadow-sm">
+            <div class="card-body">
+                <h6><i class="fas fa-check me-2"></i>Δημοσιευμένες</h6>
+                <h2>{{ stats.published }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark shadow-sm">
+            <div class="card-body">
+                <h6><i class="fas fa-file me-2"></i>Σχέδια</h6>
+                <h2>{{ stats.draft }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white shadow-sm">
+            <div class="card-body">
+                <a href="{% url 'superadmin:create_news' %}" class="btn btn-light btn-sm w-100">
+                    <i class="fas fa-plus me-1"></i>Νέα Ειδήσεις
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" action="">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold mb-1">Αναζήτηση</label>
+                    <input type="text" name="q" class="form-control" placeholder="Ψάξε τίτλο ή περιγραφή..." value="{{ search_q }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold mb-1">Κατάσταση</label>
+                    <select name="status" class="form-select">
+                        <option value="">— Όλες —</option>
+                        <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Σχέδιο</option>
+                        <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Δημοσιευμένες</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100">Αναζήτηση</button>
+                        {% if search_q or status_filter %}
+                        <a href="{% url 'superadmin:manage_news' %}" class="btn btn-outline-secondary">Καθαρισμός</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- News List -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Ειδήσεις ({{ news_list|length }})</h5>
+    </div>
+    <div class="card-body">
+        {% if news_list %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Εικόνα</th>
+                        <th>Τίτλος</th>
+                        <th>Κατάσταση</th>
+                        <th>Δημοσιεύθηκε</th>
+                        <th>Δημιουργός</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for news in news_list %}
+                <tr>
+                    <td>
+                        {% if news.image %}
+                        <img src="{{ news.image.url }}" alt="{{ news.title_gr }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                        {% else %}
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; border-radius: 4px;">
+                            <i class="fas fa-image fa-sm"></i>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div>
+                            <strong>{{ news.title_gr }}</strong>
+                            <br>
+                            <small class="text-muted">{{ news.title_en }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        {% if news.status == 'published' %}
+                        <span class="badge bg-success">Δημοσιευμένη</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">Σχέδιο</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if news.published_at %}
+                        <small>{{ news.published_at|date:"d/m/Y H:i" }}</small>
+                        {% else %}
+                        <small class="text-muted">-</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <small>Reserva.gr Team</small>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'superadmin:edit_news' news.id %}">
+                                        <i class="fas fa-edit me-2"></i>Επεξεργασία
+                                    </a>
+                                </li>
+                                <li>
+                                    <form method="post" action="{% url 'superadmin:toggle_news_status' news.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item" style="border: none; background: none; width: 100%; text-align: left;">
+                                            {% if news.status == 'draft' %}
+                                            <i class="fas fa-paper-plane me-2"></i>Δημοσίευση
+                                            {% else %}
+                                            <i class="fas fa-arrow-left me-2"></i>Σε Σχέδιο
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{% url 'superadmin:delete_news' news.id %}">
+                                        <i class="fas fa-trash me-2"></i>Διaγραφή
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+            <p class="text-muted">
+                {% if search_q or status_filter %}
+                Δεν βρέθηκαν ειδήσεις με τα τρέχοντα φίλτρα.
+                {% else %}
+                Δεν υπάρχουν ειδήσεις ακόμα.
+                {% endif %}
+            </p>
+            <a href="{% url 'superadmin:create_news' %}" class="btn btn-primary mt-2">
+                <i class="fas fa-plus me-1"></i>Δημιουργία Πρώτης Ειδήσεων
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

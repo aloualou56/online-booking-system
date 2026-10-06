@@ -1,0 +1,1090 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reserva - Εγγραφή Επαγγελματία</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --gold:        #c9a227;
+  --gold-light:  #f0c04a;
+  --gold-dark:   #8a6500;
+  --dark:        #0e0d08;
+  --dark2:       #1a180e;
+  --dark-border: rgba(201,162,39,.18);
+}
+
+*,*::before,*::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--dark);
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: #fff;
+}
+
+.bg-glow {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,162,39,.13) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 80% 80%, rgba(201,162,39,.05) 0%, transparent 50%);
+}
+
+.reg-navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(14,13,8,.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--dark-border);
+  padding: .75rem 0;
+}
+.logo-brand {
+  font-size: 1.35rem; font-weight: 900; letter-spacing: -.5px;
+  color: var(--gold-light); text-decoration: none;
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-brand img {
+  width: 32px; height: 32px; object-fit: contain; border-radius: 7px;
+  clip-path: inset(18% round 7px);
+}
+.login-link {
+  font-size: .85rem; color: rgba(255,255,255,.5);
+  text-decoration: none; transition: color .2s;
+}
+.login-link span { color: var(--gold-light); font-weight: 600; }
+.login-link:hover span { color: #fff; }
+
+.reg-wrap {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 1100px) {
+  .reg-wrap {
+    display: block;
+    min-height: auto;
+  }
+  .reg-side {
+    display: none !important;
+    position: static;
+    height: auto;
+  }
+  .reg-form-col {
+    max-width: 760px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+.reg-side {
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; padding: 6rem 3rem 3rem 5rem;
+  background: linear-gradient(160deg, #0e0d08 0%, #1a1600 60%, #0e0d08 100%);
+  border-right: 1px solid var(--dark-border);
+  overflow: hidden;
+}
+.reg-side::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 30% 40%, rgba(201,162,39,.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.side-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(201,162,39,.1); border: 1px solid rgba(201,162,39,.25);
+  color: var(--gold-light); font-size: .72rem; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; padding: 5px 14px; border-radius: 50px;
+  margin-bottom: 2rem; width: fit-content;
+}
+.side-heading {
+  font-size: clamp(1.8rem, 3vw, 2.8rem); font-weight: 900; letter-spacing: -1.5px;
+  line-height: 1.1; margin-bottom: 1.25rem;
+  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 50%, #fffbe0 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.side-sub {
+  font-size: .95rem; color: rgba(255,255,255,.45); line-height: 1.7;
+  max-width: 380px; margin-bottom: 2.5rem;
+}
+.side-perks { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .85rem; }
+.side-perks li {
+  display: flex; align-items: center; gap: 12px;
+  font-size: .88rem; color: rgba(255,255,255,.65);
+}
+.perk-icon {
+  width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(201,162,39,.15), rgba(201,162,39,.08));
+  border: 1px solid rgba(201,162,39,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; color: var(--gold);
+}
+
+.reg-form-col {
+  padding: 7rem 5rem 4rem;
+  display: flex; flex-direction: column; justify-content: flex-start;
+  background: var(--dark);
+}
+@media (max-width: 1200px) { .reg-form-col { padding: 7rem 3rem 4rem; } }
+@media (max-width: 900px) {
+  .reg-form-col {
+    padding: 6rem 1.5rem 3rem;
+    max-width: 560px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+.stepper {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 2.5rem;
+}
+.step-item {
+  display: flex; align-items: center; gap: 10px; flex: 1;
+}
+.step-item:last-child { flex: 0; }
+.step-dot {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .78rem; font-weight: 700;
+  transition: all .3s;
+  position: relative; z-index: 1;
+}
+.step-dot.done {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: #0e0d08;
+  box-shadow: 0 0 0 4px rgba(201,162,39,.15);
+}
+.step-dot.active {
+  background: rgba(201,162,39,.15);
+  border: 2px solid var(--gold);
+  color: var(--gold-light);
+  box-shadow: 0 0 0 4px rgba(201,162,39,.1);
+}
+.step-dot.idle {
+  background: rgba(255,255,255,.04);
+  border: 2px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.25);
+}
+.step-label {
+  font-size: .72rem; font-weight: 600; white-space: nowrap;
+  transition: color .3s;
+}
+.step-item.s-done .step-label { color: var(--gold); }
+.step-item.s-active .step-label { color: var(--gold-light); }
+.step-item.s-idle .step-label { color: rgba(255,255,255,.2); }
+.step-line {
+  flex: 1; height: 1px; margin: 0 8px;
+  background: rgba(255,255,255,.08);
+  transition: background .3s;
+}
+.step-line.done { background: linear-gradient(90deg, var(--gold-dark), var(--gold)); }
+
+.form-heading { font-size: 1.6rem; font-weight: 900; letter-spacing: -.7px; color: #fff; margin-bottom: .4rem; }
+.form-subheading { font-size: .88rem; color: rgba(255,255,255,.4); margin-bottom: 2rem; line-height: 1.5; }
+
+.step-panel { display: none; }
+.step-panel.active { display: block; animation: fadeUp .35s ease both; }
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .75rem;
+  margin-bottom: 1.75rem;
+}
+@media (max-width: 500px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.cat-card {
+  background: rgba(255,255,255,.03);
+  border: 1.5px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 1.1rem .85rem;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex; flex-direction: column; align-items: center; gap: .55rem;
+  text-align: center; user-select: none;
+}
+.cat-card:hover {
+  background: rgba(201,162,39,.07);
+  border-color: rgba(201,162,39,.3);
+}
+.cat-card.selected {
+  background: rgba(201,162,39,.1);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,162,39,.12);
+}
+.cat-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: rgba(201,162,39,.08);
+  border: 1px solid rgba(201,162,39,.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; color: var(--gold);
+  transition: all .2s;
+}
+.cat-card.selected .cat-icon {
+  background: linear-gradient(135deg, rgba(138,101,0,.5), rgba(240,192,74,.2));
+  border-color: var(--gold);
+}
+.cat-name { font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.55); line-height: 1.3; transition: color .2s; }
+.cat-card.selected .cat-name,
+.cat-card:hover .cat-name { color: var(--gold-light); }
+
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 500px) { .form-row-2 { grid-template-columns: 1fr; } }
+
+.field-group { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1rem; }
+.field-label {
+  font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.5); letter-spacing: .2px;
+}
+.field-label span { color: var(--gold); }
+
+.field-wrap { position: relative; }
+.field-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: rgba(255,255,255,.2); font-size: .85rem; pointer-events: none;
+  transition: color .2s;
+}
+.field-wrap:focus-within .field-icon { color: var(--gold); }
+
+.form-control-dark {
+  width: 100%;
+  background: rgba(255,255,255,.04);
+  border: 1.5px solid rgba(255,255,255,.09);
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: .88rem;
+  padding: .7rem 1rem .7rem 2.6rem;
+  outline: none;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+  -webkit-appearance: none;
+}
+.form-control-dark::placeholder { color: rgba(255,255,255,.2); }
+.form-control-dark:focus {
+  border-color: var(--gold);
+  background: rgba(201,162,39,.05);
+  box-shadow: 0 0 0 3px rgba(201,162,39,.1);
+}
+.form-control-dark.no-icon { padding-left: 1rem; }
+
+select.form-control-dark { cursor: pointer; }
+select.form-control-dark option { background: #1a180e; color: #fff; }
+
+.phone-wrap { display: flex; gap: .5rem; }
+.phone-prefix {
+  background: rgba(255,255,255,.06);
+  border: 1.5px solid rgba(255,255,255,.12);
+  border-radius: 10px;
+  color: #fff;
+  font-size: .82rem; font-family: 'Inter', sans-serif; font-weight: 600;
+  padding: .7rem .5rem;
+  width: 84px; flex-shrink: 0; text-align: center;
+  outline: none;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+  -webkit-appearance: none; cursor: pointer;
+  color-scheme: dark;
+}
+.phone-prefix option {
+  background: #1a180e;
+  color: #fff;
+}
+.phone-prefix:focus {
+  border-color: var(--gold);
+  background: rgba(201,162,39,.08);
+  box-shadow: 0 0 0 3px rgba(201,162,39,.1);
+}
+
+.pw-strength { display: flex; gap: 4px; margin-top: .5rem; height: 3px; }
+.pw-bar { flex: 1; border-radius: 2px; background: rgba(255,255,255,.08); transition: background .3s; }
+.pw-bar.weak { background: #e53e3e; }
+.pw-bar.fair { background: #ed8936; }
+.pw-bar.good { background: var(--gold); }
+.pw-bar.strong { background: #48bb78; }
+.pw-hint { font-size: .72rem; color: rgba(255,255,255,.3); margin-top: .3rem; }
+
+.pw-toggle {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  color: rgba(255,255,255,.2); cursor: pointer; font-size: .85rem;
+  transition: color .2s; border: none; background: none; padding: 0;
+}
+.pw-toggle:hover { color: var(--gold); }
+
+.check-label {
+  display: flex; align-items: flex-start; gap: 10px;
+  cursor: pointer; font-size: .82rem; color: rgba(255,255,255,.45);
+  line-height: 1.5;
+}
+.check-label input { display: none; }
+.check-box {
+  width: 18px; height: 18px; border-radius: 5px; flex-shrink: 0; margin-top: 1px;
+  border: 1.5px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.04);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .6rem; color: transparent;
+  transition: all .2s;
+}
+.check-label input:checked ~ .check-box {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  border-color: var(--gold);
+  color: #0e0d08;
+}
+.check-label a { color: var(--gold-light); text-decoration: none; }
+.check-label a:hover { text-decoration: underline; }
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 60%, var(--gold-light) 100%);
+  color: #0e0d08; font-weight: 800; font-size: .92rem;
+  padding: .85rem 1.5rem; border-radius: 12px; border: none;
+  width: 100%; cursor: pointer; letter-spacing: .2px;
+  transition: opacity .2s, transform .2s, box-shadow .2s;
+  position: relative; overflow: hidden;
+  box-shadow: 0 4px 24px rgba(201,162,39,.25);
+}
+.btn-gold:hover { opacity: .92; transform: translateY(-1px); box-shadow: 0 8px 32px rgba(201,162,39,.35); }
+.btn-gold:active { transform: translateY(0); }
+.btn-ghost {
+  background: rgba(255,255,255,.05);
+  border: 1.5px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.55); font-weight: 600; font-size: .88rem;
+  padding: .8rem 1.5rem; border-radius: 12px;
+  width: 100%; cursor: pointer;
+  transition: all .2s;
+}
+.btn-ghost:hover { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.2); }
+
+.btn-row { display: flex; gap: .75rem; }
+.btn-row .btn-ghost { flex: 0 0 auto; width: auto; padding: .8rem 1.4rem; }
+.btn-row .btn-gold { flex: 1; }
+
+.success-screen {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 1rem 0 2rem;
+}
+.success-ring {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(201,162,39,.15), rgba(201,162,39,.05));
+  border: 2px solid rgba(201,162,39,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; color: var(--gold-light);
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 0 12px rgba(201,162,39,.06), 0 0 40px rgba(201,162,39,.15);
+}
+.success-title { font-size: 1.7rem; font-weight: 900; letter-spacing: -.7px; margin-bottom: .5rem; color: #fff; }
+.success-sub { font-size: .88rem; color: rgba(255,255,255,.4); line-height: 1.7; max-width: 340px; margin-bottom: 2rem; }
+.success-card {
+  background: rgba(201,162,39,.06); border: 1px solid rgba(201,162,39,.2);
+  border-radius: 14px; padding: 1rem 1.25rem; width: 100%;
+  display: flex; flex-direction: column; gap: .5rem;
+  margin-bottom: 1.75rem;
+}
+.sc-row { display: flex; align-items: center; gap: 10px; font-size: .82rem; color: rgba(255,255,255,.55); }
+.sc-row i { color: var(--gold); width: 14px; }
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .8rem; color: rgba(255,255,255,.3);
+  text-decoration: none; margin-bottom: 2rem;
+  transition: color .2s;
+}
+.back-link:hover { color: var(--gold-light); }
+
+.plan-notice {
+  background: rgba(201,162,39,.07);
+  border: 1px solid rgba(201,162,39,.18);
+  border-radius: 10px; padding: .75rem 1rem;
+  display: flex; gap: 10px; align-items: flex-start;
+  font-size: .78rem; color: rgba(255,255,255,.4); line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+.plan-notice i { color: var(--gold); margin-top: 1px; flex-shrink: 0; }
+
+.custom-cat-wrap {
+  background: rgba(201,162,39,.06);
+  border: 1px solid rgba(201,162,39,.2);
+  border-radius: 12px;
+  padding: .9rem;
+  margin: -.25rem 0 1.25rem;
+}
+
+.auth-alert {
+  border-radius: 10px; padding: 12px 15px; font-size: .87rem;
+  margin-bottom: 20px; display: flex; gap: 10px; align-items: flex-start;
+}
+.auth-alert-error {
+  background: rgba(248,113,113,.1);
+  border: 1px solid rgba(248,113,113,.3);
+  color: #fca5a5;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  .reg-navbar { padding: .55rem 0; }
+  .reg-navbar .container-fluid {
+    padding-left: .85rem !important;
+    padding-right: .85rem !important;
+    gap: .5rem;
+  }
+  .logo-brand { font-size: 1.05rem; gap: 8px; }
+  .logo-brand img { width: 28px; height: 28px; }
+  .login-link { font-size: .74rem; white-space: nowrap; }
+  .login-link .login-prefix { display: none; }
+
+  .reg-form-col {
+    padding: calc(5rem + env(safe-area-inset-top)) 1rem calc(2rem + env(safe-area-inset-bottom));
+  }
+  .back-link { margin-bottom: 1.2rem; }
+
+  .stepper { margin-bottom: 1.4rem; }
+  .step-item { justify-content: center; }
+  .step-dot { width: 28px; height: 28px; font-size: .75rem; }
+
+  .form-heading { font-size: 1.35rem; }
+  .step-label { display: none; }
+  .step-line { margin: 0 2px; }
+
+  .cat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .6rem;
+  }
+  .cat-card { padding: .85rem .5rem; }
+  .cat-name { font-size: .72rem; }
+  .cat-icon { width: 36px; height: 36px; }
+
+  .phone-wrap { flex-direction: column; }
+  .phone-prefix {
+    width: 100%;
+    text-align: left;
+    padding-left: .9rem;
+  }
+
+  .btn-row { gap: .5rem; }
+  .btn-row .btn-ghost {
+    width: 48px;
+    padding: .75rem 0;
+  }
+  .btn-row .btn-gold { min-height: 44px; }
+
+  .check-label { font-size: .78rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<nav class="reg-navbar">
+  <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+    <a href="{% url 'landing' %}" class="logo-brand">
+      <img src="{% static 'img/logo.png' %}" alt="Reserva">
+      reserva
+    </a>
+    <a href="{% url 'accounts:login' %}" class="login-link"><span class="login-prefix">Έχετε ήδη λογαριασμό;</span> <span>Σύνδεση</span></a>
+  </div>
+</nav>
+
+<div class="reg-wrap">
+  <aside class="reg-side">
+    <div style="position:relative; z-index:1;">
+      <div class="side-pill"><i class="fa-solid fa-bolt" style="font-size:.65rem;"></i> Ξεκινήστε Δωρεάν</div>
+      <h2 class="side-heading">Αναπτύξτε την επιχείρησή σας με το Reserva</h2>
+      <p class="side-sub">Διαχειριστείτε ραντεβού, πελάτες και πληρωμές από ένα ισχυρό dashboard. Ξεκινήστε δωρεάν — ο πρώτος μήνας χωρίς χρέωση.</p>
+
+      <ul class="side-perks">
+        <li><div class="perk-icon"><i class="fa-solid fa-calendar-check"></i></div>Online κράτηση 24/7 - χωρίς τηλεφωνήματα</li>
+        <li><div class="perk-icon"><i class="fa-solid fa-bell"></i></div>Αυτόματες υπενθυμίσεις SMS & email</li>
+        <li><div class="perk-icon"><i class="fa-solid fa-chart-line"></i></div>Στατιστικά & αναφορές σε πραγματικό χρόνο</li>
+        <li><div class="perk-icon"><i class="fa-solid fa-credit-card"></i></div>Ολοκληρωμένη διαχείριση πληρωμών</li>
+        <li><div class="perk-icon"><i class="fa-solid fa-users"></i></div>Διαχείριση ομάδας & πολλαπλών υπαλλήλων</li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="reg-form-col">
+    <a href="{% url 'landing' %}" class="back-link">
+      <i class="fa-solid fa-arrow-left"></i> Επιστροφή στην αρχική
+    </a>
+
+    {% if errors %}
+    <div class="auth-alert auth-alert-error">
+      <i class="fas fa-exclamation-circle mt-1"></i>
+      <ul class="mb-0 ps-3">
+        {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <form method="post" id="professionalRegistrationForm" novalidate>
+      {% csrf_token %}
+
+      <input type="hidden" name="business_category" id="business-category-input" value="{{ form_data.business_category|default:'' }}">
+      <input type="hidden" name="custom_category_gr" id="custom-category-gr-input" value="{{ form_data.custom_category_gr|default:'' }}">
+      <input type="hidden" name="custom_category_en" id="custom-category-en-input" value="{{ form_data.custom_category_en|default:'' }}">
+      <input type="hidden" name="business_address" id="business-address-input" value="{{ form_data.business_address|default:'' }}">
+      <input type="hidden" name="business_description" id="business-description-input" value="{{ form_data.business_description|default:'' }}">
+      <input type="hidden" name="business_phone" id="business-phone-input" value="{{ form_data.business_phone|default:'' }}">
+
+      <div class="stepper" id="stepper">
+        <div class="step-item s-active" id="si-1">
+          <div class="step-dot active" id="sd-1">1</div>
+          <div class="step-label">Κατηγορία</div>
+        </div>
+        <div class="step-line" id="sl-1"></div>
+        <div class="step-item s-idle" id="si-2">
+          <div class="step-dot idle" id="sd-2">2</div>
+          <div class="step-label">Επιχείρηση</div>
+        </div>
+        <div class="step-line" id="sl-2"></div>
+        <div class="step-item s-idle" id="si-3">
+          <div class="step-dot idle" id="sd-3">3</div>
+          <div class="step-label">Λογαριασμός</div>
+        </div>
+      </div>
+
+      <div class="step-panel active" id="panel-1">
+        <h2 class="form-heading">Τι είδους επιχείρηση έχετε;</h2>
+        <p class="form-subheading">Επιλέξτε κατηγορία για να εξατομικεύσουμε τη ρύθμισή σας.</p>
+
+        <div class="cat-grid">
+          <div class="cat-card" data-cat="beauty" data-backend="beauty" data-custom-gr="" data-custom-en="">
+            <div class="cat-icon"><i class="fa-solid fa-scissors"></i></div>
+            <div class="cat-name">Κομμωτήριο & Beauty</div>
+          </div>
+          <div class="cat-card" data-cat="nails" data-backend="other" data-custom-gr="Νύχια & Αισθητική" data-custom-en="Nails & Aesthetics">
+            <div class="cat-icon"><i class="fa-solid fa-hand-sparkles"></i></div>
+            <div class="cat-name">Νύχια & Αισθητική</div>
+          </div>
+          <div class="cat-card" data-cat="barber" data-backend="other" data-custom-gr="Barbershop" data-custom-en="Barbershop">
+            <div class="cat-icon"><i class="fa-solid fa-user-tie"></i></div>
+            <div class="cat-name">Barbershop</div>
+          </div>
+          <div class="cat-card" data-cat="spa" data-backend="other" data-custom-gr="Spa & Massage" data-custom-en="Spa & Massage">
+            <div class="cat-icon"><i class="fa-solid fa-spa"></i></div>
+            <div class="cat-name">Spa & Massage</div>
+          </div>
+          <div class="cat-card" data-cat="health" data-backend="health" data-custom-gr="" data-custom-en="">
+            <div class="cat-icon"><i class="fa-solid fa-stethoscope"></i></div>
+            <div class="cat-name">Υγεία & Ιατρεία</div>
+          </div>
+          <div class="cat-card" data-cat="fitness" data-backend="fitness" data-custom-gr="" data-custom-en="">
+            <div class="cat-icon"><i class="fa-solid fa-dumbbell"></i></div>
+            <div class="cat-name">Fitness & Γυμναστική</div>
+          </div>
+          <div class="cat-card" data-cat="pet" data-backend="other" data-custom-gr="Pet Grooming" data-custom-en="Pet Grooming">
+            <div class="cat-icon"><i class="fa-solid fa-paw"></i></div>
+            <div class="cat-name">Pet Grooming</div>
+          </div>
+          <div class="cat-card" data-cat="tattoo" data-backend="other" data-custom-gr="Tattoo & Piercing" data-custom-en="Tattoo & Piercing">
+            <div class="cat-icon"><i class="fa-solid fa-pen-fancy"></i></div>
+            <div class="cat-name">Tattoo & Piercing</div>
+          </div>
+          <div class="cat-card" data-cat="other" data-backend="other" data-custom-gr="" data-custom-en="">
+            <div class="cat-icon"><i class="fa-solid fa-ellipsis"></i></div>
+            <div class="cat-name">Άλλο</div>
+          </div>
+        </div>
+
+        <div class="custom-cat-wrap" id="custom-cat-wrap" style="display:none;">
+          <div class="field-group">
+            <label class="field-label">Κατηγορία (Ελληνικά) <span>*</span></label>
+            <input type="text" id="custom-cat-gr-visible" class="form-control-dark no-icon" placeholder="π.χ. Στούντιο φωτογραφίας" value="{{ form_data.custom_category_gr|default:'' }}">
+          </div>
+          <div class="field-group" style="margin-bottom:0;">
+            <label class="field-label">Category (English) <span>*</span></label>
+            <input type="text" id="custom-cat-en-visible" class="form-control-dark no-icon" placeholder="e.g. Photo studio" value="{{ form_data.custom_category_en|default:'' }}">
+          </div>
+        </div>
+
+        <button class="btn-gold" id="next-1" type="button" onclick="goStep(2)" disabled>
+          Συνέχεια <i class="fa-solid fa-arrow-right ms-1" style="font-size:.8rem;"></i>
+        </button>
+      </div>
+
+      <div class="step-panel" id="panel-2">
+        <h2 class="form-heading">Πληροφορίες Επιχείρησης</h2>
+        <p class="form-subheading">Τα στοιχεία που θα βλέπουν οι πελάτες σας.</p>
+
+        <div class="field-group">
+          <label class="field-label">Όνομα Επιχείρησης <span>*</span></label>
+          <div class="field-wrap">
+            <i class="fa-solid fa-store field-icon"></i>
+            <input type="text" class="form-control-dark" id="biz-name" name="business_name" placeholder="π.χ. Maria Beauty Studio" value="{{ form_data.business_name|default:'' }}">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="field-group">
+            <label class="field-label">Πόλη <span>*</span></label>
+            <div class="field-wrap">
+              <i class="fa-solid fa-location-dot field-icon"></i>
+              <input type="text" class="form-control-dark" id="city" placeholder="Αθήνα" value="{{ city_value|default:'' }}">
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Περιοχή</label>
+            <div class="field-wrap">
+              <i class="fa-solid fa-map field-icon"></i>
+              <input type="text" class="form-control-dark" id="area" placeholder="Κολωνάκι" value="{{ area_value|default:'' }}">
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Αριθμός Εργαζομένων</label>
+          <div class="field-wrap">
+            <i class="fa-solid fa-users field-icon"></i>
+            <select class="form-control-dark" id="staff-count">
+              <option value="" selected>Επιλέξτε...</option>
+              <option value="1">Μόνο εγώ</option>
+              <option value="2-5">2-5 άτομα</option>
+              <option value="6-15">6-15 άτομα</option>
+              <option value="16+">16+ άτομα</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Τηλέφωνο Επιχείρησης <span>*</span></label>
+          <div class="phone-wrap">
+            <select class="phone-prefix" id="phone-prefix">
+              <option value="+30">+30</option>
+              <option value="+357">+357</option>
+              <option value="+44">+44</option>
+              <option value="+1">+1</option>
+            </select>
+            <div class="field-wrap" style="flex:1;">
+              <i class="fa-solid fa-phone field-icon"></i>
+              <input type="tel" class="form-control-dark" id="phone" name="phone" placeholder="6930000000" value="{{ form_data.phone|default:'' }}">
+            </div>
+          </div>
+        </div>
+
+        <div class="plan-notice">
+          <i class="fa-solid fa-circle-info"></i>
+          Ξεκινήστε δωρεάν: ο πρώτος μήνας είναι χωρίς χρέωση. Στη συνέχεια η συνδρομή είναι επί πληρωμή και διαμορφώνεται ανάλογα με τις ανάγκες της επιχείρησής σας — <a href="{% url 'contact' %}">επικοινωνήστε μαζί μας</a> για τιμολόγηση.
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-ghost" type="button" onclick="goStep(1)"><i class="fa-solid fa-arrow-left"></i></button>
+          <button class="btn-gold" type="button" onclick="nextFromStep2()">
+            Συνέχεια <i class="fa-solid fa-arrow-right ms-1" style="font-size:.8rem;"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="step-panel" id="panel-3">
+        <h2 class="form-heading">Δημιουργία Λογαριασμού</h2>
+        <p class="form-subheading">Τα στοιχεία σύνδεσής σας στο Reserva.</p>
+
+        <div class="form-row-2">
+          <div class="field-group">
+            <label class="field-label">Όνομα <span>*</span></label>
+            <div class="field-wrap">
+              <i class="fa-solid fa-user field-icon"></i>
+              <input type="text" class="form-control-dark" id="fname" name="first_name" placeholder="Μαρία" value="{{ form_data.first_name|default:'' }}">
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Επώνυμο <span>*</span></label>
+            <div class="field-wrap">
+              <i class="fa-solid fa-user field-icon"></i>
+              <input type="text" class="form-control-dark" id="lname" name="last_name" placeholder="Κωνσταντίνου" value="{{ form_data.last_name|default:'' }}">
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Email <span>*</span></label>
+          <div class="field-wrap">
+            <i class="fa-solid fa-envelope field-icon"></i>
+            <input type="email" class="form-control-dark" id="email" name="email" placeholder="maria@example.gr" value="{{ form_data.email|default:'' }}">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Username <span>*</span></label>
+          <div class="field-wrap">
+            <i class="fa-solid fa-at field-icon"></i>
+            <input type="text" class="form-control-dark" id="username" name="username" placeholder="maria.kon" value="{{ form_data.username|default:'' }}">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="field-group">
+            <label class="field-label">Κωδικός Πρόσβασης <span>*</span></label>
+            <div class="field-wrap">
+              <i class="fa-solid fa-lock field-icon"></i>
+              <input type="password" class="form-control-dark" id="password" name="password" placeholder="Τουλάχιστον 8 χαρακτήρες" oninput="checkPw(this.value)">
+              <button class="pw-toggle" type="button" onclick="togglePw('password', 'pw-eye-icon')">
+                <i class="fa-regular fa-eye" id="pw-eye-icon"></i>
+              </button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Επιβεβαίωση Κωδικού <span>*</span></label>
+            <div class="field-wrap">
+              <i class="fa-solid fa-lock field-icon"></i>
+              <input type="password" class="form-control-dark" id="password2" name="password2" placeholder="Επανάληψη κωδικού">
+              <button class="pw-toggle" type="button" onclick="togglePw('password2', 'pw-eye2-icon')">
+                <i class="fa-regular fa-eye" id="pw-eye2-icon"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pw-strength">
+          <div class="pw-bar" id="pwb1"></div>
+          <div class="pw-bar" id="pwb2"></div>
+          <div class="pw-bar" id="pwb3"></div>
+          <div class="pw-bar" id="pwb4"></div>
+        </div>
+        <div class="pw-hint" id="pw-hint">Χρησιμοποιήστε γράμματα, αριθμούς και σύμβολα</div>
+
+        <div class="field-group" style="margin-top:1rem;">
+          <label class="check-label">
+            <input type="checkbox" id="terms">
+            <div class="check-box"><i class="fa-solid fa-check"></i></div>
+            <span>Αποδέχομαι τους <a href="#">Όρους Χρήσης</a> και την <a href="#">Πολιτική Απορρήτου</a></span>
+          </label>
+        </div>
+
+        <div class="field-group" style="margin-bottom:1.5rem;">
+          <label class="check-label">
+            <input type="checkbox" id="marketing" checked>
+            <div class="check-box"><i class="fa-solid fa-check"></i></div>
+            <span>Θέλω να λαμβάνω tips & νέα από το Reserva</span>
+          </label>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-ghost" type="button" onclick="goStep(2)"><i class="fa-solid fa-arrow-left"></i></button>
+          <button class="btn-gold" type="submit" onclick="return submitForm(event)">
+            <i class="fa-solid fa-rocket me-1" style="font-size:.8rem;"></i> Δημιουργία Λογαριασμού
+          </button>
+        </div>
+      </div>
+
+      <div class="step-panel" id="panel-success">
+        <div class="success-screen">
+          <div class="success-ring"><i class="fa-solid fa-check"></i></div>
+          <h2 class="success-title">Υποβολή Ολοκληρώθηκε</h2>
+          <p class="success-sub">Η αίτησή σας καταχωρήθηκε επιτυχώς. Θα συνεχίσετε στο βήμα επαλήθευσης OTP.</p>
+
+          <div class="success-card">
+            <div class="sc-row"><i class="fa-solid fa-store"></i> <span id="s-bizname">-</span></div>
+            <div class="sc-row"><i class="fa-solid fa-envelope"></i> <span id="s-email">-</span></div>
+            <div class="sc-row"><i class="fa-solid fa-tag"></i> <span id="s-cat">-</span></div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </main>
+</div>
+
+<script>
+let currentStep = 1;
+let selectedCat = null;
+let selectedBackendCategory = null;
+
+const catLabels = {
+  beauty: 'Κομμωτήριο & Beauty',
+  nails: 'Νύχια & Αισθητική',
+  barber: 'Barbershop',
+  spa: 'Spa & Massage',
+  health: 'Υγεία & Ιατρεία',
+  fitness: 'Fitness & Γυμναστική',
+  pet: 'Pet Grooming',
+  tattoo: 'Tattoo & Piercing',
+  other: 'Άλλο'
+};
+
+function setStepOneButtonState() {
+  const btn = document.getElementById('next-1');
+  const customWrapVisible = document.getElementById('custom-cat-wrap').style.display !== 'none';
+  const customGr = document.getElementById('custom-cat-gr-visible').value.trim();
+  const customEn = document.getElementById('custom-cat-en-visible').value.trim();
+  const canProceed = selectedCat && (!customWrapVisible || (customGr && customEn));
+  btn.disabled = !canProceed;
+  btn.style.opacity = canProceed ? '1' : '.4';
+  btn.style.pointerEvents = canProceed ? 'auto' : 'none';
+}
+
+document.querySelectorAll('.cat-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedCat = card.dataset.cat;
+    selectedBackendCategory = card.dataset.backend;
+
+    document.getElementById('business-category-input').value = selectedBackendCategory;
+
+    const customWrap = document.getElementById('custom-cat-wrap');
+    if (selectedCat === 'other') {
+      customWrap.style.display = 'block';
+      document.getElementById('custom-category-gr-input').value = document.getElementById('custom-cat-gr-visible').value.trim();
+      document.getElementById('custom-category-en-input').value = document.getElementById('custom-cat-en-visible').value.trim();
+    } else if (selectedBackendCategory === 'other') {
+      customWrap.style.display = 'none';
+      document.getElementById('custom-category-gr-input').value = card.dataset.customGr || '';
+      document.getElementById('custom-category-en-input').value = card.dataset.customEn || '';
+    } else {
+      customWrap.style.display = 'none';
+      document.getElementById('custom-category-gr-input').value = '';
+      document.getElementById('custom-category-en-input').value = '';
+    }
+
+    setStepOneButtonState();
+  });
+});
+
+document.getElementById('custom-cat-gr-visible').addEventListener('input', function () {
+  document.getElementById('custom-category-gr-input').value = this.value.trim();
+  setStepOneButtonState();
+});
+
+document.getElementById('custom-cat-en-visible').addEventListener('input', function () {
+  document.getElementById('custom-category-en-input').value = this.value.trim();
+  setStepOneButtonState();
+});
+
+function goStep(n) {
+  document.getElementById('panel-' + currentStep)?.classList.remove('active');
+  for (let i = 1; i <= 3; i++) {
+    const si = document.getElementById('si-' + i);
+    const sd = document.getElementById('sd-' + i);
+    if (i < n) {
+      si.className = 'step-item s-done';
+      sd.className = 'step-dot done';
+      sd.innerHTML = '<i class="fa-solid fa-check" style="font-size:.6rem;"></i>';
+    } else if (i === n) {
+      si.className = 'step-item s-active';
+      sd.className = 'step-dot active';
+      sd.textContent = i;
+    } else {
+      si.className = 'step-item s-idle';
+      sd.className = 'step-dot idle';
+      sd.textContent = i;
+    }
+    if (i < 3) {
+      document.getElementById('sl-' + i).className = 'step-line' + (i < n ? ' done' : '');
+    }
+  }
+  currentStep = n;
+  document.getElementById('panel-' + n).classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function normalizePhone(raw) {
+  return (raw || '').replace(/\D/g, '');
+}
+
+function nextFromStep2() {
+  const biz = document.getElementById('biz-name').value.trim();
+  const city = document.getElementById('city').value.trim();
+  const area = document.getElementById('area').value.trim();
+  const staff = document.getElementById('staff-count').value;
+  const phone = normalizePhone(document.getElementById('phone').value);
+
+  if (!biz || !city || phone.length !== 10) {
+    if (!biz) shakeField('biz-name');
+    if (!city) shakeField('city');
+    if (phone.length !== 10) shakeField('phone');
+    return;
+  }
+
+  const address = area ? city + ', ' + area : city;
+  const description = staff ? 'Μέγεθος ομάδας: ' + staff : '';
+  document.getElementById('business-address-input').value = address;
+  document.getElementById('business-description-input').value = description;
+  document.getElementById('business-phone-input').value = phone;
+  document.getElementById('phone').value = phone;
+
+  goStep(3);
+}
+
+function submitForm(event) {
+  const email = document.getElementById('email').value.trim();
+  const pw = document.getElementById('password').value;
+  const pw2 = document.getElementById('password2').value;
+  const fname = document.getElementById('fname').value.trim();
+  const lname = document.getElementById('lname').value.trim();
+  const username = document.getElementById('username').value.trim();
+  const terms = document.getElementById('terms').checked;
+
+  if (!fname || !lname || !email || !username || !pw || !pw2 || !terms) {
+    if (!fname) shakeField('fname');
+    if (!lname) shakeField('lname');
+    if (!email) shakeField('email');
+    if (!username) shakeField('username');
+    if (!pw) shakeField('password');
+    if (!pw2) shakeField('password2');
+    event.preventDefault();
+    return false;
+  }
+
+  if (pw !== pw2) {
+    shakeField('password');
+    shakeField('password2');
+    event.preventDefault();
+    return false;
+  }
+
+  if (document.getElementById('business-phone-input').value.length !== 10) {
+    goStep(2);
+    shakeField('phone');
+    event.preventDefault();
+    return false;
+  }
+
+  document.getElementById('s-bizname').textContent = document.getElementById('biz-name').value || '-';
+  document.getElementById('s-email').textContent = email;
+  document.getElementById('s-cat').textContent = catLabels[selectedCat] || '-';
+
+  return true;
+}
+
+function shakeField(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.borderColor = '#fc8181';
+  el.style.boxShadow = '0 0 0 3px rgba(252,129,129,.15)';
+  el.animate([
+    {transform: 'translateX(0)'},
+    {transform: 'translateX(-5px)'},
+    {transform: 'translateX(5px)'},
+    {transform: 'translateX(-4px)'},
+    {transform: 'translateX(4px)'},
+    {transform: 'translateX(0)'}
+  ], {duration: 300, easing: 'ease'});
+  el.addEventListener('input', () => {
+    el.style.borderColor = '';
+    el.style.boxShadow = '';
+  }, {once: true});
+}
+
+function checkPw(val) {
+  const bars = [document.getElementById('pwb1'), document.getElementById('pwb2'),
+                document.getElementById('pwb3'), document.getElementById('pwb4')];
+  const hint = document.getElementById('pw-hint');
+  bars.forEach(b => { b.className = 'pw-bar'; });
+  if (!val) {
+    hint.textContent = 'Χρησιμοποιήστε γράμματα, αριθμούς και σύμβολα';
+    return;
+  }
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val) || /[a-z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const levels = ['weak', 'fair', 'good', 'strong'];
+  const labels = ['Αδύναμος', 'Μέτριος', 'Καλός', 'Ισχυρός'];
+  for (let i = 0; i < score; i++) bars[i].classList.add(levels[score - 1]);
+  hint.textContent = labels[Math.max(score - 1, 0)];
+}
+
+function togglePw(fieldId, iconId) {
+  const inp = document.getElementById(fieldId);
+  const ico = document.getElementById(iconId);
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    ico.className = 'fa-regular fa-eye-slash';
+  } else {
+    inp.type = 'password';
+    ico.className = 'fa-regular fa-eye';
+  }
+}
+
+function deriveUsernameFromEmail() {
+  const email = document.getElementById('email').value.trim();
+  const usernameInput = document.getElementById('username');
+  if (usernameInput.value.trim()) return;
+  const local = email.split('@')[0] || '';
+  const normalized = local.toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 30);
+  usernameInput.value = normalized;
+}
+
+document.getElementById('email').addEventListener('blur', deriveUsernameFromEmail);
+
+document.getElementById('phone').addEventListener('input', function () {
+  document.getElementById('business-phone-input').value = normalizePhone(this.value);
+});
+
+function restoreCategoryFromServerData() {
+  const backendCategory = document.getElementById('business-category-input').value;
+  const customGr = document.getElementById('custom-category-gr-input').value;
+  const customEn = document.getElementById('custom-category-en-input').value;
+
+  let targetCard = null;
+  if (backendCategory === 'beauty' || backendCategory === 'health' || backendCategory === 'fitness') {
+    targetCard = document.querySelector('.cat-card[data-backend="' + backendCategory + '"]');
+  } else if (backendCategory === 'other' && customGr && customEn) {
+    targetCard = Array.from(document.querySelectorAll('.cat-card[data-backend="other"]')).find(card => {
+      return card.dataset.customGr === customGr && card.dataset.customEn === customEn;
+    });
+    if (!targetCard) {
+      targetCard = document.querySelector('.cat-card[data-cat="other"]');
+      document.getElementById('custom-cat-wrap').style.display = 'block';
+      document.getElementById('custom-cat-gr-visible').value = customGr;
+      document.getElementById('custom-cat-en-visible').value = customEn;
+    }
+  }
+
+  if (targetCard) {
+    targetCard.click();
+  }
+}
+
+function restoreStepTwoFromServerData() {
+  const hiddenAddress = document.getElementById('business-address-input').value || '';
+  if (hiddenAddress) {
+    const parts = hiddenAddress.split(',').map(function (p) { return p.trim(); }).filter(Boolean);
+    if (parts.length > 0 && !document.getElementById('city').value) {
+      document.getElementById('city').value = parts[0];
+    }
+    if (parts.length > 1 && !document.getElementById('area').value) {
+      document.getElementById('area').value = parts.slice(1).join(', ');
+    }
+  }
+
+  const hiddenBusinessPhone = document.getElementById('business-phone-input').value;
+  if (hiddenBusinessPhone && !document.getElementById('phone').value) {
+    document.getElementById('phone').value = hiddenBusinessPhone;
+  }
+}
+
+function restoreInitialStep() {
+  const hasAccountData =
+    document.getElementById('fname').value.trim() ||
+    document.getElementById('lname').value.trim() ||
+    document.getElementById('email').value.trim() ||
+    document.getElementById('username').value.trim();
+
+  const hasBusinessData =
+    document.getElementById('biz-name').value.trim() ||
+    document.getElementById('city').value.trim() ||
+    document.getElementById('phone').value.trim();
+
+  if (hasAccountData) {
+    goStep(3);
+  } else if (hasBusinessData) {
+    goStep(2);
+  }
+}
+
+restoreCategoryFromServerData();
+restoreStepTwoFromServerData();
+restoreInitialStep();
+setStepOneButtonState();
+</script>
+</body>
+</html>

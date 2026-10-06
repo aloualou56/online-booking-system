@@ -1,0 +1,1554 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Businesses - Reserva</title>
+    <meta name="description" content="Browse all Reserva businesses, filter by category, and open each business page in your language.">
+    <link rel="icon" href="/favicon.ico?v=20260404" sizes="any">
+    <link rel="shortcut icon" href="/favicon.ico?v=20260404">
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}?v=20260404">
+    <link rel="apple-touch-icon" href="{% static 'img/logo.png' %}?v=2026">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #c9a227;
+            --gold-light: #f0c04a;
+            --gold-dark: #8a6500;
+            --gold-glow: rgba(201,162,39,.45);
+            --gold-text: #f5e6c0;
+            --dark: #0e0d08;
+            --dark2: #1a180e;
+            --dark-card: #161408;
+            --dark-border: rgba(201,162,39,.15);
+            --dark-border2: rgba(201,162,39,.08);
+            --text-muted: rgba(255,255,255,.42);
+            --text-sub: rgba(255,255,255,.62);
+        }
+
+        *,*::before,*::after { box-sizing: border-box; }
+
+        html {
+            background: var(--dark) !important;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark) !important;
+            color: #fff;
+            min-height: 100vh;
+            min-height: 100svh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--dark2); }
+        ::-webkit-scrollbar-thumb { background: rgba(201,162,39,.3); border-radius: 3px; }
+
+        .dir-hero {
+            padding: 100px 0 36px;
+            background:
+                radial-gradient(ellipse 70% 60% at 50% 0%, rgba(201,162,39,.10) 0%, transparent 60%),
+                var(--dark);
+            border-bottom: 1px solid var(--dark-border);
+            position: relative;
+            z-index: 2;
+        }
+
+        .dir-hero-label {
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .dir-hero h1 {
+            font-size: clamp(1.6rem, 4vw, 2.6rem);
+            font-weight: 900;
+            letter-spacing: -.5px;
+            line-height: 1.1;
+            margin: 0 0 10px;
+        }
+
+        .dir-hero h1 span {
+            background: linear-gradient(90deg, var(--gold-dark), var(--gold-light) 60%, #fff5c0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dir-hero p {
+            color: var(--text-sub);
+            font-size: .92rem;
+            margin: 0;
+        }
+
+        .hero-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px;
+            border-left: 1px solid var(--dark-border);
+        }
+
+        .hero-stat:first-child { border-left: none; }
+
+        .hero-stat strong {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--gold-light);
+            line-height: 1;
+        }
+
+        .hero-stat span {
+            font-size: .72rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .dir-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 0;
+            min-height: calc(100vh - 200px);
+            align-items: start;
+            transition: grid-template-columns .3s ease;
+            background: var(--dark);
+        }
+
+        .dir-layout.sidebar-hidden { grid-template-columns: 0 1fr; }
+
+        .dir-layout.sidebar-hidden .dir-sidebar {
+            width: 0;
+            padding: 0;
+            overflow: hidden;
+            border: none;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @media (max-width: 900px) {
+            .dir-layout,
+            .dir-layout.sidebar-hidden { grid-template-columns: 1fr; }
+
+            .dir-sidebar { display: none; }
+
+            .dir-sidebar.mobile-open {
+                display: block;
+                position: fixed;
+                inset: 0;
+                z-index: 150;
+                overflow-y: auto;
+                padding-top: 72px;
+                background: rgba(14,13,8,.98);
+            }
+        }
+
+        .dir-sidebar {
+            position: sticky;
+            top: 72px;
+            height: calc(100vh - 72px);
+            overflow-y: auto;
+            border-right: 1px solid var(--dark-border2);
+            background: #14120b;
+            padding: 20px 16px 40px;
+            transition: width .3s ease, padding .3s ease, opacity .3s ease;
+            width: 280px;
+        }
+
+        .sidebar-section { margin-bottom: 28px; }
+
+        .sidebar-section-title {
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sidebar-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--dark-border);
+        }
+
+        .search-wrap { position: relative; }
+
+        .search-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: .85rem;
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255,255,255,.05);
+            border: 1px solid var(--dark-border);
+            color: #fff;
+            font-size: .85rem;
+            padding: 9px 12px 9px 34px;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color .2s, background .2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .search-input::placeholder { color: var(--text-muted); }
+
+        .search-input:focus {
+            border-color: rgba(201,162,39,.5);
+            background: rgba(201,162,39,.06);
+        }
+
+        .cat-list { display: flex; flex-direction: column; gap: 3px; }
+
+        .cat-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: background .15s, color .15s;
+            border: none;
+            background: none;
+            color: var(--text-sub);
+            font-size: .84rem;
+            font-weight: 500;
+            text-align: left;
+            width: 100%;
+        }
+
+        .cat-pill:hover { background: rgba(201,162,39,.08); color: #fff; }
+
+        .cat-pill.active { background: rgba(201,162,39,.15); color: var(--gold-light); }
+
+        .cat-pill .cat-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+            flex-shrink: 0;
+            background: rgba(255,255,255,.05);
+        }
+
+        .cat-pill.active .cat-icon { background: rgba(201,162,39,.2); }
+
+        .cat-count {
+            margin-left: auto;
+            font-size: .72rem;
+            color: var(--text-muted);
+            background: rgba(255,255,255,.06);
+            padding: 1px 7px;
+            border-radius: 20px;
+        }
+
+        .cat-pill.active .cat-count {
+            background: rgba(201,162,39,.2);
+            color: var(--gold-light);
+        }
+
+        .filter-select {
+            width: 100%;
+            background: rgba(255,255,255,.05);
+            border: 1px solid var(--dark-border);
+            color: #fff;
+            font-size: .84rem;
+            padding: 9px 12px;
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23c9a227' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            font-family: 'Inter', sans-serif;
+            transition: border-color .2s;
+        }
+
+        .filter-select option { background: #1a180e; }
+
+        .filter-select:focus { border-color: rgba(201,162,39,.5); }
+
+        .rating-btns,
+        .price-btns { display: flex; gap: 6px; }
+
+        .rating-btn,
+        .price-btn {
+            flex: 1;
+            padding: 7px 0;
+            border-radius: 8px;
+            border: 1px solid var(--dark-border);
+            background: none;
+            color: var(--text-sub);
+            font-size: .78rem;
+            cursor: pointer;
+            transition: all .15s;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+
+        .price-btn { font-size: .82rem; font-weight: 600; }
+
+        .rating-btn i { color: #f5a623; font-size: .7rem; }
+
+        .rating-btn:hover,
+        .price-btn:hover {
+            border-color: rgba(201,162,39,.4);
+            color: var(--gold-light);
+        }
+
+        .rating-btn.active,
+        .price-btn.active {
+            background: rgba(201,162,39,.15);
+            border-color: rgba(201,162,39,.5);
+            color: var(--gold-light);
+        }
+
+        .clear-filters-btn {
+            width: 100%;
+            padding: 9px;
+            border-radius: 9px;
+            border: 1px solid var(--dark-border);
+            background: none;
+            color: var(--text-muted);
+            font-size: .78rem;
+            cursor: pointer;
+            transition: all .15s;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .clear-filters-btn:hover { border-color: rgba(201,162,39,.3); color: var(--gold-light); }
+
+        .dir-content {
+            padding: 20px 24px 60px;
+            background: var(--dark);
+            min-height: calc(100vh - 200px);
+        }
+
+        .dir-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .results-count { font-size: .82rem; color: var(--text-muted); }
+
+        .results-count strong { color: var(--gold-light); }
+
+        .sort-select {
+            background: rgba(255,255,255,.05);
+            border: 1px solid var(--dark-border);
+            color: #fff;
+            font-size: .8rem;
+            padding: 6px 30px 6px 10px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23c9a227' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 9px center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sort-select option { background: #1a180e; }
+
+        .sidebar-toggle-tab {
+            position: fixed;
+            top: 50vh;
+            transform: translateY(-50%);
+            left: 280px;
+            z-index: 100;
+            width: 22px;
+            height: 52px;
+            background: #2a2610;
+            border: 1px solid rgba(201,162,39,.35);
+            border-left: none;
+            border-radius: 0 10px 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: left .3s ease, background .15s, border-color .15s, box-shadow .15s;
+            color: var(--gold);
+            box-shadow: 3px 0 12px rgba(0,0,0,.4);
+        }
+
+        .sidebar-toggle-tab:hover {
+            background: #3a3418;
+            border-color: rgba(201,162,39,.7);
+            color: var(--gold-light);
+            box-shadow: 3px 0 16px rgba(201,162,39,.2);
+        }
+
+        @media (max-width: 900px) {
+            .sidebar-toggle-tab { display: none; }
+        }
+
+        .mobile-filter-btn {
+            display: none;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 14px;
+            border-radius: 9px;
+            border: 1px solid var(--dark-border);
+            background: rgba(255,255,255,.05);
+            color: var(--text-sub);
+            font-size: .82rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .15s;
+        }
+
+        .mobile-filter-btn:hover { border-color: rgba(201,162,39,.4); color: var(--gold-light); }
+
+        .mobile-sidebar-top {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            padding: 0 2px;
+        }
+
+        .mobile-sidebar-title {
+            font-size: .8rem;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--text-sub);
+            margin: 0;
+        }
+
+        .mobile-sidebar-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            border: 1px solid var(--dark-border);
+            background: rgba(255,255,255,.05);
+            color: var(--text-sub);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .mobile-sidebar-close:hover {
+            border-color: rgba(201,162,39,.45);
+            color: var(--gold-light);
+        }
+
+        @media (max-width: 900px) {
+            .mobile-filter-btn { display: flex; }
+            .mobile-sidebar-top { display: flex; }
+        }
+
+        .biz-grid { display: flex; flex-direction: column; gap: 10px; }
+
+        .biz-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border2);
+            border-radius: 18px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            transition: border-color .25s, transform .25s, box-shadow .25s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .biz-card:hover {
+            border-color: rgba(201,162,39,.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(201,162,39,.1);
+        }
+
+        @media (max-width: 600px) {
+            .biz-card { grid-template-columns: 90px 1fr; }
+            .dir-content { padding: 14px 14px 40px; }
+            .dir-hero { padding-top: 88px; padding-bottom: 24px; }
+            .hero-stat { padding: 0 10px; }
+        }
+
+        @media (max-width: 900px) {
+            .dir-layout,
+            .dir-content {
+                min-height: auto;
+            }
+
+            .dir-layout {
+                min-height: calc(100svh - 150px);
+                min-height: calc(100dvh - 150px);
+            }
+
+            .dir-content {
+                min-height: calc(100svh - 150px);
+                min-height: calc(100dvh - 150px);
+            }
+        }
+
+        .biz-cover {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e1a0a, #2a2310);
+            min-height: 120px;
+            display: grid;
+            place-items: center;
+        }
+
+        .biz-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .3s;
+        }
+
+        .biz-card:hover .biz-cover img { transform: scale(1.06); }
+
+        .biz-cover-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: rgba(201,162,39,.3);
+        }
+
+        .biz-category-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 6px;
+            backdrop-filter: blur(6px);
+        }
+
+        .biz-body {
+            padding: 20px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .biz-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .biz-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #fff;
+            margin: 0;
+        }
+
+        .biz-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .biz-rating .score { font-size: .88rem; font-weight: 700; color: #f5a623; }
+        .biz-rating .reviews { font-size: .72rem; color: var(--text-muted); }
+        .biz-rating .no-reviews { font-size: .72rem; color: var(--text-muted); white-space: nowrap; }
+
+        .biz-meta {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .biz-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: .77rem;
+            color: var(--text-muted);
+        }
+
+        .biz-meta-item i { font-size: .68rem; color: var(--gold); opacity: .7; }
+
+        .biz-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .biz-avail {
+            font-size: .73rem;
+            color: rgba(74,222,128,.8);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .biz-avail::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: rgba(74,222,128,.8);
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .btn-book {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold) 60%, var(--gold-light));
+            border: none;
+            color: #0e0d08;
+            font-weight: 700;
+            font-size: .78rem;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: box-shadow .2s, transform .15s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+
+        .btn-book:hover { box-shadow: 0 4px 16px var(--gold-glow); transform: translateY(-1px); color: #0e0d08; }
+
+        .badge-beauty { background: rgba(236,72,153,.2); color: #f472b6; }
+        .badge-health { background: rgba(34,197,94,.18); color: #4ade80; }
+        .badge-fitness { background: rgba(59,130,246,.2); color: #60a5fa; }
+        .badge-education { background: rgba(139,92,246,.2); color: #a78bfa; }
+        .badge-legal { background: rgba(245,158,11,.18); color: #fbbf24; }
+        .badge-accounting { background: rgba(16,185,129,.18); color: #34d399; }
+        .badge-auto { background: rgba(6,182,212,.18); color: #22d3ee; }
+        .badge-tech { background: rgba(129,140,248,.22); color: #a5b4fc; }
+        .badge-other { background: rgba(156,163,175,.15); color: #9ca3af; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            color: rgba(201,162,39,.2);
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .empty-state h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+        }
+
+        .featured-tag {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: .62rem;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(201,162,39,.25);
+            color: var(--gold-light);
+            border: 1px solid rgba(201,162,39,.3);
+            backdrop-filter: blur(6px);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.7);
+            z-index: 149;
+            backdrop-filter: blur(4px);
+        }
+
+        .sidebar-overlay.visible { display: block; }
+
+        .active-filters {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .active-filter-tag {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: .73rem;
+            background: rgba(201,162,39,.12);
+            color: var(--gold-light);
+            border: 1px solid rgba(201,162,39,.25);
+        }
+
+        .active-filter-tag button {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0;
+            font-size: .65rem;
+            line-height: 1;
+            opacity: .7;
+            transition: opacity .15s;
+        }
+
+        .active-filter-tag button:hover { opacity: 1; }
+
+        #noResults { display: none; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark landing-navbar fixed-top">
+        <div class="container">
+            <a class="navbar-brand landing-logo-brand" href="{% url 'landing' %}">
+                <img src="{% static 'img/logo.png' %}?v=2026" alt="Reserva"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block'">
+                <i class="fas fa-calendar-check" style="display:none"></i>
+                Reserva
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="landingNav">
+                <ul class="navbar-nav ms-auto align-items-center gap-2">
+                    <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'landing' %}" data-i18n="nav_home">Αρχική</a></li>
+                    <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'business_browser' %}" data-i18n="nav_businesses">Businesses</a></li>
+                    <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'features' %}" data-i18n="nav_features">Features</a></li>
+                    <li class="nav-item ms-2">
+                        <button id="langToggle" class="btn btn-sm lang-toggle-btn" onclick="toggleLanguage()" title="Switch language">
+                            <i class="fas fa-globe me-1"></i><span id="langLabel">EN</span>
+                        </button>
+                    </li>
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-sm px-3" href="{% url 'accounts:redirect_after_login' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="btn btn-gold-outline btn-sm px-3" href="{% url 'accounts:register_professional' %}"><i class="fas fa-briefcase me-1"></i><span data-i18n="nav_pro_cta">Είστε επαγγελματίας;</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" href="{% url 'accounts:login' %}" data-i18n="nav_login">Σύνδεση</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="dir-hero">
+        <div class="container-fluid px-4">
+            <div class="d-flex align-items-end justify-content-between flex-wrap gap-4">
+                <div>
+                    <p class="dir-hero-label" data-i18n="hero_label">Κατάλογος Επιχειρήσεων</p>
+                    <h1><span data-i18n="hero_title_1">Βρείτε &amp; κλείστε</span><br><span data-i18n="hero_title_2">ραντεβού online</span></h1>
+                    <p data-i18n="hero_sub">Επαληθευμένες επιχειρήσεις, άμεση κράτηση, χωρίς αναμονή.</p>
+                </div>
+                <div class="d-flex gap-0">
+                    <div class="hero-stat">
+                        <strong id="totalCount">0</strong>
+                        <span data-i18n="stat_businesses">Επιχειρήσεις</span>
+                    </div>
+                    <div class="hero-stat">
+                        <strong id="catCount">0</strong>
+                        <span data-i18n="stat_categories">Κατηγορίες</span>
+                    </div>
+                    <div class="hero-stat">
+                        <strong id="cityCount">0</strong>
+                        <span data-i18n="stat_cities">Πόλεις</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+    <div class="sidebar-toggle-tab" id="sidebarTab" onclick="toggleSidebar()">
+        <i class="fas fa-chevron-left" id="sidebarTabIcon" style="font-size:.6rem"></i>
+    </div>
+
+    <div class="dir-layout container-fluid px-0" id="dirLayout">
+        <aside class="dir-sidebar" id="sidebar">
+            <div class="mobile-sidebar-top">
+                <p class="mobile-sidebar-title" data-i18n="filters_btn">Φίλτρα</p>
+                <button class="mobile-sidebar-close" type="button" onclick="closeMobileSidebar()" aria-label="Close filters">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" data-i18n="filter_search">Αναζήτηση</div>
+                <div class="search-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Αναζήτηση επιχείρησης..." data-i18n-ph="search_ph" oninput="applyFilters()">
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" data-i18n="filter_category">Κατηγορία</div>
+                <div class="cat-list" id="categoryList">
+                    <button class="cat-pill active" data-cat="all" onclick="selectCategory(this)">
+                        <span class="cat-icon"><i class="fas fa-th"></i></span>
+                        <span data-i18n="cat_all">Όλες</span>
+                        <span class="cat-count" id="count-all">0</span>
+                    </button>
+                    {% for biz in businesses %}
+                    <button class="cat-pill d-none" data-cat="{{ biz.category }}" onclick="selectCategory(this)">
+                        <span class="cat-icon">
+                            <i class="fas
+                                {% if biz.category == 'health' %}fa-heart-pulse
+                                {% elif biz.category == 'beauty' %}fa-spa
+                                {% elif biz.category == 'fitness' %}fa-dumbbell
+                                {% elif biz.category == 'education' %}fa-graduation-cap
+                                {% elif biz.category == 'legal' %}fa-scale-balanced
+                                {% elif biz.category == 'accounting' %}fa-calculator
+                                {% elif biz.category == 'auto' %}fa-car
+                                {% elif biz.category == 'tech' %}fa-laptop-code
+                                {% else %}fa-circle-dot
+                                {% endif %}
+                            "></i>
+                        </span>
+                        {% if biz.category == 'other' and biz.custom_category_gr %}
+                        <span data-custom-category-gr="{{ biz.custom_category_gr }}" data-custom-category-en="{{ biz.custom_category_en|default:biz.custom_category_gr }}">{{ biz.custom_category_gr }}</span>
+                        {% else %}
+                        <span data-i18n-category="{{ biz.category }}">{{ biz.get_category_display }}</span>
+                        {% endif %}
+                        <span class="cat-count" id="count-{{ biz.category }}">0</span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" data-i18n="filter_city">Πόλη</div>
+                <select class="filter-select" id="cityFilter" onchange="applyFilters()">
+                    <option value="all" data-i18n="city_all">Όλες οι πόλεις</option>
+                </select>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" data-i18n="filter_rating">Αξιολόγηση</div>
+                <div class="rating-btns">
+                    <button class="rating-btn active" data-rating="0" onclick="selectRating(this)"><span data-i18n="rating_all">Όλες</span></button>
+                    <button class="rating-btn" data-rating="4" onclick="selectRating(this)"><i class="fas fa-star"></i>4+</button>
+                    <button class="rating-btn" data-rating="4.5" onclick="selectRating(this)"><i class="fas fa-star"></i>4.5+</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" data-i18n="filter_price">Τιμή</div>
+                <div class="price-btns">
+                    <button class="price-btn active" data-price="all" onclick="selectPrice(this)" data-i18n="price_all">Όλες</button>
+                    <button class="price-btn" data-price="€" onclick="selectPrice(this)">€</button>
+                    <button class="price-btn" data-price="€€" onclick="selectPrice(this)">€€</button>
+                    <button class="price-btn" data-price="€€€" onclick="selectPrice(this)">€€€</button>
+                </div>
+            </div>
+
+            <button class="clear-filters-btn" onclick="clearFilters()">
+                <i class="fas fa-rotate-left"></i>
+                <span data-i18n="clear_filters">Καθαρισμός φίλτρων</span>
+            </button>
+        </aside>
+
+        <main class="dir-content">
+            <div class="dir-toolbar">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <button class="mobile-filter-btn" onclick="openMobileSidebar()">
+                        <i class="fas fa-sliders"></i>
+                        <span data-i18n="filters_btn">Φίλτρα</span>
+                    </button>
+                    <p class="results-count mb-0"><strong id="visibleCount">0</strong> <span data-i18n="results_label">αποτελέσματα</span></p>
+                </div>
+                <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+                    <option value="featured" data-i18n="sort_featured">Προτεινόμενα</option>
+                    <option value="rating" data-i18n="sort_rating">Υψηλότερη βαθμολογία</option>
+                    <option value="name" data-i18n="sort_name">Αλφαβητικά</option>
+                    <option value="reviews" data-i18n="sort_reviews">Περισσότερες κριτικές</option>
+                </select>
+            </div>
+
+            <div class="active-filters" id="activeFilters"></div>
+
+            {% if businesses %}
+            <div class="biz-grid" id="bizGrid">
+                {% for biz in businesses %}
+                <article class="biz-card biz-item"
+                         data-id="{{ biz.id }}"
+                         data-name="{{ biz.name|lower }}"
+                         data-desc="{{ biz.description|default:''|lower }}"
+                         data-category="{{ biz.category }}"
+                         data-address="{{ biz.address|default:''|lower }}"
+                         data-rating="{{ biz.average_rating|default:0 }}"
+                         data-reviews="{{ biz.review_count|default:0 }}"
+                         data-price-tier="{% with services=biz.services.all %}{% if services %}{% for svc in services|slice:':1' %}{% if svc.price < 20 %}€{% elif svc.price < 50 %}€€{% else %}€€€{% endif %}{% endfor %}{% else %}€€{% endif %}{% endwith %}">
+
+                    <div class="biz-cover">
+                        {% if biz.logo %}
+                        <img src="{{ biz.logo.url }}" alt="{{ biz.name }}">
+                        {% else %}
+                        <div class="biz-cover-placeholder">
+                            <i class="fas
+                                {% if biz.category == 'health' %}fa-stethoscope
+                                {% elif biz.category == 'beauty' %}fa-cut
+                                {% elif biz.category == 'fitness' %}fa-dumbbell
+                                {% elif biz.category == 'education' %}fa-graduation-cap
+                                {% elif biz.category == 'legal' %}fa-gavel
+                                {% elif biz.category == 'accounting' %}fa-calculator
+                                {% elif biz.category == 'auto' %}fa-car
+                                {% elif biz.category == 'tech' %}fa-laptop-code
+                                {% else %}fa-store
+                                {% endif %}
+                            "></i>
+                        </div>
+                        {% endif %}
+                        <span class="biz-category-badge badge-{{ biz.category }}" data-cat-label>
+                            {% if biz.category == 'other' and biz.custom_category_gr %}
+                            <span data-custom-category-gr="{{ biz.custom_category_gr }}" data-custom-category-en="{{ biz.custom_category_en|default:biz.custom_category_gr }}">{{ biz.custom_category_gr }}</span>
+                            {% else %}
+                            <span data-i18n-category="{{ biz.category }}">{{ biz.get_category_display }}</span>
+                            {% endif %}
+                        </span>
+                        {% if biz.average_rating >= 4.8 %}
+                        <span class="featured-tag" data-i18n="featured_label">Προτεινόμενο</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="biz-body">
+                        <div class="biz-top">
+                            <h3 class="biz-name">{{ biz.name }}</h3>
+                            <div class="biz-rating">
+                                {% if biz.review_count %}
+                                <span class="score">{{ biz.average_rating|default:0|floatformat:1 }}</span>
+                                <i class="fas fa-star" style="color:#f5a623;font-size:.7rem"></i>
+                                <span class="reviews">({{ biz.review_count }})</span>
+                                {% else %}
+                                <span class="no-reviews" data-i18n="no_reviews">Χωρίς κριτικές</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="biz-meta">
+                            <span class="biz-meta-item"><i class="fas fa-location-dot"></i><span data-city-label>{{ biz.address|default:'-' }}</span></span>
+                            <span class="biz-meta-item"><i class="fas fa-tag"></i>
+                                {% with services=biz.services.all %}
+                                    {% if services %}
+                                        {% for svc in services|slice:':1' %}
+                                        <span data-i18n="from_label">από</span> {{ svc.price|floatformat:0 }}€
+                                        {% endfor %}
+                                    {% else %}
+                                        <span data-i18n="from_label">από</span> -
+                                    {% endif %}
+                                {% endwith %}
+                            </span>
+                        </div>
+
+                        <div class="biz-footer">
+                            <span class="biz-avail" data-i18n="available_now">Διαθέσιμο τώρα</span>
+                            <div class="d-flex gap-2">
+                                <a class="btn-book" href="{% url 'business_custom_page' biz.slug %}" data-i18n="open_page">Σελίδα</a>
+                                <a class="btn-book" href="{{ biz.get_booking_url }}" data-i18n="book_btn">Κλείστε ραντεβού</a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <h4 data-i18n="no_results_title">Δεν βρέθηκαν αποτελέσματα</h4>
+                <p data-i18n="no_results_sub">Δοκιμάστε διαφορετικά φίλτρα ή αναζήτηση.</p>
+            </div>
+            {% endif %}
+
+            <div class="empty-state" id="noResults">
+                <i class="fas fa-search"></i>
+                <h4 data-i18n="no_results_title">Δεν βρέθηκαν αποτελέσματα</h4>
+                <p data-i18n="no_results_sub">Δοκιμάστε διαφορετικά φίλτρα ή αναζήτηση.</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const T = {
+            gr: {
+                nav_home: 'Αρχική',
+                nav_businesses: 'Businesses',
+                nav_features: 'Features',
+                nav_login: 'Σύνδεση',
+                nav_pro_cta: 'Είστε επαγγελματίας;',
+                hero_label: 'Κατάλογος Επιχειρήσεων',
+                hero_title_1: 'Βρείτε & κλείστε',
+                hero_title_2: 'ραντεβού online',
+                hero_sub: 'Επαληθευμένες επιχειρήσεις, άμεση κράτηση, χωρίς αναμονή.',
+                stat_businesses: 'Επιχειρήσεις',
+                stat_categories: 'Κατηγορίες',
+                stat_cities: 'Πόλεις',
+                filter_search: 'Αναζήτηση',
+                search_ph: 'Αναζήτηση επιχείρησης...',
+                filter_category: 'Κατηγορία',
+                filter_city: 'Πόλη',
+                filter_rating: 'Αξιολόγηση',
+                filter_price: 'Τιμή',
+                cat_all: 'Όλες',
+                city_all: 'Όλες οι πόλεις',
+                rating_all: 'Όλες',
+                price_all: 'Όλες',
+                clear_filters: 'Καθαρισμός φίλτρων',
+                filters_btn: 'Φίλτρα',
+                results_label: 'αποτελέσματα',
+                sort_featured: 'Προτεινόμενα',
+                sort_rating: 'Υψηλότερη βαθμολογία',
+                sort_name: 'Αλφαβητικά',
+                sort_reviews: 'Περισσότερες κριτικές',
+                no_results_title: 'Δεν βρέθηκαν αποτελέσματα',
+                no_results_sub: 'Δοκιμάστε διαφορετικά φίλτρα ή αναζήτηση.',
+                book_btn: 'Κλείστε ραντεβού',
+                open_page: 'Σελίδα',
+                from_label: 'από',
+                featured_label: 'Προτεινόμενο',
+                no_reviews: 'Χωρίς κριτικές',
+                available_now: 'Διαθέσιμο τώρα',
+                city_serres: 'Σέρρες',
+                city_thessaloniki: 'Θεσσαλονίκη',
+                city_athens: 'Αθήνα',
+                city_other: 'Άλλη πόλη'
+            },
+            en: {
+                nav_home: 'Home',
+                nav_businesses: 'Businesses',
+                nav_features: 'Features',
+                nav_login: 'Login',
+                nav_pro_cta: 'Are you a professional?',
+                hero_label: 'Business Directory',
+                hero_title_1: 'Find & book',
+                hero_title_2: 'appointments online',
+                hero_sub: 'Verified businesses, instant booking, no waiting.',
+                stat_businesses: 'Businesses',
+                stat_categories: 'Categories',
+                stat_cities: 'Cities',
+                filter_search: 'Search',
+                search_ph: 'Search businesses...',
+                filter_category: 'Category',
+                filter_city: 'City',
+                filter_rating: 'Rating',
+                filter_price: 'Price',
+                cat_all: 'All',
+                city_all: 'All cities',
+                rating_all: 'All',
+                price_all: 'All',
+                clear_filters: 'Clear filters',
+                filters_btn: 'Filters',
+                results_label: 'results',
+                sort_featured: 'Featured',
+                sort_rating: 'Highest rated',
+                sort_name: 'Alphabetical',
+                sort_reviews: 'Most reviews',
+                no_results_title: 'No results found',
+                no_results_sub: 'Try different filters or search terms.',
+                book_btn: 'Book now',
+                open_page: 'Open page',
+                from_label: 'from',
+                featured_label: 'Featured',
+                no_reviews: 'No reviews',
+                available_now: 'Available now',
+                city_serres: 'Serres',
+                city_thessaloniki: 'Thessaloniki',
+                city_athens: 'Athens',
+                city_other: 'Other city'
+            }
+        };
+
+        const CAT_LABELS = {
+            gr: {
+                health: 'Υγεία', beauty: 'Ομορφιά', fitness: 'Fitness', education: 'Εκπαίδευση',
+                legal: 'Νομικά', accounting: 'Λογιστικά', auto: 'Αυτοκίνητο', tech: 'Τεχνολογία', other: 'Άλλο'
+            },
+            en: {
+                health: 'Health', beauty: 'Beauty', fitness: 'Fitness', education: 'Education',
+                legal: 'Legal', accounting: 'Accounting', auto: 'Auto', tech: 'Tech', other: 'Other'
+            }
+        };
+
+        // Known cities, with the spellings businesses actually type: Greek
+        // (accents are stripped before matching) and greeklish/latin.
+        // Matching one of these shows the city in the visitor's language, so
+        // "Kerkira" and "Κέρκυρα" appear as the same city and filter together.
+        const CITY_TABLE = [
+            { key: 'athens',         gr: 'Αθήνα',          en: 'Athens',         aliases: ['αθην', 'athen', 'athin'] },
+            { key: 'piraeus',        gr: 'Πειραιάς',       en: 'Piraeus',        aliases: ['πειραι', 'pirai', 'peiraia', 'piraeus'] },
+            { key: 'thessaloniki',   gr: 'Θεσσαλονίκη',    en: 'Thessaloniki',   aliases: ['θεσσαλον', 'thessalon', 'saloniki'] },
+            { key: 'patra',          gr: 'Πάτρα',          en: 'Patras',         aliases: ['πατρα', 'patra', 'patras'] },
+            { key: 'heraklion',      gr: 'Ηράκλειο',       en: 'Heraklion',      aliases: ['ηρακλει', 'irakli', 'herakli'] },
+            { key: 'larisa',         gr: 'Λάρισα',         en: 'Larissa',        aliases: ['λαρισ', 'laris'] },
+            { key: 'volos',          gr: 'Βόλος',          en: 'Volos',          aliases: ['βολος', 'volos'] },
+            { key: 'ioannina',       gr: 'Ιωάννινα',       en: 'Ioannina',       aliases: ['ιωαννιν', 'ioannin', 'giannena', 'giannina'] },
+            { key: 'trikala',        gr: 'Τρίκαλα',        en: 'Trikala',        aliases: ['τρικαλ', 'trikal'] },
+            { key: 'chalkida',       gr: 'Χαλκίδα',        en: 'Chalkida',       aliases: ['χαλκιδ', 'chalkid', 'halkid'] },
+            { key: 'serres',         gr: 'Σέρρες',         en: 'Serres',         aliases: ['σερρ', 'serr'] },
+            { key: 'alexandroupoli', gr: 'Αλεξανδρούπολη', en: 'Alexandroupoli', aliases: ['αλεξανδρουπ', 'alexandroup'] },
+            { key: 'xanthi',         gr: 'Ξάνθη',          en: 'Xanthi',         aliases: ['ξανθ', 'xanth'] },
+            { key: 'kavala',         gr: 'Καβάλα',         en: 'Kavala',         aliases: ['καβαλ', 'kaval'] },
+            { key: 'katerini',       gr: 'Κατερίνη',       en: 'Katerini',       aliases: ['κατεριν', 'katerin'] },
+            { key: 'kozani',         gr: 'Κοζάνη',         en: 'Kozani',         aliases: ['κοζαν', 'kozan'] },
+            { key: 'kalamata',       gr: 'Καλαμάτα',       en: 'Kalamata',       aliases: ['καλαματ', 'kalamat'] },
+            { key: 'rhodes',         gr: 'Ρόδος',          en: 'Rhodes',         aliases: ['ροδος', 'rodos', 'rhodes'] },
+            { key: 'chania',         gr: 'Χανιά',          en: 'Chania',         aliases: ['χανι', 'chania', 'hania'] },
+            { key: 'kerkyra',        gr: 'Κέρκυρα',        en: 'Corfu',          aliases: ['κερκυρ', 'kerkyr', 'kerkir', 'corfu'] },
+            { key: 'drama',          gr: 'Δράμα',          en: 'Drama',          aliases: ['δραμα', 'drama'] },
+            { key: 'veria',          gr: 'Βέροια',         en: 'Veria',          aliases: ['βεροι', 'veria', 'veroia'] },
+            { key: 'komotini',       gr: 'Κομοτηνή',       en: 'Komotini',       aliases: ['κομοτην', 'komotin'] },
+            { key: 'lamia',          gr: 'Λαμία',          en: 'Lamia',          aliases: ['λαμια', 'lamia'] },
+            { key: 'agrinio',        gr: 'Αγρίνιο',        en: 'Agrinio',        aliases: ['αγρινι', 'agrini'] },
+            { key: 'chios',          gr: 'Χίος',           en: 'Chios',          aliases: ['χιος', 'chios', 'hios'] },
+            { key: 'mytilini',       gr: 'Μυτιλήνη',       en: 'Mytilene',       aliases: ['μυτιλην', 'mytilin', 'mitilin'] },
+            { key: 'corinth',        gr: 'Κόρινθος',       en: 'Corinth',        aliases: ['κορινθ', 'korinth', 'corinth'] },
+            { key: 'tripoli',        gr: 'Τρίπολη',        en: 'Tripoli',        aliases: ['τριπολ', 'tripol'] },
+            { key: 'rethymno',       gr: 'Ρέθυμνο',        en: 'Rethymno',       aliases: ['ρεθυμν', 'rethymn', 'rethimn'] },
+            { key: 'nafplio',        gr: 'Ναύπλιο',        en: 'Nafplio',        aliases: ['ναυπλι', 'nafpli'] },
+            { key: 'karditsa',       gr: 'Καρδίτσα',       en: 'Karditsa',       aliases: ['καρδιτσ', 'karditsa'] },
+            { key: 'ptolemaida',     gr: 'Πτολεμαΐδα',     en: 'Ptolemaida',     aliases: ['πτολεμαιδ', 'ptolemaid'] },
+            { key: 'kilkis',         gr: 'Κιλκίς',         en: 'Kilkis',         aliases: ['κιλκι', 'kilkis'] },
+            { key: 'florina',        gr: 'Φλώρινα',        en: 'Florina',        aliases: ['φλωριν', 'florin'] },
+            { key: 'grevena',        gr: 'Γρεβενά',        en: 'Grevena',        aliases: ['γρεβεν', 'greven'] },
+            { key: 'preveza',        gr: 'Πρέβεζα',        en: 'Preveza',        aliases: ['πρεβεζ', 'prevez'] },
+            { key: 'arta',           gr: 'Άρτα',           en: 'Arta',           aliases: ['αρτα', 'arta'] },
+            { key: 'sparti',         gr: 'Σπάρτη',         en: 'Sparta',         aliases: ['σπαρτ', 'sparti', 'sparta'] },
+            { key: 'thiva',          gr: 'Θήβα',           en: 'Thebes',         aliases: ['θηβα', 'thiva', 'thebes'] },
+            { key: 'livadeia',       gr: 'Λιβαδειά',       en: 'Livadeia',       aliases: ['λιβαδει', 'livadei', 'levadia'] },
+            { key: 'pyrgos',         gr: 'Πύργος',         en: 'Pyrgos',         aliases: ['πυργος', 'pyrgos', 'pirgos'] }
+        ];
+
+        // Greek is normally typed with accents ("Αθήνα", "Σέρρες"), so the
+        // unaccented aliases above only match once the marks are stripped.
+        function stripAccents(text) {
+            return (text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
+        // Cities found in addresses that are not one of the translated ones above.
+        // Maps generated key -> the city name exactly as the business typed it.
+        const CITY_DISPLAY = {};
+
+        let lang = localStorage.getItem('lang') || 'gr';
+        let activeCategory = 'all';
+        let activeRating = 0;
+        let activePrice = 'all';
+        let activeCity = 'all';
+
+        // "Ερμού 12, Κατερίνη 601 00" -> ["Ερμού", "Κατερίνη"]
+        // Splits on commas and drops street/postal numbers.
+        function addressParts(address) {
+            return (address || '')
+                .split(',')
+                .map(p => p.replace(/[0-9]+/g, ' ').replace(/\s+/g, ' ').trim())
+                .filter(Boolean);
+        }
+
+        // Returns the CITY_TABLE key for a single fragment, or null.
+        function matchKnownCity(text) {
+            const probe = stripAccents(text).toLowerCase();
+            if (!probe) return null;
+            for (const entry of CITY_TABLE) {
+                if (entry.aliases.some(alias => probe.includes(alias))) return entry.key;
+            }
+            return null;
+        }
+
+        // Accents are stripped for the key so "Κατερίνη" and "Κατερινη"
+        // group into one filter entry.
+        function cityKeyFor(cityName) {
+            return 'city_' + stripAccents(cityName).toLowerCase().replace(/\s+/g, '_');
+        }
+
+        function detectCityKey(address) {
+            const parts = addressParts(address);
+            if (!parts.length) return 'other';
+
+            // Greek addresses usually end with the city ("Ερμού 12, Κατερίνη"),
+            // so the last part gets priority. Checking it first also stops a
+            // street named after a city from winning: in "Σπάρτης 3, Άρτα"
+            // the answer must be Άρτα, not Σπάρτη.
+            const last = parts[parts.length - 1];
+            let key = matchKnownCity(last);
+
+            // Some businesses put the city first ("Kerkira, Biro"), so if the
+            // last part is not a city, look for a known one anywhere.
+            if (!key) {
+                for (const part of parts) {
+                    key = matchKnownCity(part);
+                    if (key) break;
+                }
+            }
+            if (key) return key;
+
+            // No known city. With several parts the last one is still the best
+            // guess; with only one, let the caller print the address as typed.
+            if (parts.length > 1) {
+                const generated = cityKeyFor(last);
+                CITY_DISPLAY[generated] = last;
+                return generated;
+            }
+            return 'other';
+        }
+
+        function cityLabel(cityKey) {
+            const t = T[lang];
+            const known = CITY_TABLE.find(entry => entry.key === cityKey);
+            if (known) return lang === 'en' ? known.en : known.gr;
+            if (CITY_DISPLAY[cityKey]) return CITY_DISPLAY[cityKey];
+            return t.city_other;
+        }
+
+        function applyTranslations() {
+            const t = T[lang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key] !== undefined) el.innerHTML = t[key];
+            });
+
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if (t[key] !== undefined) el.placeholder = t[key];
+            });
+
+            document.querySelectorAll('[data-i18n-category]').forEach(el => {
+                const cat = el.getAttribute('data-i18n-category');
+                if (CAT_LABELS[lang][cat]) el.textContent = CAT_LABELS[lang][cat];
+            });
+
+            document.querySelectorAll('[data-custom-category-gr]').forEach(el => {
+                const gr = el.getAttribute('data-custom-category-gr') || '';
+                const en = el.getAttribute('data-custom-category-en') || '';
+                el.textContent = lang === 'en' ? (en || gr) : (gr || en);
+            });
+
+            document.querySelectorAll('.biz-item').forEach(item => {
+                const cityKey = item.dataset.city || 'other';
+                const cityLabelEl = item.querySelector('[data-city-label]');
+                if (!cityLabelEl) return;
+                // No city could be read from the address: keep whatever the
+                // business actually entered rather than replacing it with
+                // a generic "other city".
+                cityLabelEl.textContent = (cityKey === 'other' && item.dataset.addressDisplay)
+                    ? item.dataset.addressDisplay
+                    : cityLabel(cityKey);
+            });
+
+            const langLabel = document.getElementById('langLabel');
+            if (langLabel) langLabel.textContent = lang === 'gr' ? 'EN' : 'ΕΛ';
+            document.documentElement.lang = lang === 'gr' ? 'el' : 'en';
+        }
+
+        function toggleLanguage() {
+            lang = lang === 'gr' ? 'en' : 'gr';
+            localStorage.setItem('lang', lang);
+            applyTranslations();
+            updateCitySelectLabels();
+            updateActiveTags();
+        }
+
+        function selectCategory(btn) {
+            document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeCategory = btn.getAttribute('data-cat');
+            applyFilters();
+        }
+
+        function selectRating(btn) {
+            document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeRating = parseFloat(btn.getAttribute('data-rating'));
+            applyFilters();
+        }
+
+        function selectPrice(btn) {
+            document.querySelectorAll('.price-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activePrice = btn.getAttribute('data-price');
+            applyFilters();
+        }
+
+        function clearFilters() {
+            activeCategory = 'all';
+            activeRating = 0;
+            activePrice = 'all';
+            activeCity = 'all';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('cityFilter').value = 'all';
+            document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+            const allCatBtn = document.querySelector('.cat-pill[data-cat="all"]');
+            if (allCatBtn) allCatBtn.classList.add('active');
+            document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('active'));
+            const allRatingBtn = document.querySelector('.rating-btn[data-rating="0"]');
+            if (allRatingBtn) allRatingBtn.classList.add('active');
+            document.querySelectorAll('.price-btn').forEach(b => b.classList.remove('active'));
+            const allPriceBtn = document.querySelector('.price-btn[data-price="all"]');
+            if (allPriceBtn) allPriceBtn.classList.add('active');
+            applyFilters();
+        }
+
+        function applyFilters() {
+            activeCity = document.getElementById('cityFilter').value;
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const sort = document.getElementById('sortSelect').value;
+
+            const items = Array.from(document.querySelectorAll('.biz-item'));
+
+            items.forEach(item => {
+                const name = item.dataset.name || '';
+                const desc = item.dataset.desc || '';
+                const category = item.dataset.category || '';
+                const city = item.dataset.city || 'other';
+                const rating = parseFloat(item.dataset.rating || '0');
+                const priceTier = item.dataset.priceTier || '€€';
+
+                const queryOk = !query || name.includes(query) || desc.includes(query);
+                const catOk = activeCategory === 'all' || category === activeCategory;
+                const cityOk = activeCity === 'all' || city === activeCity;
+                const ratingOk = activeRating === 0 || rating >= activeRating;
+                const priceOk = activePrice === 'all' || priceTier === activePrice;
+
+                item.style.display = queryOk && catOk && cityOk && ratingOk && priceOk ? '' : 'none';
+            });
+
+            const visible = items.filter(item => item.style.display !== 'none');
+
+            visible.sort((a, b) => {
+                if (sort === 'rating') return parseFloat(b.dataset.rating || '0') - parseFloat(a.dataset.rating || '0');
+                if (sort === 'reviews') return parseInt(b.dataset.reviews || '0', 10) - parseInt(a.dataset.reviews || '0', 10);
+                if (sort === 'name') return (a.dataset.name || '').localeCompare(b.dataset.name || '', lang === 'gr' ? 'el' : 'en');
+                const aFeatured = a.querySelector('.featured-tag') ? 1 : 0;
+                const bFeatured = b.querySelector('.featured-tag') ? 1 : 0;
+                return bFeatured - aFeatured;
+            });
+
+            const grid = document.getElementById('bizGrid');
+            visible.forEach(item => grid.appendChild(item));
+
+            document.getElementById('visibleCount').textContent = visible.length;
+            document.getElementById('noResults').style.display = visible.length === 0 ? 'block' : 'none';
+
+            updateActiveTags();
+        }
+
+        function updateActiveTags() {
+            const t = T[lang];
+            const wrap = document.getElementById('activeFilters');
+            const tags = [];
+
+            if (activeCategory !== 'all') {
+                const catLabel = CAT_LABELS[lang][activeCategory] || activeCategory;
+                tags.push('<span class="active-filter-tag">' + catLabel + '<button onclick="clearCat()"><i class="fas fa-times"></i></button></span>');
+            }
+            if (activeCity !== 'all') {
+                tags.push('<span class="active-filter-tag">' + cityLabel(activeCity) + '<button onclick="clearCity()"><i class="fas fa-times"></i></button></span>');
+            }
+            if (activeRating > 0) {
+                tags.push('<span class="active-filter-tag">' + activeRating + '+ ★<button onclick="clearRating()"><i class="fas fa-times"></i></button></span>');
+            }
+            if (activePrice !== 'all') {
+                tags.push('<span class="active-filter-tag">' + activePrice + '<button onclick="clearPrice()"><i class="fas fa-times"></i></button></span>');
+            }
+
+            wrap.innerHTML = tags.join('');
+        }
+
+        function clearCat() {
+            activeCategory = 'all';
+            document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+            const allBtn = document.querySelector('.cat-pill[data-cat="all"]');
+            if (allBtn) allBtn.classList.add('active');
+            applyFilters();
+        }
+
+        function clearCity() {
+            activeCity = 'all';
+            document.getElementById('cityFilter').value = 'all';
+            applyFilters();
+        }
+
+        function clearRating() {
+            activeRating = 0;
+            document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('active'));
+            const allBtn = document.querySelector('.rating-btn[data-rating="0"]');
+            if (allBtn) allBtn.classList.add('active');
+            applyFilters();
+        }
+
+        function clearPrice() {
+            activePrice = 'all';
+            document.querySelectorAll('.price-btn').forEach(b => b.classList.remove('active'));
+            const allBtn = document.querySelector('.price-btn[data-price="all"]');
+            if (allBtn) allBtn.classList.add('active');
+            applyFilters();
+        }
+
+        function updateCounts() {
+            const items = Array.from(document.querySelectorAll('.biz-item'));
+            const cats = {};
+            const cities = new Set();
+
+            items.forEach(item => {
+                const cat = item.dataset.category || 'other';
+                const city = item.dataset.city || 'other';
+                cats[cat] = (cats[cat] || 0) + 1;
+                cities.add(city);
+            });
+
+            document.getElementById('count-all').textContent = items.length;
+            document.getElementById('totalCount').textContent = items.length;
+            document.getElementById('catCount').textContent = Object.keys(cats).length;
+            document.getElementById('cityCount').textContent = cities.size;
+
+            Object.keys(cats).forEach(cat => {
+                const countEl = document.getElementById('count-' + cat);
+                if (countEl) countEl.textContent = cats[cat];
+            });
+        }
+
+        function setupCategoryButtons() {
+            const buttons = Array.from(document.querySelectorAll('.cat-pill[data-cat]'));
+            const seen = new Set(['all']);
+
+            buttons.forEach(btn => {
+                const cat = btn.dataset.cat;
+                if (cat === 'all') return;
+                if (seen.has(cat)) {
+                    btn.remove();
+                    return;
+                }
+                seen.add(cat);
+                btn.classList.remove('d-none');
+            });
+        }
+
+        function setupCities() {
+            const items = document.querySelectorAll('.biz-item');
+            const cityFilter = document.getElementById('cityFilter');
+            const presentCities = new Set();
+
+            items.forEach(item => {
+                // The server rendered the real address here; capture it before
+                // applyTranslations() replaces the text with a city label.
+                const labelEl = item.querySelector('[data-city-label]');
+                const printed = labelEl ? labelEl.textContent.trim() : '';
+                if (printed && printed !== '-') item.dataset.addressDisplay = printed;
+
+                const cityKey = detectCityKey(printed || item.dataset.address || '');
+                item.dataset.city = cityKey;
+                presentCities.add(cityKey);
+            });
+
+            Array.from(cityFilter.querySelectorAll('option:not([value="all"])')).forEach(option => option.remove());
+
+            Array.from(presentCities)
+                .sort((a, b) => cityLabel(a).localeCompare(cityLabel(b), 'el'))
+                .forEach(cityKey => {
+                    const option = document.createElement('option');
+                    option.value = cityKey;
+                    option.dataset.cityKey = cityKey;
+                    option.textContent = cityLabel(cityKey);
+                    cityFilter.appendChild(option);
+                });
+        }
+
+        function updateCitySelectLabels() {
+            const cityFilter = document.getElementById('cityFilter');
+            Array.from(cityFilter.options).forEach(opt => {
+                if (opt.value === 'all') {
+                    opt.textContent = T[lang].city_all;
+                } else {
+                    opt.textContent = cityLabel(opt.value);
+                }
+            });
+        }
+
+        function toggleSidebar() {
+            const layout = document.getElementById('dirLayout');
+            const tab = document.getElementById('sidebarTab');
+            const icon = document.getElementById('sidebarTabIcon');
+            const isHidden = layout.classList.toggle('sidebar-hidden');
+            tab.style.left = isHidden ? '0' : '280px';
+            icon.className = isHidden ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
+            icon.style.fontSize = '.6rem';
+        }
+
+        function openMobileSidebar() {
+            document.getElementById('sidebar').classList.add('mobile-open');
+            document.getElementById('sidebarOverlay').classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileSidebar() {
+            document.getElementById('sidebar').classList.remove('mobile-open');
+            document.getElementById('sidebarOverlay').classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            setupCategoryButtons();
+            setupCities();
+            updateCounts();
+            applyTranslations();
+            updateCitySelectLabels();
+            applyFilters();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Αίτημα Διαγραφής Επιχείρησης - Reserva{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Αίτημα Διαγραφής Επιχείρησης</h4>
+                </div>
+                <div class="card-body p-5">
+                    <div class="alert alert-warning" role="alert">
+                        <strong>⚠️ Σημαντικό!</strong> Το αίτημα διαγραφής θα αποσταλεί στο διαχειριστή του συστήματος για αποδοχή.
+                    </div>
+
+                    <h5 class="mt-4 mb-3">Επιχείρηση:</h5>
+                    <p class="fs-5 fw-bold">{{ business.name }}</p>
+                    <p class="text-muted">{{ business.category_label }}</p>
+
+                    <h5 class="mt-4 mb-3">Τι θα συμβεί:</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-envelope"></i> Το αίτημα θα αποσταλεί στο διαχειριστή</li>
+                        <li class="mb-2"><i class="bi bi-hourglass-split"></i> Θα περιμένετε για έγκριση</li>
+                        <li class="mb-2"><i class="bi bi-power"></i> Όταν εγκριθεί, η επιχείρηση θα απενεργοποιηθεί</li>
+                        <li class="mb-2"><i class="bi bi-calendar-x"></i> Θα σταματήσουν όλα τα ραντεβού</li>
+                        <li class="mb-2"><i class="bi bi-archive"></i> Τα δεδομένα θα διατηρηθούν για αρχειακούς σκοπούς</li>
+                    </ul>
+
+                    <form method="post" class="mt-5">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="reason" class="form-label">Λόγος Διαγραφής (Προαιρετικό)</label>
+                            <textarea 
+                                class="form-control" 
+                                id="reason" 
+                                name="reason"
+                                rows="4"
+                                placeholder="Προαιρετικά, εξηγήστε γιατί θέλετε να διαγράψετε την επιχείρηση..."
+                            ></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input 
+                                    type="checkbox" 
+                                    class="form-check-input" 
+                                    id="confirm_check"
+                                    onchange="toggleSubmitButton()"
+                                >
+                                <label class="form-check-label" for="confirm_check">
+                                    Επιβεβαιώνω ότι θέλω να διαγράψω την επιχείρηση και κατανοώ τις συνέπειες.
+                                </label>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="confirm" id="confirm_input" value="no">
+
+                        <button 
+                            type="submit" 
+                            class="btn btn-danger btn-lg w-100 mb-3"
+                            id="submit_btn"
+                            disabled
+                            onclick="setConfirmValue()"
+                        >
+                            Αποστολή Αιτήματος
+                        </button>
+
+                        <a href="{% url 'businesses:dashboard' %}" class="btn btn-secondary btn-lg w-100">
+                            Ακύρωση
+                        </a>
+                    </form>
+
+                    {% if messages %}
+                        <div class="mt-4">
+                            {% for message in messages %}
+                                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p class="text-muted">
+                    <a href="{% url 'businesses:dashboard' %}">Επιστροφή στη διαχείριση</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleSubmitButton() {
+    const checkbox = document.getElementById('confirm_check');
+    const btn = document.getElementById('submit_btn');
+    btn.disabled = !checkbox.checked;
+}
+
+function setConfirmValue() {
+    document.getElementById('confirm_input').value = 'yes';
+}
+</script>
+
+<style>
+.list-unstyled li i {
+    color: #dc3545;
+    margin-right: 8px;
+    font-weight: bold;
+}
+</style>
+{% endblock %}

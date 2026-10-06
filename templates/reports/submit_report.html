@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Αναφορά Επιχείρησης — Reserva{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:700px;">
+
+    <!-- Back -->
+    <a href="{% url 'accounts:my_bookings' %}" class="btn btn-outline-secondary btn-sm mb-4">
+        <i class="fas fa-arrow-left me-1"></i>
+        <span class="lang-gr">Επιστροφή</span>
+        <span class="lang-en" style="display:none">Back</span>
+    </a>
+
+    <div class="card shadow border-0">
+        <div class="card-header" style="background:linear-gradient(135deg,#c9a227,#f0c04a);color:#1a1400;">
+            <h4 class="mb-0 fw-bold">
+                <i class="fas fa-flag me-2"></i>
+                <span class="lang-gr">Αναφορά Επιχείρησης</span>
+                <span class="lang-en" style="display:none">Report Business</span>
+            </h4>
+        </div>
+        <div class="card-body p-4">
+
+            <div class="alert alert-info mb-4">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong class="lang-gr">Αναφέρετε:</strong>
+                <strong class="lang-en" style="display:none">Reporting:</strong>
+                <span class="fw-semibold">{{ business.name }}</span>
+            </div>
+
+            {% if booking %}
+            <div class="alert alert-light border mb-4">
+                <i class="fas fa-calendar-check me-2 text-muted"></i>
+                <span class="lang-gr">Σχετικό ραντεβού:</span>
+                <span class="lang-en" style="display:none">Related booking:</span>
+                {{ booking.service.name }} — {{ booking.date|date:"d/m/Y" }} {{ booking.start_time|time:"H:i" }}
+            </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                {% if booking %}<input type="hidden" name="booking_id" value="{{ booking.id }}">{% endif %}
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        <i class="fas fa-tag me-1"></i>
+                        <span class="lang-gr">Κατηγορία Αναφοράς</span>
+                        <span class="lang-en" style="display:none">Report Category</span>
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="row g-2">
+                        {% for cat_value, cat_label in categories %}
+                        <div class="col-md-6">
+                            <div class="form-check border rounded p-3 h-100 category-card" style="cursor:pointer;">
+                                <input class="form-check-input" type="radio" name="category"
+                                       id="cat_{{ cat_value }}" value="{{ cat_value }}" required>
+                                <label class="form-check-label w-100" for="cat_{{ cat_value }}" style="cursor:pointer;">
+                                    {% if cat_value == 'missed_appointment' %}
+                                        <i class="fas fa-calendar-times text-danger me-2"></i>
+                                    {% elif cat_value == 'offensive_language' %}
+                                        <i class="fas fa-comment-slash text-warning me-2"></i>
+                                    {% elif cat_value == 'no_show_business' %}
+                                        <i class="fas fa-store-slash text-danger me-2"></i>
+                                    {% elif cat_value == 'poor_service' %}
+                                        <i class="fas fa-thumbs-down text-secondary me-2"></i>
+                                    {% elif cat_value == 'fraud' %}
+                                        <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                                    {% else %}
+                                        <i class="fas fa-ellipsis-h text-muted me-2"></i>
+                                    {% endif %}
+                                    {{ cat_label }}
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold" for="description">
+                        <i class="fas fa-align-left me-1"></i>
+                        <span class="lang-gr">Περιγραφή</span>
+                        <span class="lang-en" style="display:none">Description</span>
+                        <span class="text-danger">*</span>
+                    </label>
+                    <textarea name="description" id="description" class="form-control" rows="5"
+                              placeholder="Περιγράψτε τι συνέβη με όσο το δυνατόν περισσότερες λεπτομέρειες..."
+                              required minlength="10">{{ request.POST.description }}</textarea>
+                    <div class="form-text lang-gr">Ελάχιστο 10 χαρακτήρες. Η αναφορά σας θα παραμείνει εμπιστευτική.</div>
+                    <div class="form-text lang-en" style="display:none">Minimum 10 characters. Your report will remain confidential.</div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-danger flex-grow-1">
+                        <i class="fas fa-flag me-2"></i>
+                        <span class="lang-gr">Υποβολή Αναφοράς</span>
+                        <span class="lang-en" style="display:none">Submit Report</span>
+                    </button>
+                    <a href="{% url 'accounts:my_bookings' %}" class="btn btn-outline-secondary">
+                        <span class="lang-gr">Άκυρο</span>
+                        <span class="lang-en" style="display:none">Cancel</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.category-card:has(input:checked) {
+    border-color: #c9a227 !important;
+    background: rgba(201,162,39,.08);
+}
+.category-card:hover { background: rgba(0,0,0,.03); }
+</style>
+{% endblock %}
