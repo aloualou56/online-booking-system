@@ -7,20 +7,13 @@ from flask import Flask, request, abort
 
 app = Flask(__name__)
 
-# --- CONFIGURATION ---
-# Generate a long random secret and export it as the WEBHOOK_SECRET environment variable.
-# IMPORTANT: This secret MUST match the one you set in your GitHub webhook settings.
+# Must match the secret set in the GitHub webhook settings.
 WEBHOOK_SECRET = os.environ.get('WEBHOOK_SECRET', '')
 if not WEBHOOK_SECRET:
     sys.exit('WEBHOOK_SECRET environment variable is required.')
-# The path to your deployment script
 DEPLOYMENT_SCRIPT_PATH = './deploy.sh'
-# --- END CONFIGURATION ---
 
 def is_valid_signature(signature, payload):
-    """
-    Validates the GitHub webhook signature.
-    """
     if not signature:
         print("Signature missing!")
         return False
@@ -73,7 +66,5 @@ def webhook():
     return "Ping event received.", 200
 
 if __name__ == '__main__':
-    # Make sure to use a production-ready server like Gunicorn or Waitress in a real setup
-    # For simplicity, we use Flask's built-in server here.
-    # Listen on all interfaces on port 5000
+    # dev server; put gunicorn/waitress in front for real use
     app.run(host='0.0.0.0', port=5000)

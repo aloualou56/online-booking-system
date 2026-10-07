@@ -7,13 +7,10 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-# --- CONFIGURATION ---
-# The absolute path to your project directory on your server
+# project dir on the server
 PROJECT_DIR="/path/to/Project_online"
-# The user that the web server runs as (e.g., www-data, nginx, or your own user)
-# This is important for file permissions. We'll use the current user for simplicity.
+# user the web server runs as (for file permissions)
 WEB_USER=$(whoami) 
-# --- END CONFIGURATION ---
 
 echo "Starting deployment..."
 
@@ -58,8 +55,7 @@ echo "Static files collected."
 
 # Restart the application server
 #
-# --- IMPORTANT ---
-# The following lines are examples. You MUST adapt them to how you run your server.
+# examples below, adapt to your setup
 #
 # If you are using the Django development server (for testing only):
 # You will need to find and kill the old process to restart it.
